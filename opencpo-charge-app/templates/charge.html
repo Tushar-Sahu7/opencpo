@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}{{ t.charging | default('Charging') }} — {{ display_name }}{% endblock %}
+{% block content %}
+<div class="screen active">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg,#0a1929);border-bottom:1px solid var(--border,#1e3a5f);position:sticky;top:0;z-index:800;">
+    <a href="/" style="color:var(--text2,#94a3b8);text-decoration:none;font-size:20px;line-height:1;">←</a>
+    <a href="/" style="display:flex;align-items:center;text-decoration:none;"><span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span></a>
+  </div>
+
+  <div class="page-content">
+    <div class="charger-card">
+      <div class="charger-location" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+          <span class="location-icon">📍</span>
+          <span class="location-name">{{ display_name }}</span>
+        </div>
+        {% if flags.get('favorites') %}
+        <button
+          id="fav-btn"
+          class="fav-btn"
+          onclick="toggleFavorite('{{ cp_id }}', '{{ display_name | e }}', '{{ address | default('', true) | e }}', {{ lat | default('null') }}, {{ lng | default('null') }})"
+          title="{{ t.save_favorite | default('Save as favourite') }}"
+          aria-label="{{ t.favorites | default('Favourite') }}"
+          style="
+            background:none; border:none; cursor:pointer; padding:4px;
+            font-size:22px; line-height:1; flex-shrink:0;
+            color:#64748b; transition:color 0.15s, transform 0.15s;
+          "
+        >♡</button>
+        {% endif %}
+      </div>
+      <h2 class="charger-title">⚡ {{ t.connector | default('Connector') }} {{ connector }}</h2>
+      {% if evse_id %}
+        <div style="font-size:12px;color:var(--text3);margin-bottom:12px;font-family:monospace;">{{ evse_id }}</div>
+      {% endif %}
+
+      {# Status badge #}
+      {% if conn_status == "Available" %}
+        <div class="status-badge available">● {{ t.available | default('Available') }}</div>
+      {% elif conn_status == "Preparing" %}
+        <div class="status-badge preparing"><span class="live-dot" style="background:var(--yellow);"></span> {{ t.preparing | default('Cable connected') }}</div>
+      {% elif conn_status in ["Charging", "SuspendedEV", "SuspendedEVSE", "Finishing"] %}
+        <div class="status-badge occupied">🔵 {{ t.occupied_in_use | default('In use') }}</div>
+      {% else %}
+        <div class="status-badge available">● {{ t.available | default('Available') }}</div>
+      {% endif %}
+
+      {# Rate display #}
+      <div class="rate-display">
+        <div class="rate-value">
+          {% if rate_value %}{{ rate_value }}{% else %}—{% endif %}
+        </div>
+        <div class="rate-label">{{ rate_label }}</div>
+        <div class="rate-note">{{ t.incl_btw | default('incl. VAT') }} &bull; {{ t.rate_updated | default('Updated every 15 min') }}</div>
+      </div>
+
+      {# Step guide #}
+      <div class="step-guide">
+        <div class="step-item {% if conn_status == 'Available' %}active{% elif conn_status == 'Preparing' %}done{% endif %}">
+          <span class="step-icon">{% if conn_status == 'Preparing' %}✅{% else %}🔌{% endif %}</span>
+          <div>
+            <div class="step-title">
+              {% if conn_status == 'Preparing' %}{{ t.step1_connected | default('Step 1: Cable connected ✓') }}{% else %}{{ t.step1_connect | default('Step 1: Connect the cable') }}{% endif %}
+            </div>
+            <div class="step-desc">{{ t.step1_desc | default('Connect the charging cable to your car') }}</div>
+          </div>
+        </div>
+        <div class="step-item {% if conn_status == 'Preparing' %}active{% endif %}">
+          <span class="step-icon">💳</span>
+          <div>
+            <div class="step-title">{{ t.step2_pay | default('Step 2: Pay') }}</div>
+            <div class="step-desc">{{ t.step2_desc | default('Pay securely') }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-note">
+        {{ t.preauth_prefix | default("A") }} <strong>{{ preauth_amount }} {{ t.preauth_label | default('authorisation') }}</strong> {{ t.preauth_suffix | default('will be taken.') }}
+        {{ t.preauth_detail | default('You only pay for the energy actually consumed.') }}
+      </div>
+
+      {% if charger_error %}
+        <div class="error-card">{{ t.charger_warning | default('Warning: could not retrieve charger status.') }}</div>
+      {% endif %}
+
+      {# Cost Estimator — flag-gated #}
+      {% if flags.get('cost_estimator') %}
+      <div id="cost-estimator"
+           data-tariff="{{ tariff_kwh_raw }}"
+           data-power="{{ charger_power_kw }}"
+           style="margin:20px 0; padding:16px; background:var(--card2, rgba(255,255,255,0.05)); border:1px solid var(--accent, #00B0E4); border-radius:12px;">
+        <div style="font-size:14px; font-weight:600; color:var(--accent,#00B0E4); margin-bottom:12px;">🔢 {{ t.estimator_title | default('Cost estimate') }}</div>
+        <label for="kwh-slider" style="font-size:13px; color:var(--text2,#c0d0e0); display:block; margin-bottom:8px;">
+          {{ t.estimator_slider_label | default('How much do you want to charge?') }}
+        </label>
+        <input type="range" id="kwh-slider" min="5" max="100" step="1" value="30"
+               style="width:100%; accent-color:var(--accent,#00B0E4); cursor:pointer;" />
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+          <div>
+            <div id="est-cost" style="font-size:20px; font-weight:700; color:var(--text1,#fff);">—</div>
+            <div style="font-size:11px; color:var(--text3,#6a8aa0); margin-top:2px;">{{ t.incl_btw | default('incl. VAT') }}</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="est-time" style="font-size:14px; font-weight:600; color:var(--text2,#c0d0e0);">—</div>
+            <div style="font-size:11px; color:var(--text3,#6a8aa0); margin-top:2px;">{{ t.estimated_time | default('estimated charge time') }}</div>
+          </div>
+        </div>
+      </div>
+      <script>
+      (function() {
+        var el = document.getElementById('cost-estimator');
+        var slider = document.getElementById('kwh-slider');
+        var tariff = parseFloat(el.dataset.tariff) || 0;
+        var power = parseFloat(el.dataset.power) || 0;
+        var I18N = window.I18N || {};
+
+        function dutchNumber(n) {
+          return n.toFixed(2).replace('.', ',');
+        }
+
+        function update() {
+          var kwh = parseInt(slider.value, 10);
+          if (tariff > 0) {
+            var cost = kwh * tariff * 1.21;
+            document.getElementById('est-cost').textContent =
+              '~\u20AC' + dutchNumber(cost) + ' ' + (I18N.estimator_kwh_selected ? 'for ' + kwh + ' kWh' : 'for ' + kwh + ' kWh');
+          } else {
+            document.getElementById('est-cost').textContent = kwh + ' kWh ' + (I18N.estimator_kwh_selected || 'selected');
+          }
+          if (power > 0) {
+            var mins = Math.round((kwh / power) * 60);
+            var h = Math.floor(mins / 60);
+            var m = mins % 60;
+            var at = I18N.estimator_charge_time_at || 'at';
+            var minLabel = I18N.estimator_minutes || 'min';
+            var timeStr = h > 0 ? ('~' + h + ' u ' + m + ' min') : ('~' + m + ' ' + minLabel);
+            document.getElementById('est-time').textContent = timeStr + ' ' + at + ' ' + power + ' kW';
+          } else {
+            document.getElementById('est-time').textContent = '';
+          }
+        }
+
+        slider.addEventListener('input', update);
+        update();
+      })();
+      </script>
+      {% endif %}
+
+      {# Start button — only enabled when Available or Preparing #}
+      {% if conn_status in ["Charging", "SuspendedEV", "SuspendedEVSE", "Finishing"] %}
+        <button class="btn btn-primary" disabled>{{ t.charger_busy | default('Charger in use') }}</button>
+      {% elif conn_status == "Preparing" %}
+        <a href="/auth/{{ cp_id }}/{{ connector }}{% if qr_code %}?qr_code={{ qr_code }}{% if site_id %}&site_id={{ site_id }}{% endif %}{% if evse_id %}&evse_id={{ evse_id }}{% endif %}{% endif %}" class="btn btn-primary btn-ready">
+          ✓ {{ t.pay_and_charge | default('Pay now') }} →
+        </a>
+      {% else %}
+        <a href="/auth/{{ cp_id }}/{{ connector }}{% if qr_code %}?qr_code={{ qr_code }}{% if site_id %}&site_id={{ site_id }}{% endif %}{% if evse_id %}&evse_id={{ evse_id }}{% endif %}{% endif %}" class="btn btn-primary">
+          {{ t.start_charging | default('Start charging') }} →
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="app-footer">
+    {{ t.powered_by | default('Powered by ' ~ app_title) }}
+  </div>
+</div>
+
+{% if flags.get('favorites') %}
+<script>
+(function () {
+  var CP_ID = '{{ cp_id }}';
+  var FAV_KEY = 'favorites';
+  var I18N = window.I18N || {};
+
+  function loadFavorites() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); }
+    catch (e) { return []; }
+  }
+
+  function saveFavorites(favs) {
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
+  }
+
+  function isSaved(cpId) {
+    return loadFavorites().some(function (f) { return f.cp_id === cpId; });
+  }
+
+  function updateBtn(saved) {
+    var btn = document.getElementById('fav-btn');
+    if (!btn) return;
+    btn.textContent = saved ? '♥' : '♡';
+    btn.style.color = saved ? '#ef4444' : '#64748b';
+    btn.style.transform = saved ? 'scale(1.15)' : 'scale(1)';
+    btn.title = saved
+      ? (I18N.remove_favorite || 'Remove from favourites')
+      : (I18N.save_favorite || 'Save as favourite');
+  }
+
+  window.toggleFavorite = function (cpId, name, address, lat, lng) {
+    var favs = loadFavorites();
+    var idx = favs.findIndex(function (f) { return f.cp_id === cpId; });
+    var saving = idx === -1;
+
+    if (saving) {
+      favs.push({ cp_id: cpId, name: name, address: address, lat: lat, lng: lng });
+    } else {
+      favs.splice(idx, 1);
+    }
+    saveFavorites(favs);
+    updateBtn(saving);
+
+    var method = saving ? 'POST' : 'DELETE';
+    fetch('/api/favorites/' + encodeURIComponent(cpId), { method: method })
+      .catch(function () { /* offline OK */ });
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    updateBtn(isSaved(CP_ID));
+  });
+})();
+</script>
+{% endif %}
+{% endblock %}

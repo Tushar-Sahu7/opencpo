@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}{{ t.app_name | default(app_title) }}{% endblock %}
+{% block content %}
+{# Pass translations to JS for map popups and scanner UI #}
+<script>window.I18N = {{ t | tojson }};</script>
+
+<div class="home-screen">
+
+  <!-- ── Floating Logo ───────────────────────────────────────── -->
+  <a href="/" id="floating-logo" style="position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:900;background:rgba(10,25,40,0.85);backdrop-filter:blur(8px);border-radius:24px;padding:8px 20px;box-shadow:0 2px 12px rgba(0,0,0,0.4);text-decoration:none;">
+    <span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span>
+  </a>
+  {% if flags.get('multi_language') %}
+  <div id="lang-hint" style="position:fixed;bottom:80px;left:12px;z-index:899;display:flex;flex-direction:column;gap:6px;opacity:0.9;transition:opacity 0.6s;">
+    <a href="?lang=nl" style="font-size:22px;text-decoration:none;line-height:1;{% if lang == 'nl' or not lang %}opacity:1{% else %}opacity:0.4{% endif %};transition:opacity 0.15s;">🇳🇱</a>
+    <a href="?lang=en" style="font-size:22px;text-decoration:none;line-height:1;{% if lang == 'en' %}opacity:1{% else %}opacity:0.4{% endif %};transition:opacity 0.15s;">🇬🇧</a>
+  </div>
+  <script>
+  (function(){
+    if(document.cookie.indexOf('lang=')!==-1){document.getElementById('lang-hint').style.display='none';return;}
+    setTimeout(function(){var h=document.getElementById('lang-hint');if(h){h.style.opacity='0';setTimeout(function(){h.style.display='none';},600);}},5000);
+  })();
+  </script>
+  {% endif %}
+
+  <!-- ── Map Tab ───────────────────────────────────────────────── -->
+  <div class="home-tab-content" id="tab-map">
+    <div id="charger-map"></div>
+
+    <!-- Loading overlay -->
+    <div class="map-loading-overlay" id="map-loading" style="display:none;">
+      <div class="spinner" style="margin-bottom:12px;"></div>
+      <span>{{ t.chargers_loading | default('Loading chargers…') }}</span>
+    </div>
+
+    <!-- Theme toggle -->
+    <button class="theme-toggle" id="theme-toggle" title="{{ t.theme_toggle | default('Toggle theme') }}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+
+    <!-- Zoom controls -->
+    <div class="map-zoom-controls">
+      <button class="map-zoom-btn" id="zoom-in">+</button>
+      <button class="map-zoom-btn" id="zoom-out">−</button>
+    </div>
+
+    <!-- Locate me button -->
+    <button class="map-geo-btn" id="geo-btn" title="{{ t.my_location | default('My location') }}">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        <circle cx="12" cy="12" r="7"/>
+      </svg>
+    </button>
+
+    <!-- Charger count badge -->
+    <div id="charger-badge" style="
+      position:absolute; top:12px; left:12px; z-index:1100;
+      background:var(--bg2); border:1px solid var(--border);
+      border-radius:20px; padding:4px 12px;
+      font-size:13px; font-weight:600; color:var(--accent);
+      opacity:0; transition:opacity 0.5s; pointer-events:none;
+    "></div>
+
+    <!-- Locate banner -->
+    <div class="locate-banner hidden" id="locate-banner">
+      <button class="locate-banner-btn" id="locate-banner-btn">{{ t.locate_me_banner | default('📍 Use my location to find chargers') }}</button>
+    </div>
+
+    <!-- Bottom sheet -->
+    <div class="map-bottom-sheet" id="charger-sheet">
+      <div class="sheet-handle" id="sheet-handle"></div>
+      <div id="sheet-content"></div>
+    </div>
+  </div>
+
+  <!-- ── Scan Tab ──────────────────────────────────────────────── -->
+  <div class="home-tab-content hidden" id="tab-scan">
+    <video id="scan-video" autoplay playsinline muted style="
+      width:100%; height:100%; object-fit:cover;
+      background:#000; position:absolute; top:0; left:0;
+    "></video>
+
+    <!-- Scan overlay -->
+    <div style="
+      position:absolute; inset:0;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      z-index:10; pointer-events:none;
+    ">
+      <div style="position:relative; width:220px; height:220px;">
+        <!-- Corners -->
+        <div style="position:absolute;top:0;left:0;width:32px;height:32px;
+          border-top:3px solid #22c55e;border-left:3px solid #22c55e;border-radius:4px 0 0 0;"></div>
+        <div style="position:absolute;top:0;right:0;width:32px;height:32px;
+          border-top:3px solid #22c55e;border-right:3px solid #22c55e;border-radius:0 4px 0 0;"></div>
+        <div style="position:absolute;bottom:0;left:0;width:32px;height:32px;
+          border-bottom:3px solid #22c55e;border-left:3px solid #22c55e;border-radius:0 0 0 4px;"></div>
+        <div style="position:absolute;bottom:0;right:0;width:32px;height:32px;
+          border-bottom:3px solid #22c55e;border-right:3px solid #22c55e;border-radius:0 0 4px 0;"></div>
+        <!-- Scan line -->
+        <div style="
+          position:absolute; left:4px; right:4px; height:2px;
+          background:linear-gradient(90deg,transparent,#22c55e,transparent);
+          animation:scanLine 1.5s ease-in-out infinite; top:50%;
+        "></div>
+      </div>
+      <p style="color:rgba(255,255,255,0.8);font-size:14px;margin-top:24px;font-weight:500;">
+        {{ t.scan_instruction | default('Scan the QR code on the charger') }}
+      </p>
+    </div>
+
+    <!-- Manual code input -->
+    <div style="
+      position:absolute; bottom:0; left:0; right:0; z-index:20;
+      background:linear-gradient(transparent, rgba(10,25,41,0.95));
+      padding:32px 20px 20px;
+    ">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="manual-code"
+          placeholder="{{ t.manual_code_placeholder | default('Enter code manually…') }}"
+          class="form-input" style="flex:1;font-size:15px;"
+          autocomplete="off" autocorrect="off" autocapitalize="characters" />
+        <button id="manual-submit" style="
+          padding:14px 16px; background:var(--accent); color:#0C2340;
+          border:none; border-radius:var(--radius-sm); font-weight:700; cursor:pointer; font-size:18px;
+        ">→</button>
+      </div>
+      <p id="scan-status" style="color:var(--text3);font-size:12px;margin-top:8px;text-align:center;min-height:18px;"></p>
+    </div>
+
+    <!-- Camera permission error -->
+    <div id="camera-error" class="hidden" style="
+      position:absolute; inset:0; z-index:30;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      background:var(--bg); padding:32px; text-align:center;
+    ">
+      <div style="font-size:48px;margin-bottom:16px;">📷</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:8px;">{{ t.camera_unavailable | default('Camera unavailable') }}</h3>
+      <p style="color:var(--text2);font-size:14px;margin-bottom:20px;">
+        {{ t.camera_unavailable_desc | default('Allow camera access to scan QR codes, or enter the code manually below.') }}
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script src="/static/home.js"></script>
+{% endblock %}

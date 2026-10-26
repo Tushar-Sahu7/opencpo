@@ -1,0 +1,9 @@
+# Example CPO branding
+# Copy relevant section into your config.yaml
+branding:
+  company: "Example CPO"
+  logo_path: "examples/branding/example/logo-white.svg"  # for dark header
+  logo_color_path: "examples/branding/example/logo-color.svg"  # for light footer
+  primary_color: "#1e3a5f"   # navy
+  accent_color: "#2563eb"    # blue
+  green_color: "#16a34a"     # green

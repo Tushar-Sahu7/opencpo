@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 56" height="56" width="320">
+  <!-- STR — white for dark backgrounds -->
+  <text x="0" y="42" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="900" font-size="38" fill="#ffffff" letter-spacing="1">STR</text>
+
+  <!-- OO isotype -->
+  <circle cx="109" cy="26" r="17" fill="none" stroke="#00B0E4" stroke-width="6"/>
+  <rect x="92" y="21" width="5" height="10" rx="2" fill="#00B0E4"/>
+  <circle cx="133" cy="26" r="17" fill="none" stroke="#84BD00" stroke-width="6"/>
+  <rect x="145" y="21" width="5" height="10" rx="2" fill="#84BD00"/>
+  <rect x="118" y="8" width="14" height="36" fill="#0C2340"/>
+  <path d="M118 9 A17 17 0 0 1 118 43" fill="none" stroke="#84BD00" stroke-width="6"/>
+  <path d="M133 9 A17 17 0 0 0 133 43" fill="none" stroke="#00B0E4" stroke-width="6"/>
+
+  <!-- MLIJNEN — white -->
+  <text x="157" y="42" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="900" font-size="38" fill="#ffffff" letter-spacing="1">MLIJNEN</text>
+</svg>

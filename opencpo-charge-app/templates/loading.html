@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}{{ t.loading | default('Loading...') }}{% endblock %}
+{% block content %}
+<div class="screen active" style="display:flex;align-items:center;justify-content:center;min-height:80vh;">
+  <div style="text-align:center;">
+    <div class="pulse-ring" style="width:48px;height:48px;border:3px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+    <div style="font-size:15px;color:var(--text2);">{{ t.loading | default('Loading...') }}</div>
+  </div>
+</div>
+<style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+{% endblock %}

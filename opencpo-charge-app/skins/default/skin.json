@@ -1,0 +1,13 @@
+{
+  "name": "Default",
+  "version": "1.0",
+  "colors": {
+    "primary": "#2563eb",
+    "secondary": "#16a34a",
+    "background": "#0f172a",
+    "card": "#1e293b",
+    "border": "#334155"
+  },
+  "logo": "logo.svg",
+  "favicon": "favicon.svg"
+}

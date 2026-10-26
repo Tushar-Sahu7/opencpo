@@ -1,0 +1,20 @@
+{
+  "name": "voltage-industrial",
+  "version": "1.0",
+  "mode": "dark",
+  "colors": {
+    "primary": "#00daf3",
+    "secondary": "#40e56c",
+    "background": "#131313",
+    "card": "#353535",
+    "border": "#414754"
+  },
+  "fonts": {
+    "headline": "Space Grotesk",
+    "body": "Inter",
+    "label": "Space Grotesk",
+    "mono": "'SF Mono', 'Fira Code', 'Roboto Mono', monospace"
+  },
+  "logo": "logo.svg",
+  "favicon": "favicon.svg"
+}

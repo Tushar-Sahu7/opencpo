@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}{{ t.my_sessions | default('My Charging Sessions') }} — {{ app_title }}{% endblock %}
+{% block content %}
+<div class="screen active">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg,#0a1929);border-bottom:1px solid var(--border,#1e3a5f);position:sticky;top:0;z-index:800;">
+    <a href="/account/profile" style="color:var(--text2,#94a3b8);text-decoration:none;font-size:20px;line-height:1;">←</a>
+    <a href="/" style="display:flex;align-items:center;text-decoration:none;"><span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span></a>
+  </div>
+  <div class="page-content">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:16px;">⚡ {{ t.my_sessions | default('My Charging Sessions') }}</h2>
+    <div id="history-loading" style="text-align:center;padding:40px 0;color:var(--text3);">{{ t.loading | default('Loading...') }}</div>
+    <div id="history-content" style="display:none;"></div>
+  </div>
+</div>
+<script>
+var I18N={{ t | tojson if t is defined else '{}' }};
+(async function(){
+  try{
+    var r=await fetch('/api/account/sessions');
+    var data=await r.json();
+    if(!r.ok){document.getElementById('history-loading').textContent=I18N.error||'Fout';return;}
+    var sessions=data.sessions||[];
+    var totals=data.totals||{};
+    var el=document.getElementById('history-content');
+    var html='';
+    if(totals.total_kwh!==undefined){
+      html+='<div style="display:flex;gap:12px;margin-bottom:20px;">';
+      html+='<div style="flex:1;background:var(--card-bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--accent);">'+(totals.total_kwh||0).toFixed(1)+'</div><div style="font-size:11px;color:var(--text3);">kWh</div></div>';
+      html+='<div style="flex:1;background:var(--card-bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--accent);">€'+(totals.total_cost||0).toFixed(2).replace(".",",")+'</div><div style="font-size:11px;color:var(--text3);">'+(I18N.total||'Totaal')+'</div></div>';
+      html+='<div style="flex:1;background:var(--card-bg);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:18px;font-weight:700;color:var(--accent);">'+(totals.count||0)+'</div><div style="font-size:11px;color:var(--text3);">'+(I18N.sessions||'Sessies')+'</div></div>';
+      html+='</div>';
+    }
+    if(!sessions.length){
+      html+='<div style="text-align:center;padding:40px 0;color:var(--text3);">'+(I18N.no_sessions||'No charging sessions yet.')+'</div>';
+    }else{
+      sessions.forEach(function(s){
+        var date=s.started_at?new Date(s.started_at).toLocaleDateString('nl-NL',{day:'numeric',month:'short',year:'numeric'}):'—';
+        var kwh=(s.energy_kwh||0).toFixed(1);
+        var cost='€'+((s.energy_kwh||0)*(s.rate_kwh||0.35)).toFixed(2).replace('.',',');
+        html+='<div style="background:var(--card-bg);border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">';
+        html+='<div><div style="font-weight:600;">'+s.cp_id+'</div><div style="font-size:12px;color:var(--text3);">'+date+'</div></div>';
+        html+='<div style="text-align:right;"><div style="font-weight:600;">'+kwh+' kWh</div><div style="font-size:12px;color:var(--text3);">'+cost+'</div></div>';
+        html+='</div>';
+      });
+    }
+    el.innerHTML=html;
+    document.getElementById('history-loading').style.display='none';
+    el.style.display='';
+  }catch(e){document.getElementById('history-loading').textContent=I18N.connection_error||'Connection error';}
+})();
+</script>
+{% endblock %}

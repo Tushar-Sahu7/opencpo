@@ -1,0 +1,45 @@
+# OCPP Compliance Tester — Configuration Example
+# Copy to config.yaml and adjust for your setup.
+
+server:
+  host: "0.0.0.0"
+  port: 9300
+  version: "auto"  # auto, 1.6, or 2.0.1
+  tls: false
+  tls_cert: null
+  tls_key: null
+
+charger:
+  expected_vendor: null    # Set to validate vendor name (optional)
+  expected_model: null     # Set to validate model name (optional)
+  num_connectors: 1        # Expected number of physical connectors
+
+timing:
+  heartbeat_interval: 30   # Expected heartbeat interval in seconds
+  meter_interval: 10       # Expected meter value sample interval
+  boot_timeout: 60         # Wait for charger to connect (seconds)
+  test_timeout: 120        # Per-test timeout (seconds)
+  transaction_start_max: 5 # Max seconds between auth and StartTransaction
+
+tests:
+  skip: []    # Test categories to skip e.g. [firmware, smart_charging]
+  only: []    # Run only these categories (empty = all)
+  full: false # Include firmware/diagnostics tests (requires physical intervention)
+  interactive: true  # Enable physical interaction prompts (e.g. plug in cable)
+
+branding:
+  company: "OCPP Compliance Tester"
+  logo_path: null            # Path to SVG logo file for reports, null = no logo
+  logo_color_path: null      # Optional: separate logo for light backgrounds
+  primary_color: "#1e3a5f"   # Header/table header color
+  accent_color: "#2563eb"    # Accent/highlight color
+  green_color: "#16a34a"     # Pass/success color
+
+report:
+  format: "both"  # pdf, html, both, or none
+  output: null    # null = auto-generate filename based on charger vendor/model/date
+
+rfid:
+  valid_tag: ""      # An RFID tag that should be accepted by the charger
+  invalid_tag: ""    # A tag that should be rejected
+  blocked_tag: null            # A blocked/expired tag (optional)

@@ -1,0 +1,491 @@
+{% extends "base.html" %}
+{% set active = "settings" %}
+{% block title %}Settings — CPO Admin{% endblock %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-1">Settings</h1>
+<p class="text-gray-500 text-sm mb-6">Runtime configuration for SMS, email, and OTP. Changes take effect immediately — no restart needed.</p>
+
+<div class="space-y-6 max-w-3xl">
+
+    <!-- ── SMS Provider ─────────────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">📱 SMS Provider</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Used for OTP login codes and session notifications.</p>
+            </div>
+            {% if sms.provider == "demo" or not sms.provider %}
+                <span class="text-xs px-2 py-1 rounded bg-yellow-900/50 border border-yellow-800 text-yellow-300">Demo mode</span>
+            {% elif sms.api_key and sms.api_key != "****" or sms.api_key == "****" %}
+                <span class="text-xs px-2 py-1 rounded bg-green-900/50 border border-green-800 text-green-300">Configured</span>
+            {% else %}
+                <span class="text-xs px-2 py-1 rounded bg-red-900/50 border border-red-800 text-red-300">Not configured</span>
+            {% endif %}
+        </div>
+        <form hx-post="/action/settings/sms"
+              hx-target="#sms-result"
+              hx-swap="innerHTML"
+              class="p-4 space-y-4">
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Provider</label>
+                <select name="provider" id="sms-provider" onchange="toggleSmsFields(this.value)"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                    <option value="demo" {% if sms.provider == "demo" or not sms.provider %}selected{% endif %}>Demo (no SMS sent — logs only)</option>
+                    <option value="bird" {% if sms.provider == "bird" %}selected{% endif %}>Bird</option>
+                    <option value="twilio" {% if sms.provider == "twilio" %}selected{% endif %}>Twilio</option>
+                </select>
+            </div>
+
+            <div id="sms-fields" class="space-y-4" style="{% if sms.provider == 'demo' or not sms.provider %}display:none{% endif %}">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1" id="sms-key-label">API Key</label>
+                        <input name="api_key" type="password" autocomplete="off"
+                            placeholder="{% if sms.api_key == '****' %}(saved — leave blank to keep){% else %}Enter API key{% endif %}"
+                            value="{% if sms.api_key and sms.api_key != '****' %}{{ sms.api_key }}{% endif %}"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1" id="sms-workspace-label">Workspace ID / Account SID</label>
+                        <input name="workspace_id" type="text" autocomplete="off"
+                            value="{{ sms.workspace_id or '' }}"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1" id="sms-channel-label">Channel ID / Auth Token</label>
+                        <input name="channel_id" type="password" autocomplete="off"
+                            placeholder="{% if sms.channel_id == '****' %}(saved){% endif %}"
+                            value="{% if sms.channel_id and sms.channel_id != '****' %}{{ sms.channel_id }}{% endif %}"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Sender Name / Number</label>
+                        <input name="sender" type="text"
+                            value="{{ sms.sender or '' }}"
+                            placeholder="STRMLIJN or +31612345678"
+                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <div id="sms-result"></div>
+
+            <div class="flex items-center gap-3 pt-1">
+                <button type="submit"
+                    class="px-5 py-2 bg-brand-green text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    Save SMS Settings
+                </button>
+            </div>
+        </form>
+
+        <!-- Test SMS -->
+        <div class="px-4 pb-4">
+            <div class="border-t border-gray-800 pt-4">
+                <p class="text-xs text-gray-500 mb-2">Send a test SMS to verify your configuration:</p>
+                <form hx-post="/action/settings/sms/test"
+                      hx-target="#sms-test-result"
+                      hx-swap="innerHTML"
+                      class="flex gap-2">
+                    <input name="test_phone" type="tel" placeholder="+31612345678"
+                        class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm">
+                    <button type="submit"
+                        class="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm text-gray-200 transition-colors whitespace-nowrap">
+                        Send Test SMS
+                    </button>
+                </form>
+                <div id="sms-test-result" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── SMTP ─────────────────────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">✉️ Email (SMTP)</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Used for charging receipts sent to drivers.</p>
+            </div>
+            {% if smtp.host and smtp.user %}
+                <span class="text-xs px-2 py-1 rounded bg-green-900/50 border border-green-800 text-green-300">Configured</span>
+            {% else %}
+                <span class="text-xs px-2 py-1 rounded bg-yellow-900/50 border border-yellow-800 text-yellow-300">Not configured</span>
+            {% endif %}
+        </div>
+        <form hx-post="/action/settings/smtp"
+              hx-target="#smtp-result"
+              hx-swap="innerHTML"
+              class="p-4 space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">SMTP Host</label>
+                    <input name="host" type="text" value="{{ smtp.host or '' }}"
+                        placeholder="smtp.example.com"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Port</label>
+                    <input name="port" type="number" value="{{ smtp.port or 587 }}" min="1" max="65535"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Username</label>
+                    <input name="user" type="text" value="{{ smtp.user or '' }}"
+                        placeholder="user@example.com"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Password</label>
+                    <input name="password" type="password" autocomplete="off"
+                        placeholder="{% if smtp.password == '****' %}(saved — leave blank to keep){% else %}Enter password{% endif %}"
+                        value="{% if smtp.password and smtp.password != '****' %}{{ smtp.password }}{% endif %}"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">From Address</label>
+                    <input name="from_address" type="email" value="{{ smtp.from_address or '' }}"
+                        placeholder="noreply@example.com"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">From Name</label>
+                    <input name="from_name" type="text" value="{{ smtp.from_name or 'OpenCPO' }}"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="tls" {% if smtp.tls %}checked{% endif %}
+                        class="w-4 h-4 rounded accent-brand-green">
+                    <span class="text-sm text-gray-300">Use STARTTLS</span>
+                </label>
+            </div>
+
+            <div id="smtp-result"></div>
+
+            <div class="flex items-center gap-3 pt-1">
+                <button type="submit"
+                    class="px-5 py-2 bg-brand-green text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    Save SMTP Settings
+                </button>
+            </div>
+        </form>
+
+        <!-- Test Email -->
+        <div class="px-4 pb-4">
+            <div class="border-t border-gray-800 pt-4">
+                <p class="text-xs text-gray-500 mb-2">Send a test email to verify your SMTP configuration:</p>
+                <form hx-post="/action/settings/smtp/test"
+                      hx-target="#smtp-test-result"
+                      hx-swap="innerHTML"
+                      class="flex gap-2">
+                    <input name="test_email" type="email" placeholder="you@example.com"
+                        class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm">
+                    <button type="submit"
+                        class="px-4 py-1.5 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm text-gray-200 transition-colors whitespace-nowrap">
+                        Send Test Email
+                    </button>
+                </form>
+                <div id="smtp-test-result" class="mt-2"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── OTP ──────────────────────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">🔐 OTP / Driver Login</h2>
+                <p class="text-xs text-gray-500 mt-0.5">One-time password settings for the driver-facing charge app.</p>
+            </div>
+            {% if otp.demo_mode %}
+                <span class="text-xs px-2 py-1 rounded bg-yellow-900/50 border border-yellow-800 text-yellow-300">Demo mode (000000 accepted)</span>
+            {% elif otp.enabled %}
+                <span class="text-xs px-2 py-1 rounded bg-green-900/50 border border-green-800 text-green-300">Enabled</span>
+            {% else %}
+                <span class="text-xs px-2 py-1 rounded bg-red-900/50 border border-red-800 text-red-300">Disabled</span>
+            {% endif %}
+        </div>
+        <form hx-post="/action/settings/otp"
+              hx-target="#otp-result"
+              hx-swap="innerHTML"
+              class="p-4 space-y-4">
+            <div class="space-y-3">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" name="enabled" {% if otp.enabled %}checked{% endif %}
+                        class="w-4 h-4 rounded accent-brand-green">
+                    <div>
+                        <span class="text-sm text-gray-200">Enable OTP authentication</span>
+                        <p class="text-xs text-gray-500">Uncheck to disable phone-based login entirely</p>
+                    </div>
+                </label>
+
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" name="demo_mode" {% if otp.demo_mode %}checked{% endif %}
+                        class="w-4 h-4 rounded accent-yellow-400">
+                    <div>
+                        <span class="text-sm text-gray-200">Demo mode</span>
+                        <p class="text-xs text-gray-500">Accept code <code class="bg-gray-800 px-1 rounded">000000</code> as always valid — useful for testing without real SMS</p>
+                    </div>
+                </label>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Code Length</label>
+                    <select name="code_length"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                        <option value="4" {% if otp.code_length == 4 %}selected{% endif %}>4 digits</option>
+                        <option value="6" {% if otp.code_length == 6 or not otp.code_length %}selected{% endif %}>6 digits</option>
+                        <option value="8" {% if otp.code_length == 8 %}selected{% endif %}>8 digits</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Code TTL (seconds)</label>
+                    <input name="ttl_seconds" type="number" min="60" max="3600"
+                        value="{{ otp.ttl_seconds or 300 }}"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+            </div>
+
+            <div id="otp-result"></div>
+
+            <div class="pt-1">
+                <button type="submit"
+                    class="px-5 py-2 bg-brand-green text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    Save OTP Settings
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── OCPI Identity ────────────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">🌐 OCPI Identity</h2>
+                <p class="text-xs text-gray-500 mt-0.5">Your operator identity advertised to roaming partners via OCPI.</p>
+            </div>
+            {% if ocpi.operator_name and ocpi.base_url %}
+                <span class="text-xs px-2 py-1 rounded bg-green-900/50 border border-green-800 text-green-300">Configured</span>
+            {% else %}
+                <span class="text-xs px-2 py-1 rounded bg-yellow-900/50 border border-yellow-800 text-yellow-300">Not configured</span>
+            {% endif %}
+        </div>
+        <form hx-post="/action/settings/ocpi"
+              hx-target="#ocpi-result"
+              hx-swap="innerHTML"
+              class="p-4 space-y-4">
+            <div class="grid grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Country Code</label>
+                    <input name="country_code" type="text" maxlength="2"
+                        value="{{ ocpi.country_code or 'NL' }}"
+                        placeholder="NL"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Party ID</label>
+                    <input name="party_id" type="text" maxlength="3"
+                        value="{{ ocpi.party_id or 'OCP' }}"
+                        placeholder="OCP"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Role</label>
+                    <select name="role"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                        <option value="CPO"  {% if ocpi.role == 'CPO'  %}selected{% endif %}>CPO — Charge Point Operator</option>
+                        <option value="EMSP" {% if ocpi.role == 'EMSP' %}selected{% endif %}>eMSP — Mobility Service Provider</option>
+                        <option value="HUB"  {% if ocpi.role == 'HUB'  %}selected{% endif %}>HUB — Roaming Hub</option>
+                    </select>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs text-gray-400 mb-1">Operator Name</label>
+                <input name="operator_name" type="text"
+                    value="{{ ocpi.operator_name or '' }}"
+                    placeholder="e.g. My Company"
+                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">eMSP Country Code</label>
+                    <input name="emsp_country_code" type="text" maxlength="2"
+                        value="{{ ocpi.emsp_country_code or 'NL' }}"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono uppercase">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">eMSP Party ID</label>
+                    <input name="emsp_party_id" type="text" maxlength="3"
+                        value="{{ ocpi.emsp_party_id or 'OCP' }}"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono uppercase">
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-xs text-gray-400 mb-1">Base URL</label>
+                    <input name="base_url" type="url"
+                        value="{{ ocpi.base_url or '' }}"
+                        placeholder="https://ocpi.example.com"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Versions Path</label>
+                    <input name="versions_path" type="text"
+                        value="{{ ocpi.versions_path or '/ocpi/versions' }}"
+                        placeholder="/ocpi/versions"
+                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                </div>
+            </div>
+            <div id="ocpi-result"></div>
+            <div class="pt-1">
+                <button type="submit"
+                    class="px-5 py-2 bg-brand-green text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    Save OCPI Identity
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── Network / Tailscale ──────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800" id="tailscale">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">Network / Tailscale</h2>
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Zero-trust networking for charger sites. Each site connects through an encrypted WireGuard tunnel —
+                    no open ports or VPN configuration needed.
+                    <a href="https://tailscale.com" target="_blank" rel="noopener" class="text-brand-blue hover:underline">tailscale.com</a>
+                </p>
+            </div>
+            {% if tailscale.api_key and tailscale.api_key != "****" or tailscale.api_key == "****" %}
+                <span class="text-xs px-2 py-1 rounded bg-green-900/50 border border-green-800 text-green-300">Configured</span>
+            {% else %}
+                <span class="text-xs px-2 py-1 rounded bg-gray-800 border border-gray-700 text-gray-500">Not configured</span>
+            {% endif %}
+        </div>
+        <form hx-post="/action/settings/tailscale"
+              hx-target="#tailscale-result"
+              hx-swap="innerHTML"
+              class="p-4 space-y-4">
+
+            <div class="flex items-center gap-3">
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" name="enabled" class="sr-only peer"
+                           {% if tailscale.enabled %}checked{% endif %}>
+                    <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer
+                                peer-checked:after:translate-x-full peer-checked:after:border-white
+                                after:content-[''] after:absolute after:top-0.5 after:left-[2px]
+                                after:bg-white after:border-gray-300 after:border after:rounded-full
+                                after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-blue"></div>
+                </label>
+                <span class="text-sm text-gray-300">Enable Tailscale networking</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Tailnet Name</label>
+                    <input name="tailnet" type="text" autocomplete="off"
+                           value="{{ tailscale.tailnet or '' }}"
+                           placeholder="e.g. example.com or tailXXXXXX.ts.net"
+                           class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    <p class="text-xs text-gray-600 mt-1">Found in the Tailscale admin console under DNS.</p>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">API Key</label>
+                    <input name="api_key" type="password" autocomplete="off"
+                           placeholder="{% if tailscale.api_key == '****' %}(saved — leave blank to keep){% else %}tskey-api-...{% endif %}"
+                           value="{% if tailscale.api_key and tailscale.api_key != '****' %}{{ tailscale.api_key }}{% endif %}"
+                           class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    <p class="text-xs text-gray-600 mt-1">
+                        Generate at
+                        <a href="https://login.tailscale.com/admin/settings/keys" target="_blank" rel="noopener" class="text-brand-blue hover:underline">tailscale.com/admin/settings/keys</a>.
+                        Needs <em>Devices: Read</em> and <em>Auth Keys: Write</em> scopes.
+                    </p>
+                </div>
+            </div>
+
+            <div id="tailscale-result"></div>
+
+            <div class="flex items-center gap-3 pt-1">
+                <button type="submit"
+                        class="px-5 py-2 bg-brand-green text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    Save Network Settings
+                </button>
+                <button type="button"
+                        hx-post="/action/settings/tailscale/test"
+                        hx-target="#tailscale-result"
+                        hx-swap="innerHTML"
+                        class="px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 hover:bg-gray-700 transition-colors">
+                    Test Connection
+                </button>
+                <a href="/network" class="text-sm text-brand-blue hover:underline">
+                    Go to Network & Sites
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- ── Backup & Restore ─────────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800" id="backup-panel">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">💾 Backup & Restore</h2>
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Create backups of your platform data, restore from a previous backup,
+                    or import an external backup file.
+                </p>
+            </div>
+        </div>
+        <div class="p-4">
+            <div hx-get="/partials/backup-panel" hx-trigger="load" hx-swap="innerHTML">
+                <div class="text-sm text-gray-500">Loading backups...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Platform Update ────────────────────────────────────────────── -->
+    <div class="bg-gray-900 rounded-lg border border-gray-800" id="platform-update">
+        <div class="p-4 border-b border-gray-800 flex items-center justify-between">
+            <div>
+                <h2 class="text-base font-semibold">⬆ Platform Update</h2>
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Check for new OpenCPO releases and update with one click.
+                    Your data and configuration are preserved.
+                </p>
+            </div>
+        </div>
+        <div id="update-status-container" hx-get="/partials/update-status" hx-trigger="load" hx-swap="innerHTML">
+            <div class="p-4 text-sm text-gray-500">Checking for updates...</div>
+        </div>
+    </div>
+
+</div><!-- /max-w-3xl -->
+
+<script>
+function toggleSmsFields(provider) {
+    const fields = document.getElementById('sms-fields');
+    const keyLabel = document.getElementById('sms-key-label');
+    const workspaceLabel = document.getElementById('sms-workspace-label');
+    const channelLabel = document.getElementById('sms-channel-label');
+    if (provider === 'demo') {
+        fields.style.display = 'none';
+    } else {
+        fields.style.display = 'block';
+        if (provider === 'twilio') {
+            keyLabel.textContent = 'Auth Token';
+            workspaceLabel.textContent = 'Account SID';
+            channelLabel.textContent = 'Twilio Phone Number';
+        } else {
+            keyLabel.textContent = 'API Key';
+            workspaceLabel.textContent = 'Workspace ID';
+            channelLabel.textContent = 'Channel ID';
+        }
+    }
+}
+// Run on load to set correct labels
+toggleSmsFields(document.getElementById('sms-provider').value);
+</script>
+{% endblock %}

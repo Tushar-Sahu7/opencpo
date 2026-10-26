@@ -1,0 +1,20 @@
+{
+  "name": "voltage-backstage",
+  "version": "1.0",
+  "mode": "dark",
+  "colors": {
+    "primary": "#6fd2ff",
+    "secondary": "#9dd82c",
+    "background": "#051424",
+    "card": "#283647",
+    "border": "#3d484f"
+  },
+  "fonts": {
+    "headline": "Space Grotesk",
+    "body": "Manrope",
+    "label": "Space Grotesk",
+    "mono": "'SF Mono', 'Fira Code', 'Roboto Mono', monospace"
+  },
+  "logo": "logo.svg",
+  "favicon": "favicon.svg"
+}

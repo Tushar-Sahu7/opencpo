@@ -1,0 +1,20 @@
+{
+  "name": "ion-flux",
+  "version": "1.0",
+  "mode": "dark",
+  "colors": {
+    "primary": "#81ecff",
+    "secondary": "#22c55e",
+    "background": "#0c0e12",
+    "card": "#23262c",
+    "border": "#46484d"
+  },
+  "fonts": {
+    "headline": "Space Grotesk",
+    "body": "Inter",
+    "label": "Inter",
+    "mono": "'SF Mono', 'Fira Code', 'Roboto Mono', monospace"
+  },
+  "logo": "logo.svg",
+  "favicon": "favicon.svg"
+}

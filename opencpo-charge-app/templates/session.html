@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+{% block title %}{{ t.charging | default('Charging') }} — Live{% endblock %}
+{% block content %}
+<div class="screen active">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg,#0a1929);border-bottom:1px solid var(--border,#1e3a5f);position:sticky;top:0;z-index:800;">
+    <a href="/" style="color:var(--text2,#94a3b8);text-decoration:none;font-size:20px;line-height:1;">←</a>
+    <a href="/" style="display:flex;align-items:center;text-decoration:none;"><span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span></a>
+  </div>
+
+  <div class="page-content">
+
+    <!-- State: waiting for payment -->
+    <div id="state-pending" style="display:none; text-align:center; padding:40px 0;">
+      <div class="spinner" style="margin-bottom:20px;"></div>
+      <div style="font-size:17px; font-weight:600; color:var(--text2);">{{ t.waiting_payment | default('Waiting for payment…') }}</div>
+      <div style="font-size:13px; color:var(--text3); margin-top:8px;">{{ t.waiting_payment_subtitle | default('Pay via the link in your email') }}</div>
+    </div>
+
+    <!-- State: starting -->
+    <div id="state-starting" style="display:none; text-align:center; padding:40px 0;">
+      <div class="spinner" style="margin-bottom:20px;"></div>
+      <div style="font-size:17px; font-weight:600; color:var(--text2);">{{ t.session_starting | default('Starting charger…') }}</div>
+      <div style="font-size:13px; color:var(--text3); margin-top:8px;">{{ t.session_starting_subtitle | default('Connect the cable if not already done') }}</div>
+    </div>
+
+    <!-- State: finishing -->
+    <div id="state-finishing" style="display:none; text-align:center; padding:40px 0;">
+      <div class="spinner" style="margin-bottom:20px;"></div>
+      <div style="font-size:17px; font-weight:600; color:var(--text2);">{{ t.session_finishing | default('Finishing session…') }}</div>
+      <div style="font-size:13px; color:var(--text3); margin-top:8px;">{{ t.session_finishing_subtitle | default('Please wait, your receipt is being prepared') }}</div>
+    </div>
+
+    <!-- State: charging -->
+    <div id="state-charging" style="display:none;">
+      <div style="text-align:center; margin-bottom:4px;">
+        <div class="live-indicator">
+          <div class="live-dot"></div>
+          LIVE
+        </div>
+      </div>
+
+      <!-- Charger info header -->
+      <div class="session-charger-info" id="charger-info" style="display:none;">
+        <div class="session-charger-name" id="charger-name-val">—</div>
+        <div class="session-charger-detail" id="charger-detail-val">—</div>
+      </div>
+
+      <!-- Power gauge -->
+      <div class="power-display">
+        <div class="power-value" id="power-val">—</div>
+        <div class="power-unit">kW</div>
+      </div>
+
+      <!-- SoC battery bar (hidden until available) -->
+      <div id="soc-bar-wrap" style="display:none;">
+        <div class="soc-bar">
+          <div class="soc-fill" id="soc-fill" style="width:0%;"></div>
+          <span class="soc-text" id="soc-text">—</span>
+        </div>
+      </div>
+
+      <!-- Stats card -->
+      <div class="session-stats">
+        <div class="stat-row">
+          <span class="stat-label">⚡ {{ t.energy | default('Energy') }}</span>
+          <span class="stat-value mono" id="kwh-val">— kWh</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">⏱ {{ t.duration | default('Duration') }}</span>
+          <span class="stat-value mono" id="duration-val">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">💰 {{ t.cost | default('Cost') }}</span>
+          <div style="text-align:right;">
+            <span class="stat-value mono" id="cost-val">—</span>
+            <div style="font-size:11px; color:var(--text3); margin-top:2px;">{{ t.incl_btw | default('incl. VAT') }}</div>
+          </div>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">📊 {{ t.power | default('Power') }}</span>
+          <span class="stat-value mono" id="rate-val">—</span>
+        </div>
+      </div>
+
+      {# CO₂ savings badge — flag-gated #}
+      {% if flags.get('co2_savings') %}
+      <div id="co2-badge" style="margin-top:12px; padding:10px 14px; background:rgba(132,189,0,0.12); border:1px solid #84BD00; border-radius:10px; display:flex; align-items:center; gap:10px;">
+        <span style="font-size:20px;">🌱</span>
+        <div>
+          <div style="font-size:13px; color:#84BD00; font-weight:600;">{{ t.co2_saved | default('CO₂ saved') }}</div>
+          <div id="co2-val" style="font-size:18px; font-weight:700; color:#fff;">— kg</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div id="session-status-note" class="info-note" style="display:none;"></div>
+    <div id="session-error"></div>
+
+    <!-- Stuck session warning (shown after 90s in starting state) -->
+    <div id="stuck-warning" style="display:none;margin-top:20px;padding:16px;background:rgba(239,68,68,0.12);border:1px solid #ef4444;border-radius:10px;text-align:center;">
+      <div style="font-size:16px;font-weight:700;color:#ef4444;margin-bottom:8px;">⚠️ {{ t.charger_not_responding | default('Charger not responding') }}</div>
+      <button class="btn btn-danger" onclick="cancelStuckSession()" style="width:100%;">
+        {{ t.cancel_return_home | default('Cancel and go back') }}
+      </button>
+    </div>
+
+    <button class="btn btn-danger" id="stop-btn" style="display:none;" onclick="confirmStop()">
+      ■ {{ t.stop_charging | default('Stop charging') }}
+    </button>
+  </div>
+</div>
+
+<script>
+var SESSION_ID = {{ session_id | tojson }};
+var CO2_KG_PER_KWH = 0.459;
+var I18N = {{ t | tojson if t is defined else '{}' }};
+var _durationStart = null;
+var _kwhBaseline = null;
+var _baselineKey = 'kwh_baseline_' + SESSION_ID;
+var _pollInterval = null;
+var _durationInterval = null;
+var _lastKwh = 0;
+var _lastCost = 0;
+
+var _stored = localStorage.getItem(_baselineKey);
+if (_stored !== null) _kwhBaseline = parseFloat(_stored);
+
+var _durationKey = 'duration_start_' + SESSION_ID;
+var _storedDuration = localStorage.getItem(_durationKey);
+if (_storedDuration !== null) _durationStart = parseInt(_storedDuration);
+
+function formatDuration(ms) {
+  var seconds = Math.floor(ms / 1000);
+  if (seconds < 0) return '00:00:00';
+  var h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+  var m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+  var s = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return h + ':' + m + ':' + s;
+}
+
+function formatEuro(amount) {
+  return new Intl.NumberFormat('nl-NL', {style:'currency', currency:'EUR'}).format(amount);
+}
+
+function showState(state) {
+  ['pending', 'starting', 'finishing', 'charging'].forEach(function(s) {
+    document.getElementById('state-' + s).style.display = (s === state) ? '' : 'none';
+  });
+  document.getElementById('stop-btn').style.display = (state === 'charging') ? '' : 'none';
+  // Charging glow animation
+  var statsEl = document.querySelector('.session-stats, .stat-card')?.parentElement;
+  if (statsEl) {
+    if (state === 'charging') statsEl.classList.add('charging-active');
+    else statsEl.classList.remove('charging-active');
+  }
+}
+
+async function pollSession() {
+  try {
+    var r = await fetch('/api/sessions/' + SESSION_ID + '/poll');
+    var session = await r.json();
+    var statusNote = document.getElementById('session-status-note');
+
+    if (session.error) {
+      document.getElementById('session-error').innerHTML =
+        '<div class="error-card">' + (I18N.err_poll_friendly || 'Something went wrong. Refresh the page.') + '</div>';
+      return;
+    }
+
+    if (session.payment_status === 'pending') {
+      showState('pending');
+      return;
+    }
+
+    if (['failed', 'expired', 'canceled'].includes(session.payment_status)) {
+      clearInterval(_pollInterval);
+      clearInterval(_durationInterval);
+      ['pending','starting','finishing','charging'].forEach(function(s) {
+        document.getElementById('state-' + s).style.display = 'none';
+      });
+      document.getElementById('stop-btn').style.display = 'none';
+      statusNote.style.display = 'block';
+      statusNote.innerHTML = '❌ <strong>' + (I18N.err_payment_status || 'Payment') + ' ' +
+        session.payment_status + '.</strong> ' + (I18N.err_try_again || 'Please try again.');
+      return;
+    }
+
+    if (session.stopped_at) {
+      showState('finishing');
+      clearInterval(_pollInterval);
+      clearInterval(_durationInterval);
+      localStorage.removeItem('active_session_id');
+      localStorage.removeItem(_baselineKey);
+      localStorage.removeItem(_durationKey);
+      setTimeout(function() { window.location.href = '/receipt/' + SESSION_ID; }, 2000);
+      return;
+    }
+
+    if (session.remote_start_failed) {
+      clearInterval(_pollInterval);
+      clearInterval(_durationInterval);
+      ['pending','starting','finishing','charging'].forEach(function(s) {
+        document.getElementById('state-' + s).style.display = 'none';
+      });
+      document.getElementById('stop-btn').style.display = 'none';
+      statusNote.style.display = 'block';
+      statusNote.innerHTML = '❌ <strong>' + (I18N.err_charger_offline || 'Charger unreachable.') + '</strong> ' +
+        (I18N.err_charger_offline_contact || 'Please contact the operator.');
+      return;
+    }
+
+    if (!session.started_at) {
+      showState('starting');
+      if (session.created_at && !_durationStart) {
+        _durationStart = new Date(session.created_at).getTime();
+      }
+      return;
+    }
+
+    showState('charging');
+    statusNote.style.display = 'none';
+    _subscribePush();
+
+    if (!_durationStart) {
+      var ts = session.started_at || session.created_at;
+      _durationStart = ts ? new Date(ts).getTime() : Date.now();
+      localStorage.setItem(_durationKey, String(_durationStart));
+    }
+
+    var rawKwh = session.kwh_delivered || 0;
+    if (rawKwh > 0 && _kwhBaseline === null) {
+      _kwhBaseline = rawKwh;
+      localStorage.setItem(_baselineKey, String(_kwhBaseline));
+    }
+    var kwh = (_kwhBaseline !== null) ? Math.max(0, rawKwh - _kwhBaseline) : 0;
+    var rate = session.rate_kwh || 0;
+    var cost = kwh * rate * 1.21;
+    _lastKwh = kwh;
+    _lastCost = cost;
+
+    var powerKw = session.current_kw;
+    var powerEl = document.getElementById('power-val');
+    if (powerKw !== null && powerKw !== undefined) {
+      powerEl.textContent = powerKw.toFixed(1);
+      powerEl.classList.toggle('charging', powerKw > 0);
+    } else {
+      powerEl.textContent = '—';
+      powerEl.classList.remove('charging');
+    }
+
+    document.getElementById('kwh-val').textContent = kwh.toFixed(3) + ' kWh';
+    document.getElementById('cost-val').textContent = formatEuro(cost);
+    if (rate) document.getElementById('rate-val').textContent = formatEuro(rate * 1.21) + '/kWh';
+
+    var co2El = document.getElementById('co2-val');
+    if (co2El) {
+      var co2Kg = kwh * CO2_KG_PER_KWH;
+      co2El.textContent = co2Kg.toFixed(2).replace('.', ',') + ' kg';
+    }
+
+    var soc = session.soc_pct;
+    if (soc && soc > 0) {
+      document.getElementById('soc-bar-wrap').style.display = '';
+      document.getElementById('soc-fill').style.width = Math.min(100, soc).toFixed(0) + '%';
+      document.getElementById('soc-text').textContent = soc.toFixed(0) + '%';
+    }
+
+    if (session.cp_id) {
+      var infoEl = document.getElementById('charger-info');
+      infoEl.style.display = '';
+      document.getElementById('charger-name-val').textContent =
+        (I18N.charger || 'Charger') + ' ' + session.cp_id;
+      document.getElementById('charger-detail-val').textContent =
+        (I18N.connector || 'Connector') + ' ' + (session.connector_id || '—');
+    }
+
+  } catch(e) {
+    document.getElementById('session-error').innerHTML =
+      '<div class="error-card">' + (I18N.err_connection_friendly || 'Connection lost. Check your internet.') + '</div>';
+  }
+}
+
+_durationInterval = setInterval(function() {
+  if (_durationStart) {
+    var elapsed = Date.now() - _durationStart;
+    document.getElementById('duration-val').textContent = formatDuration(elapsed);
+  }
+}, 1000);
+
+// ── Push notification subscription ───────────────────────────────────────
+var _pushSubscribed = false;
+var _pushSubKey = 'push_subscribed_' + SESSION_ID;
+
+function _urlBase64ToUint8Array(base64String) {
+  var padding = '='.repeat((4 - base64String.length % 4) % 4);
+  var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  var rawData = window.atob(base64);
+  var outputArray = new Uint8Array(rawData.length);
+  for (var i = 0; i < rawData.length; ++i) outputArray[i] = rawData.charCodeAt(i);
+  return outputArray;
+}
+
+async function _subscribePush() {
+  if (_pushSubscribed || localStorage.getItem(_pushSubKey)) return;
+  if (!window.FEATURES || !window.FEATURES.push_notifications) return;
+  if (!('Notification' in window) || !('PushManager' in window)) return;
+  try {
+    var keyResp = await fetch('/api/push/key');
+    var keyData = await keyResp.json();
+    var vapidKey = keyData.publicKey;
+    var perm = await Notification.requestPermission();
+    if (perm !== 'granted') return;
+    var reg = await navigator.serviceWorker.ready;
+    var sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: _urlBase64ToUint8Array(vapidKey),
+    });
+    await fetch('/api/push/subscribe', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({session_id: SESSION_ID, subscription: sub.toJSON()}),
+    });
+    _pushSubscribed = true;
+    localStorage.setItem(_pushSubKey, '1');
+  } catch(e) {
+    console.warn('Push subscription failed:', e);
+  }
+}
+
+// ── Stuck session detection ───────────────────────────────────────────────
+var _startingStateBeganAt = null;
+var _stuckTimeout90 = null;
+var _stuckTimeout180 = null;
+
+function _onStartingState() {
+  if (_startingStateBeganAt !== null) return; // already tracking
+  _startingStateBeganAt = Date.now();
+
+  // 90s: show warning + cancel button
+  _stuckTimeout90 = setTimeout(function() {
+    document.getElementById('stuck-warning').style.display = '';
+  }, 90000);
+
+  // 180s: auto-cancel and redirect home
+  _stuckTimeout180 = setTimeout(function() {
+    cancelStuckSession();
+  }, 180000);
+}
+
+function _clearStuckTimers() {
+  _startingStateBeganAt = null;
+  clearTimeout(_stuckTimeout90);
+  clearTimeout(_stuckTimeout180);
+  document.getElementById('stuck-warning').style.display = 'none';
+}
+
+function cancelStuckSession() {
+  clearInterval(_pollInterval);
+  clearInterval(_durationInterval);
+  _clearStuckTimers();
+  localStorage.removeItem('active_session_id');
+  localStorage.removeItem(_baselineKey);
+  localStorage.removeItem(_durationKey);
+  window.location.href = '/';
+}
+
+// Patch showState to track starting state
+var _origShowState = showState;
+showState = function(state) {
+  _origShowState(state);
+  if (state === 'starting') {
+    _onStartingState();
+  } else {
+    _clearStuckTimers();
+  }
+};
+
+showState('starting');
+pollSession();
+_pollInterval = setInterval(pollSession, 5000);
+
+async function confirmStop() {
+  var kwhTxt = _lastKwh.toFixed(3) + ' kWh';
+  var costTxt = formatEuro(_lastCost) + ' (' + (I18N.incl_btw || 'incl. VAT') + ')';
+  var msg = (I18N.confirm_stop || 'Are you sure you want to stop charging?') + '\n\n' +
+            (I18N.confirm_stop_charged || 'Charged:') + '  ' + kwhTxt + '\n' +
+            (I18N.confirm_stop_cost || 'Cost:') + '   ' + costTxt;
+  if (!confirm(msg)) return;
+  var btn = document.getElementById('stop-btn');
+  btn.disabled = true;
+  btn.textContent = (I18N.stopping || 'Stopping\u2026');
+  try {
+    await fetch('/api/sessions/' + SESSION_ID + '/stop', {method: 'POST'});
+    clearInterval(_pollInterval);
+    clearInterval(_durationInterval);
+    localStorage.removeItem('active_session_id');
+    localStorage.removeItem(_baselineKey);
+    localStorage.removeItem(_durationKey);
+    window.location.href = '/receipt/' + SESSION_ID;
+  } catch(e) {
+    document.getElementById('session-error').innerHTML =
+      '<div class="error-card">' + (I18N.err_stop_friendly || 'Could not stop the charger. Please try again.') + '</div>';
+    btn.disabled = false;
+    btn.textContent = '\u25a0 ' + (I18N.stop_charging || 'Stop charging');
+  }
+}
+</script>
+{% endblock %}

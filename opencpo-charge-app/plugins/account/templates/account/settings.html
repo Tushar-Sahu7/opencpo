@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{{ t.settings | default('Settings') }} — {{ app_title }}{% endblock %}
+{% block content %}
+<div class="screen active">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg,#0a1929);border-bottom:1px solid var(--border,#1e3a5f);position:sticky;top:0;z-index:800;">
+    <a href="/" style="color:var(--text2,#94a3b8);text-decoration:none;font-size:20px;line-height:1;">←</a>
+    <a href="/" style="display:flex;align-items:center;text-decoration:none;"><span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span></a>
+  </div>
+
+  <div class="page-content">
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">{{ t.settings | default('Settings') }}</h2>
+
+    {% if flags is defined and flags.get('multi_language') %}
+    <!-- Language section -->
+    <div style="background:var(--card-bg,rgba(255,255,255,0.05));border-radius:12px;padding:16px;margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text3,#6a8aa0);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">
+        {{ t.language | default('Language') }}
+      </div>
+      <div style="display:flex;gap:12px;">
+        <a href="?lang=nl" style="
+          flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+          padding:12px;border-radius:10px;text-decoration:none;font-size:15px;font-weight:600;
+          background:{% if lang == 'nl' or not lang %}var(--accent,#00B0E4);color:#0C2340{% else %}var(--bg2,#0d2137);color:var(--text2,#94a3b8);border:1px solid var(--border,#1e3a5f){% endif %};
+        ">
+          🇳🇱 Nederlands
+        </a>
+        <a href="?lang=en" style="
+          flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+          padding:12px;border-radius:10px;text-decoration:none;font-size:15px;font-weight:600;
+          background:{% if lang == 'en' %}var(--accent,#00B0E4);color:#0C2340{% else %}var(--bg2,#0d2137);color:var(--text2,#94a3b8);border:1px solid var(--border,#1e3a5f){% endif %};
+        ">
+          🇬🇧 English
+        </a>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Account section -->
+    <div style="background:var(--card-bg,rgba(255,255,255,0.05));border-radius:12px;padding:16px;margin-bottom:20px;">
+      <div style="font-size:13px;font-weight:700;color:var(--text3,#6a8aa0);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">
+        {{ t.profile | default('Account') }}
+      </div>
+
+      {% if account is defined and account %}
+        <!-- Logged in -->
+        <a href="/account/profile" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border,#1e3a5f);text-decoration:none;color:var(--text1,#fff);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">👤</span>
+            <span style="font-size:15px;font-weight:600;">{{ t.profile | default('My profile') }}</span>
+          </div>
+          <span style="color:var(--text3,#64748b);">›</span>
+        </a>
+        <a href="/account/history" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;text-decoration:none;color:var(--text1,#fff);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">⚡</span>
+            <span style="font-size:15px;font-weight:600;">{{ t.history | default('Charging history') }}</span>
+          </div>
+          <span style="color:var(--text3,#64748b);">›</span>
+        </a>
+      {% else %}
+        <!-- Not logged in -->
+        {% if flags is defined and flags.get('account_login') %}
+        <a href="/account/login" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border,#1e3a5f);text-decoration:none;color:var(--text1,#fff);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">🔑</span>
+            <span style="font-size:15px;font-weight:600;">{{ t.login | default('Log in') }}</span>
+          </div>
+          <span style="color:var(--text3,#64748b);">›</span>
+        </a>
+        <a href="/account/register" style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;text-decoration:none;color:var(--text1,#fff);">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">✨</span>
+            <span style="font-size:15px;font-weight:600;">{{ t.register | default('Register') }}</span>
+          </div>
+          <span style="color:var(--text3,#64748b);">›</span>
+        </a>
+        {% else %}
+        <p style="color:var(--text3,#6a8aa0);font-size:14px;padding:8px 0;">
+          {{ t.login | default('Account login is currently unavailable.') }}
+        </p>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

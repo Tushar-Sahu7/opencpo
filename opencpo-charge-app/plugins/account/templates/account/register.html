@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ t.register | default('Register') }} — {{ app_title }}{% endblock %}
+{% block content %}
+<div class="screen active">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg,#0a1929);border-bottom:1px solid var(--border,#1e3a5f);position:sticky;top:0;z-index:800;">
+    <a href="/" style="color:var(--text2,#94a3b8);text-decoration:none;font-size:20px;line-height:1;">←</a>
+    <a href="/" style="display:flex;align-items:center;text-decoration:none;"><span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span></a>
+  </div>
+  <div class="page-content">
+    <div style="margin-bottom:24px;">
+      <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;">{{ t.create_account | default('Account aanmaken') }}</h2>
+      <p class="text-muted">{{ t.register_subtitle | default('Maak een account aan om uw laadgeschiedenis bij te houden.') }}</p>
+    </div>
+    <div id="reg-error"></div>
+    <div class="form-group">
+      <label class="form-label">{{ t.name | default('Name') }}</label>
+      <input class="form-input" id="reg-name" type="text" placeholder="{{ t.your_name | default('Uw naam') }}" autocomplete="name" style="font-size:16px;padding:14px 16px;" />
+    </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label class="form-label">{{ t.email | default('Email') }}</label>
+      <input class="form-input" id="reg-email" type="email" inputmode="email" placeholder="{{ t.email_placeholder | default('naam@voorbeeld.nl') }}" autocomplete="email" style="font-size:16px;padding:14px 16px;" />
+    </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label class="form-label">{{ t.phone | default('Phone') }} <span class="text-muted" style="font-weight:400;">({{ t.optional | default('optioneel') }})</span></label>
+      <input class="form-input" id="reg-phone" type="tel" inputmode="tel" placeholder="+31 6 12 34 56 78" autocomplete="tel" style="font-size:16px;padding:14px 16px;" />
+    </div>
+    <div class="form-group" style="margin-top:16px;">
+      <label class="form-label">{{ t.password | default('Password') }}</label>
+      <input class="form-input" id="reg-password" type="password" placeholder="{{ t.choose_password | default('Kies een wachtwoord') }}" autocomplete="new-password" style="font-size:16px;padding:14px 16px;" />
+    </div>
+    <button class="btn btn-primary" style="margin-top:24px;" id="reg-btn" onclick="doRegister()">{{ t.register | default('Register') }} →</button>
+    <div style="margin-top:20px;text-align:center;">
+      <a href="/account/login" class="text-muted" style="font-size:14px;">{{ t.already_account | default('Already have an account?') }} <strong style="color:var(--primary);">{{ t.login | default('Log in') }}</strong></a>
+    </div>
+  </div>
+</div>
+<script>
+var I18N={{ t | tojson if t is defined else '{}' }};
+async function doRegister(){
+  var name=document.getElementById('reg-name').value.trim(),email=document.getElementById('reg-email').value.trim();
+  var phone=document.getElementById('reg-phone').value.trim(),pw=document.getElementById('reg-password').value;
+  var err=document.getElementById('reg-error'),btn=document.getElementById('reg-btn');
+  err.innerHTML='';
+  if(!email||!email.includes('@')){err.innerHTML='<div class="error-card">'+(I18N.invalid_email||'Voer een geldig e-mailadres in.')+'</div>';return;}
+  if(!pw||pw.length<6){err.innerHTML='<div class="error-card">'+(I18N.password_too_short||'Password must be at least 6 characters.')+'</div>';return;}
+  btn.disabled=true;btn.textContent=(I18N.registering||'Registering…');
+  try{
+    var r=await fetch('/api/account/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name||null,email:email,phone:phone||null,password:pw})});
+    var data=await r.json();
+    if(!r.ok||data.error){err.innerHTML='<div class="error-card">'+(data.error||(I18N.register_failed||'Registration failed'))+'</div>';btn.disabled=false;btn.textContent=(I18N.register||'Register')+' →';return;}
+    window.location.href='/account/profile';
+  }catch(e){err.innerHTML='<div class="error-card">'+(I18N.connection_error||'Connection error')+'</div>';btn.disabled=false;btn.textContent=(I18N.register||'Register')+' →';}
+}
+</script>
+{% endblock %}
+}

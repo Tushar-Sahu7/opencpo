@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Charger Farm{% endblock %} — OpenCPO</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/farm.css">
+  <script src="/static/htmx.min.js" defer></script>
+  <script src="/static/farm.js" defer></script>
+</head>
+<body>
+<nav style="display:flex;align-items:center;gap:4px;padding:6px 16px;background:#0a1628;border-bottom:1px solid #1e3a5f;font-size:12px;position:sticky;top:0;z-index:9999;overflow-x:auto;white-space:nowrap;">
+  <span style="font-weight:700;font-size:13px;margin-right:12px;">
+    <span style="color:#fff;">Open</span><span style="color:#64748b;">CPO</span>
+    <span style="color:#94a3b8;font-weight:400;font-size:11px;margin-left:6px;">Charger Farm</span>
+  </span>
+  <a href="http://localhost:8080" target="_blank" style="color:#94a3b8;text-decoration:none;padding:4px 10px;border-radius:6px;">🔧 Admin</a>
+  <a href="http://localhost:8003" target="_blank" style="color:#94a3b8;text-decoration:none;padding:4px 10px;border-radius:6px;">⚡ Charge App</a>
+  <a href="/" style="color:#00B0E4;text-decoration:none;padding:4px 10px;border-radius:6px;background:#00B0E422;">🔌 Charger Farm</a>
+</nav>
+
+<main>
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

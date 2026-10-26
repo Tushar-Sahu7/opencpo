@@ -1,0 +1,20 @@
+{
+  "name": "stroom-electron",
+  "version": "1.0",
+  "mode": "dark",
+  "colors": {
+    "primary": "#9EDA2D",
+    "secondary": "#6FD2FF",
+    "background": "#051423",
+    "card": "#1D2B3B",
+    "border": "#434936"
+  },
+  "fonts": {
+    "headline": "Space Grotesk",
+    "body": "Inter",
+    "label": "Inter",
+    "mono": "'SF Mono', 'Fira Code', 'Roboto Mono', monospace"
+  },
+  "logo": "logo.svg",
+  "favicon": "favicon.svg"
+}

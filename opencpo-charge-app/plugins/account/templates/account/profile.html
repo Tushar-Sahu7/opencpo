@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ t.my_account | default('Mijn Account') }} — {{ app_title }}{% endblock %}
+{% block content %}
+<div class="screen active">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg,#0a1929);border-bottom:1px solid var(--border,#1e3a5f);position:sticky;top:0;z-index:800;">
+    <a href="/" style="color:var(--text2,#94a3b8);text-decoration:none;font-size:20px;line-height:1;">←</a>
+    <a href="/" style="display:flex;align-items:center;text-decoration:none;"><span style="font-size:16px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span></a>
+  </div>
+
+  <div class="page-content">
+    <div id="profile-error"></div>
+    <div id="profile-success"></div>
+
+    <div id="view-mode">
+      <div style="margin-bottom:24px;">
+        <div style="font-size:40px;text-align:center;margin-bottom:12px;">👤</div>
+        <h2 style="font-size:20px;font-weight:700;text-align:center;margin-bottom:4px;">
+          {{ profile.name or '—' }}
+        </h2>
+        <p class="text-muted" style="text-align:center;">{{ profile.email }}</p>
+      </div>
+
+      <div style="background:var(--card-bg);border-radius:12px;padding:16px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span class="text-muted">{{ t.name | default('Name') }}</span>
+          <span>{{ profile.name or '—' }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+          <span class="text-muted">{{ t.email | default('Email') }}</span>
+          <span>{{ profile.email }}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:10px 0;">
+          <span class="text-muted">{{ t.phone | default('Phone') }}</span>
+          <span>{{ profile.phone or '—' }}</span>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="showEdit()" style="margin-bottom:12px;">
+        ✏️ {{ t.edit_profile | default('Edit profile') }}
+      </button>
+
+      <a href="/account/history" class="btn btn-ghost" style="display:block;text-align:center;margin-bottom:12px;">
+        ⚡ {{ t.my_sessions | default('My Charging Sessions') }}
+      </a>
+
+      <a href="/account/settings" class="btn btn-ghost" style="display:block;text-align:center;margin-bottom:12px;">
+        ⚙️ {{ t.settings | default('Instellingen') }}
+      </a>
+
+      <button class="btn btn-ghost" onclick="doLogout()" style="color:var(--error,#e55);">
+        {{ t.logout | default('Log out') }}
+      </button>
+    </div>
+
+    <div id="edit-mode" style="display:none;">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;">{{ t.edit_profile | default('Gegevens wijzigen') }}</h2>
+      <div class="form-group">
+        <label class="form-label">{{ t.name | default('Name') }}</label>
+        <input class="form-input" id="edit-name" type="text" value="{{ profile.name or '' }}" placeholder="{{ t.your_name | default('Uw naam') }}" style="font-size:16px;padding:14px 16px;" />
+      </div>
+      <div class="form-group" style="margin-top:16px;">
+        <label class="form-label">{{ t.phone | default('Phone') }}</label>
+        <input class="form-input" id="edit-phone" type="tel" value="{{ profile.phone or '' }}" placeholder="+31 6 12 34 56 78" style="font-size:16px;padding:14px 16px;" />
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px;">
+        <button class="btn btn-primary" onclick="doSave()">{{ t.save | default('Save') }}</button>
+        <button class="btn btn-ghost" onclick="hideEdit()">{{ t.cancel | default('Cancel') }}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var I18N = {{ t | tojson if t is defined else '{}' }};
+function showEdit() { document.getElementById('view-mode').style.display='none'; document.getElementById('edit-mode').style.display=''; document.getElementById('edit-name').focus(); }
+function hideEdit() { document.getElementById('edit-mode').style.display='none'; document.getElementById('view-mode').style.display=''; }
+async function doSave() {
+  var errEl=document.getElementById('profile-error'), successEl=document.getElementById('profile-success');
+  errEl.innerHTML=''; successEl.innerHTML='';
+  try {
+    var r=await fetch('/api/account/profile',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:document.getElementById('edit-name').value.trim()||null,phone:document.getElementById('edit-phone').value.trim()||null})});
+    var data=await r.json();
+    if(!r.ok||data.error){errEl.innerHTML='<div class="error-card">'+(data.error||(I18N.save_failed||'Save failed'))+'</div>';return;}
+    successEl.innerHTML='<div style="background:#1a3a1a;border:1px solid #4a4;border-radius:8px;padding:12px;margin-bottom:16px;color:#4a4;">✓ '+(I18N.saved||'Saved')+'</div>';
+    hideEdit(); setTimeout(()=>window.location.reload(),800);
+  } catch(e){errEl.innerHTML='<div class="error-card">'+(I18N.connection_error||'Connection error')+'</div>';}
+}
+async function doLogout(){await fetch('/api/account/logout',{method:'POST'});window.location.href='/';}
+</script>
+{% endblock %}

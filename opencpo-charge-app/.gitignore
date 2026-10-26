@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.pyc
+.venv/
+venv/
+env/
+.env
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.egg-info/
+dist/
+build/
+
+# Ignore private skins (add yours here)
+# skins/my-brand/

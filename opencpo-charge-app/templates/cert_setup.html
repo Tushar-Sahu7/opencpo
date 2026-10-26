@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+{% block title %}Certificate Setup{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+<style>
+  .cert-wizard { max-width: 480px; margin: 0 auto; padding: 24px 16px; }
+  .cert-step { display: none; }
+  .cert-step.active { display: block; }
+  .cert-card { background: var(--bg2, #0d2137); border: 1px solid var(--border, #1e3a5f); border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+  .cert-title { font-size: 20px; font-weight: 700; color: var(--text, #e2e8f0); margin: 0 0 8px; }
+  .cert-sub { font-size: 14px; color: var(--text2, #94a3b8); line-height: 1.5; margin: 0 0 20px; }
+  .cert-btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; text-align: center; text-decoration: none; margin-bottom: 12px; transition: transform 0.1s, opacity 0.15s; }
+  .cert-btn:active { transform: scale(0.98); }
+  .cert-btn-primary { background: var(--accent, #2563eb); color: #fff; }
+  .cert-btn-secondary { background: transparent; border: 1px solid var(--border, #1e3a5f); color: var(--text2, #94a3b8); }
+  .cert-btn-download { background: var(--accent2, #0284c7); color: #fff; }
+  .cert-progress { display: flex; gap: 8px; margin-bottom: 24px; }
+  .cert-progress-dot { flex: 1; height: 4px; border-radius: 2px; background: var(--border, #1e3a5f); transition: background 0.3s; }
+  .cert-progress-dot.done { background: var(--accent, #2563eb); }
+  .cert-progress-dot.current { background: var(--accent2, #0284c7); }
+  .cert-password { font-family: monospace; font-size: 18px; letter-spacing: 2px; background: rgba(2,132,199,0.1); border: 1px solid var(--accent2, #0284c7); border-radius: 8px; padding: 12px 16px; text-align: center; color: var(--accent2, #0284c7); margin: 16px 0; user-select: all; cursor: pointer; }
+  .cert-password:hover { background: rgba(2,132,199,0.15); }
+  .cert-icon { font-size: 48px; text-align: center; margin-bottom: 16px; }
+  .cert-error { text-align: center; padding: 48px 16px; }
+  .cert-error-icon { font-size: 64px; margin-bottom: 16px; }
+  .cert-hint { font-size: 13px; color: var(--text3, #64748b); line-height: 1.5; margin-top: 12px; }
+  .cert-os-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; background: rgba(37,99,235,0.15); color: var(--accent, #2563eb); margin-bottom: 12px; }
+  .cert-check { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 10px; margin-bottom: 8px; }
+  .cert-check-ok { background: rgba(37,99,235,0.1); }
+  .cert-check-fail { background: rgba(239,68,68,0.1); }
+  .cert-check-wait { background: rgba(2,132,199,0.1); }
+  .cert-help { margin-top: 20px; padding: 16px; background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2); border-radius: 12px; font-size: 13px; color: var(--text2, #94a3b8); line-height: 1.6; }
+  .cert-help a { color: var(--accent2, #0284c7); }
+</style>
+
+<div class="cert-wizard">
+
+  <!-- Logo -->
+  <div style="text-align:center;margin-bottom:24px;">
+    <span style="font-size:18px;font-weight:600;color:#e8edf2;letter-spacing:-0.2px;">Open<span style="color:#4a6580;">CPO</span></span>
+  </div>
+
+  {% if error %}
+  <!-- ── Error State ──────────────────────────────────────── -->
+  <div class="cert-error">
+    <div class="cert-error-icon">
+      {% if error == 'token_expired' %}⏰{% elif error == 'token_used' %}✅{% elif error == 'token_invalid' %}🔗{% else %}⚠️{% endif %}
+    </div>
+    <h2 class="cert-title" style="text-align:center;">
+      {% if error == 'missing_token' %}No setup link
+      {% elif error == 'token_expired' %}Link expired
+      {% elif error == 'token_used' %}Link already used
+      {% elif error == 'token_invalid' %}Invalid link
+      {% else %}Something went wrong{% endif %}
+    </h2>
+    <p class="cert-sub" style="text-align:center;">
+      {% if error == 'missing_token' %}Open the link you received via SMS or email.
+      {% elif error == 'token_expired' %}This setup link has expired. Contact your administrator for a new link.
+      {% elif error == 'token_used' %}This certificate has already been created. If you need a new certificate, contact your administrator.
+      {% elif error == 'token_invalid' %}This link is invalid.
+      {% else %}Please try again or contact support.{% endif %}
+    </p>
+    <div class="cert-help">
+      Need help? Contact your system administrator.
+    </div>
+  </div>
+
+  {% else %}
+  <!-- ── Wizard Steps ─────────────────────────────────────── -->
+
+  <!-- Progress -->
+  <div class="cert-progress">
+    <div class="cert-progress-dot current" id="dot-1"></div>
+    <div class="cert-progress-dot" id="dot-2"></div>
+    <div class="cert-progress-dot" id="dot-3"></div>
+    <div class="cert-progress-dot" id="dot-4"></div>
+  </div>
+
+  <!-- Step 1: Welcome -->
+  <div class="cert-step active" id="step-1">
+    <div class="cert-card">
+      <div class="cert-icon">🔐</div>
+      <h2 class="cert-title">Welcome, {{ driver.name.split(' ')[0] }}</h2>
+      <p class="cert-sub">
+        We'll install your security certificate.
+        This lets you be automatically recognized when charging — no login required.
+      </p>
+      <p class="cert-sub" style="font-size:13px;">
+        <strong>What will be installed:</strong><br>
+        1. A trust certificate (Root CA)<br>
+        2. Your personal certificate
+      </p>
+      <div class="cert-os-badge" id="os-badge">Detecting...</div>
+      <button class="cert-btn cert-btn-primary" onclick="goStep(2)">Get started →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Root CA -->
+  <div class="cert-step" id="step-2">
+    <div class="cert-card">
+      <div class="cert-icon">🛡️</div>
+      <h2 class="cert-title">Step 1: Trust Certificate</h2>
+      <p class="cert-sub">
+        Download and install the Root CA certificate.
+        This allows your device to trust our certificates.
+      </p>
+
+      <!-- iOS instructions -->
+      <div id="ios-instructions" style="display:none;">
+        <p class="cert-hint">
+          <strong>After downloading:</strong><br>
+          1. Go to <strong>Settings → General → VPN & Device Management</strong><br>
+          2. Tap the downloaded profile<br>
+          3. Tap <strong>Install</strong> and enter your PIN<br>
+          4. Go to <strong>Settings → General → About → Certificate Trust Settings</strong><br>
+          5. Enable the Root CA certificate
+        </p>
+      </div>
+
+      <!-- Android instructions -->
+      <div id="android-instructions" style="display:none;">
+        <p class="cert-hint">
+          <strong>After downloading:</strong><br>
+          1. Open the downloaded file (.crt)<br>
+          2. Or go to <strong>Settings → Security → Encryption → Install from storage</strong><br>
+          3. Select the certificate and tap <strong>OK</strong>
+        </p>
+      </div>
+
+      <!-- Desktop instructions -->
+      <div id="desktop-instructions" style="display:none;">
+        <p class="cert-hint">
+          <strong>After downloading:</strong><br>
+          Open the file and add it to your system certificate store (Keychain on Mac, certmgr on Windows).
+        </p>
+      </div>
+
+      <a class="cert-btn cert-btn-download"
+         href="/api/cert-setup/root-ca"
+         download="opencpo-root-ca.crt"
+         onclick="rootCaDownloaded()">
+        ⬇️ Download Root CA
+      </a>
+      <button class="cert-btn cert-btn-primary" id="btn-step3" onclick="goStep(3)" disabled style="opacity:0.5;">
+        Next →
+      </button>
+      <button class="cert-btn cert-btn-secondary" onclick="goStep(1)">← Back</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Issue + Install client cert -->
+  <div class="cert-step" id="step-3">
+    <div class="cert-card">
+      <div class="cert-icon">📱</div>
+      <h2 class="cert-title">Step 2: Your Certificate</h2>
+      <p class="cert-sub">
+        Click below to generate and download your personal certificate.
+      </p>
+
+      <div id="cert-issue-area">
+        <button class="cert-btn cert-btn-primary" onclick="issueCert()" id="btn-issue">
+          🔑 Generate certificate
+        </button>
+      </div>
+
+      <!-- Shown after cert is issued -->
+      <div id="cert-issued-area" style="display:none;">
+        <p class="cert-sub" style="color:var(--accent,#2563eb);font-weight:600;">
+          ✅ Certificate created!
+        </p>
+
+        <p class="cert-sub">
+          <strong>Installation password:</strong>
+        </p>
+        <div class="cert-password" id="cert-password" onclick="copyPassword()" title="Click to copy">
+          —
+        </div>
+        <p class="cert-hint" id="copy-hint" style="text-align:center;">Click the password to copy</p>
+
+        <a class="cert-btn cert-btn-download" id="cert-download-link" href="#" style="display:none;">
+          ⬇️ Download certificate
+        </a>
+        <a class="cert-btn cert-btn-download" id="cert-mobileconfig-link" href="#" style="display:none;">
+          📱 Install via profile (iOS)
+        </a>
+
+        <!-- iOS P12 instructions -->
+        <div id="ios-p12-instructions" style="display:none;">
+          <p class="cert-hint">
+            <strong>After downloading:</strong><br>
+            1. Go to <strong>Settings → General → VPN & Device Management</strong><br>
+            2. Tap the profile<br>
+            3. Enter the <strong>password above</strong><br>
+            4. Tap <strong>Install</strong>
+          </p>
+        </div>
+
+        <!-- Android P12 instructions -->
+        <div id="android-p12-instructions" style="display:none;">
+          <p class="cert-hint">
+            <strong>After downloading:</strong><br>
+            1. Open the downloaded file (.p12)<br>
+            2. Enter the <strong>password above</strong><br>
+            3. Give the certificate a name<br>
+            4. Select <strong>VPN and apps</strong> as the usage
+          </p>
+        </div>
+
+        <button class="cert-btn cert-btn-primary" onclick="goStep(4)" style="margin-top:16px;">
+          Next →
+        </button>
+      </div>
+
+      <button class="cert-btn cert-btn-secondary" onclick="goStep(2)">← Back</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Verify -->
+  <div class="cert-step" id="step-4">
+    <div class="cert-card">
+      <div class="cert-icon">✅</div>
+      <h2 class="cert-title">Step 3: Verify</h2>
+      <p class="cert-sub">
+        Let's check that your certificate is installed correctly.
+      </p>
+
+      <div id="verify-result"></div>
+
+      <button class="cert-btn cert-btn-primary" onclick="verifyCert()" id="btn-verify">
+        🔍 Test certificate
+      </button>
+
+      <div id="verify-success" style="display:none;">
+        <div class="cert-check cert-check-ok">
+          <span style="font-size:24px;">✅</span>
+          <div>
+            <strong style="color:var(--accent,#2563eb);">Certificate working!</strong><br>
+            <span style="font-size:13px;color:var(--text2);" id="verify-email"></span>
+          </div>
+        </div>
+        <a class="cert-btn cert-btn-primary" href="/" style="margin-top:16px;">
+          🔌 Open Charge App
+        </a>
+      </div>
+
+      <div id="verify-fail" style="display:none;">
+        <div class="cert-check cert-check-fail">
+          <span style="font-size:24px;">❌</span>
+          <div>
+            <strong style="color:#ef4444;">Certificate not detected</strong><br>
+            <span style="font-size:13px;color:var(--text2);">Check that you installed both certificates and try again.</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="cert-btn cert-btn-secondary" onclick="goStep(3)" style="margin-top:8px;">← Back</button>
+
+      <div class="cert-help">
+        <strong>Not working?</strong><br>
+        Try fully closing and reopening your browser after installing the certificates.
+        Contact your system administrator for further help.
+      </div>
+    </div>
+  </div>
+
+  {% endif %}
+</div>
+
+<script>
+const TOKEN = '{{ token }}';
+let certPassword = '';
+let downloadUrl = '';
+
+// ── OS Detection ─────────────────────────────────────────
+function detectOS() {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/.test(ua)) return 'ios';
+  if (/Android/.test(ua)) return 'android';
+  if (/Mac/.test(ua)) return 'macos';
+  if (/Win/.test(ua)) return 'windows';
+  return 'desktop';
+}
+
+const OS = detectOS();
+const osLabels = {ios:'iOS', android:'Android', macos:'macOS', windows:'Windows', desktop:'Desktop'};
+
+document.addEventListener('DOMContentLoaded', function() {
+  const badge = document.getElementById('os-badge');
+  if (badge) badge.textContent = osLabels[OS] || 'Desktop';
+
+  // Show OS-specific instructions
+  if (OS === 'ios') {
+    showEl('ios-instructions');
+    showEl('ios-p12-instructions');
+  } else if (OS === 'android') {
+    showEl('android-instructions');
+    showEl('android-p12-instructions');
+  } else {
+    showEl('desktop-instructions');
+  }
+});
+
+// ── Navigation ───────────────────────────────────────────
+function goStep(n) {
+  document.querySelectorAll('.cert-step').forEach(s => s.classList.remove('active'));
+  const step = document.getElementById('step-' + n);
+  if (step) step.classList.add('active');
+
+  // Update progress dots
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.getElementById('dot-' + i);
+    if (!dot) continue;
+    dot.className = 'cert-progress-dot';
+    if (i < n) dot.classList.add('done');
+    if (i === n) dot.classList.add('current');
+  }
+
+  window.scrollTo(0, 0);
+}
+
+// ── Root CA Download ─────────────────────────────────────
+function rootCaDownloaded() {
+  const btn = document.getElementById('btn-step3');
+  if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+}
+
+// ── Issue Certificate ────────────────────────────────────
+async function issueCert() {
+  const btn = document.getElementById('btn-issue');
+  btn.disabled = true;
+  btn.textContent = '⏳ Working...';
+
+  try {
+    const resp = await fetch('/api/cert-setup/issue?token=' + encodeURIComponent(TOKEN), {
+      method: 'POST',
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      alert(err.detail || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.textContent = '🔑 Generate certificate';
+      return;
+    }
+
+    const data = await resp.json();
+    certPassword = data.password;
+    downloadUrl = data.download_url;
+
+    // Show password
+    document.getElementById('cert-password').textContent = certPassword;
+
+    // Show download link(s)
+    const dlToken = encodeURIComponent(downloadUrl.split('token=')[1]);
+    if (OS === 'ios') {
+      // iOS: use .mobileconfig (installs Root CA + identity in one step)
+      const mc = document.getElementById('cert-mobileconfig-link');
+      mc.href = '/api/cert-setup/mobileconfig?token=' + dlToken;
+      mc.style.display = 'block';
+    } else {
+      // Android/desktop: raw P12
+      const dl = document.getElementById('cert-download-link');
+      dl.href = '/api/cert-setup/download?token=' + dlToken;
+      dl.style.display = 'block';
+    }
+
+    // Hide issue area, show result
+    document.getElementById('cert-issue-area').style.display = 'none';
+    document.getElementById('cert-issued-area').style.display = 'block';
+
+  } catch (e) {
+    alert('Network error: ' + e.message);
+    btn.disabled = false;
+    btn.textContent = '🔑 Generate certificate';
+  }
+}
+
+// ── Copy Password ────────────────────────────────────────
+function copyPassword() {
+  if (!certPassword) return;
+  navigator.clipboard.writeText(certPassword).then(() => {
+    document.getElementById('copy-hint').textContent = '✅ Copied!';
+    setTimeout(() => {
+      document.getElementById('copy-hint').textContent = 'Click the password to copy';
+    }, 2000);
+  });
+}
+
+// ── Verify Certificate ───────────────────────────────────
+async function verifyCert() {
+  const btn = document.getElementById('btn-verify');
+  btn.disabled = true;
+  btn.textContent = '⏳ Checking...';
+
+  document.getElementById('verify-success').style.display = 'none';
+  document.getElementById('verify-fail').style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/cert-setup/verify');
+    const data = await resp.json();
+
+    if (data.status === 'ok') {
+      document.getElementById('verify-email').textContent = data.email;
+      document.getElementById('verify-success').style.display = 'block';
+      btn.style.display = 'none';
+      // Mark step 4 as done
+      document.getElementById('dot-4').className = 'cert-progress-dot done';
+    } else {
+      document.getElementById('verify-fail').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '🔍 Try again';
+    }
+  } catch (e) {
+    document.getElementById('verify-fail').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '🔍 Try again';
+  }
+}
+
+function showEl(id) {
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'block';
+}
+</script>
+{% endblock %}
