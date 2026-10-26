@@ -1,0 +1,149 @@
+<!-- ═══ Row 4: Live Connected Chargers & Remote Command Table ═════════════ -->
+<div class="dashboard-panel p-4 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <span class="text-emerald-400 text-sm">⛽</span>
+            <h2 class="text-xs font-bold text-gray-200">Live Charger Fleet &amp; Direct Command Console</h2>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/40">
+                {{ charger_count }} ONLINE UNITS
+            </span>
+        </div>
+        <div class="flex items-center gap-2">
+            <!-- Filter buttons -->
+            <button onclick="filterFleet('all')" id="fleet-tab-all" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800/50">
+                All ({{ charger_count }})
+            </button>
+            <button onclick="filterFleet('online')" id="fleet-tab-online" class="px-2 py-0.5 rounded text-[10px] font-medium bg-[#08101a] text-gray-400 border border-[#192d48] hover:text-gray-200">
+                Online ({{ online_count }})
+            </button>
+            <div class="relative">
+                <input type="text" id="fleet-search" onkeyup="searchFleetTable()" placeholder="Search charger ID, site, model..."
+                       class="bg-[#08101a] border border-[#192d48] rounded px-6 py-1 text-[11px] text-gray-300 placeholder-gray-600 outline-none w-48 focus:border-cyan-500">
+                <span class="absolute left-2 top-1.5 text-[10px] text-gray-500">🔍</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto rounded border border-[#14243b]">
+        <table class="exception-table" id="fleet-table">
+            <thead>
+                <tr>
+                    <th style="width: 140px;">Charger ID</th>
+                    <th style="width: 90px;">OCPP Ver</th>
+                    <th style="width: 90px;">Status</th>
+                    <th>Site / Model</th>
+                    <th style="width: 160px;">Connectors &amp; State</th>
+                    <th style="width: 140px;">Last Heartbeat</th>
+                    <th style="width: 250px;" class="text-right">Live CSMS Commands</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cp in chargers %}
+                <tr class="fleet-row" data-status="{{ cp.status }}" data-id="{{ cp.id }}" data-model="{{ cp.vendor }} {{ cp.model }}" data-site="{{ cp.site or 'Central Depot' }}">
+                    <!-- ID -->
+                    <td class="font-mono font-bold text-cyan-300 text-xs">
+                        <a href="/remote/{{ cp.id }}" class="hover:underline flex items-center gap-1 text-cyan-300 no-underline">
+                            <span>⚡</span>
+                            <span>{{ cp.id }}</span>
+                        </a>
+                    </td>
+
+                    <!-- Version -->
+                    <td class="font-mono text-[11px] text-gray-400">{{ cp.ocpp_version or '1.6' }}</td>
+
+                    <!-- Status -->
+                    <td>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold {% if cp.status == 'online' %}bg-emerald-950/60 text-emerald-400 border border-emerald-800/40{% else %}bg-red-950/60 text-red-400 border border-red-800/40{% endif %}">
+                            <span class="w-1.5 h-1.5 rounded-full {% if cp.status == 'online' %}bg-emerald-400 animate-pulse{% else %}bg-red-400{% endif %}"></span>
+                            {{ cp.status|upper }}
+                        </span>
+                    </td>
+
+                    <!-- Site / Model -->
+                    <td>
+                        <div class="text-gray-200 font-medium text-xs">{{ cp.site or 'Central Depot' }}</div>
+                        <div class="text-[10px] text-gray-500">{{ cp.vendor or 'ABB' }} {{ cp.model or 'Terra 54' }}</div>
+                    </td>
+
+                    <!-- Connectors & State -->
+                    <td>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            {% set live = cp.live or {} %}
+                            {% set has_live = false %}
+                            {% for k, v in live.items() %}
+                                {% if k.startswith("connector_") and k.endswith("_status") %}
+                                    {% set has_live = true %}
+                                    {% set cid = k.replace("connector_", "").replace("_status", "") %}
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold {% if v == 'Charging' %}bg-cyan-950 text-cyan-400 border border-cyan-800/50 animate-pulse{% elif v == 'Available' %}bg-emerald-950 text-emerald-400 border border-emerald-800/50{% elif v == 'Faulted' %}bg-red-950 text-red-400 border border-red-800/50{% else %}bg-gray-800 text-gray-400{% endif %}">
+                                        #{{ cid }}: {{ v }}
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not has_live %}
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-800/50">#1: Ready</span>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <!-- Last Heartbeat -->
+                    <td class="font-mono text-[10px] text-gray-400">
+                        {{ cp.last_heartbeat or 'Just now' }}
+                    </td>
+
+                    <!-- Quick Command Actions -->
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1 justify-end">
+                            <button hx-post="/action/start/{{ cp.id }}?connector=1"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="RemoteStartTransaction"
+                                    class="action-btn action-btn-accent">
+                                <span>▶</span>
+                                <span>Start</span>
+                            </button>
+                            <button hx-post="/action/stop/{{ cp.id }}?connector=1"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="RemoteStopTransaction"
+                                    class="action-btn">
+                                <span>⏹</span>
+                                <span>Stop</span>
+                            </button>
+                            <button hx-post="/action/reset/{{ cp.id }}?type=Soft"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="Soft Reset"
+                                    class="action-btn">
+                                <span>↻</span>
+                                <span>Reset</span>
+                            </button>
+                            <button hx-post="/action/unlock/{{ cp.id }}?connector=1"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="Unlock Stuck Connector"
+                                    class="action-btn">
+                                <span>🔓</span>
+                                <span>Unlock</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not chargers %}
+                <tr>
+                    <td colspan="7" class="p-8 text-center text-gray-500">
+                        <div class="text-base mb-1">⛽ No Charge Points Registered</div>
+                        <div class="text-xs text-gray-400 mb-3">Spawn virtual chargers above or register physical chargers via OCPP WebSocket.</div>
+                        <button hx-post="/action/dashboard/spawn-virtual?count=3"
+                                hx-target="#toast-container"
+                                hx-swap="beforeend"
+                                class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-semibold">
+                            ⚡ Spawn 3 Virtual Chargers Now
+                        </button>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

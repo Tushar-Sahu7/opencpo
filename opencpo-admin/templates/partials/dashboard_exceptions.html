@@ -1,0 +1,156 @@
+<!-- ═══ Row 5: Actionable Exception Queue ════════════════════════════════ -->
+<div class="dashboard-panel p-4 mb-4">
+    <!-- Header with Alert Badge & Filter Controls -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="text-red-400 text-sm">⚠️</span>
+                <h2 class="text-xs font-bold text-gray-200">Actionable Exception Queue</h2>
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full {% if exception_count > 0 %}bg-red-950 text-red-400 border border-red-800/40{% else %}bg-emerald-950 text-emerald-400 border border-emerald-800/40{% endif %}">
+                    {% if exception_count > 0 %}{{ exception_count }} ITEMS NEED ATTENTION{% else %}ALL SYSTEMS HEALTHY{% endif %}
+                </span>
+            </div>
+            <p class="text-[10px] text-gray-500 mt-0.5">Live anomalies detected in hardware interlocks, heartbeat drops, and expiring certificates</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <!-- Triage Tabs -->
+            <div class="flex items-center bg-[#08101a] border border-[#14243b] rounded p-0.5">
+                <button type="button" onclick="setExceptionTab('unresolved')" id="tab-exc-unresolved"
+                        class="px-2.5 py-1 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/50">
+                    Unresolved ({{ exception_count }})
+                </button>
+                <button type="button" onclick="setExceptionTab('acknowledged')" id="tab-exc-acknowledged"
+                        class="px-2.5 py-1 rounded text-[10px] font-medium text-gray-400 hover:text-gray-200">
+                    Acknowledged (0)
+                </button>
+            </div>
+
+            <!-- Severity Dropdown -->
+            <select id="exception-severity-filter" onchange="filterExceptionsTable()"
+                    class="filter-select text-[11px] py-1 bg-[#08101a] border-[#192d48]">
+                <option value="ALL">All Severities</option>
+                <option value="CRITICAL">🔴 CRITICAL</option>
+                <option value="WARNING">🟡 WARNING</option>
+            </select>
+
+            <!-- Live Search -->
+            <div class="relative">
+                <input type="text" id="exception-search" onkeyup="filterExceptionsTable()"
+                       placeholder="Search asset, site, error..."
+                       class="bg-[#08101a] border border-[#192d48] rounded px-6 py-1 text-[11px] text-gray-300 placeholder-gray-600 outline-none w-44 focus:border-cyan-500">
+                <span class="absolute left-2 top-1.5 text-[10px] text-gray-500">🔍</span>
+            </div>
+
+            <!-- Export Incident Bundle (.JSON) -->
+            <a href="/api/dashboard/export-exceptions" download class="action-btn no-underline" title="Download real-incident-bundle.json">
+                <span>📥</span>
+                <span>Export JSON</span>
+            </a>
+
+            <!-- Acknowledge All Action -->
+            <button hx-post="/action/dashboard/acknowledge-all"
+                    hx-target="#toast-container"
+                    hx-swap="beforeend"
+                    class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition">
+                Acknowledge All
+            </button>
+        </div>
+    </div>
+
+    <!-- Table of Exceptions -->
+    <div class="overflow-x-auto rounded border border-[#14243b]">
+        <table class="exception-table" id="exceptions-table">
+            <thead>
+                <tr>
+                    <th style="width: 110px;">Severity</th>
+                    <th style="width: 160px;">Asset Identifier</th>
+                    <th>Site Location</th>
+                    <th>Detected Anomaly &amp; Diagnostic</th>
+                    <th style="width: 170px;">Observed Timestamp</th>
+                    <th style="width: 90px;">Freshness</th>
+                    <th style="width: 240px;" class="text-right">Quick Remediation Action</th>
+                </tr>
+            </thead>
+            <tbody id="exceptions-tbody">
+                {% for item in exceptions %}
+                <tr class="exception-row" data-severity="{{ item.severity }}" data-asset="{{ item.asset|lower }}" data-site="{{ item.site|lower }}" data-anomaly="{{ item.anomaly|lower }}">
+                    <!-- Severity -->
+                    <td>
+                        {% if item.severity == 'CRITICAL' %}
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-red-950/60 text-red-400 border border-red-800/40">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span> CRITICAL
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/60 text-amber-400 border border-amber-800/40">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> WARNING
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Asset Identifier -->
+                    <td>
+                        <div class="flex items-center gap-1.5 font-mono text-cyan-300 font-semibold text-xs">
+                            <span>⚡</span>
+                            <span>{{ item.asset }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Site Location -->
+                    <td>
+                        <div class="text-gray-200 font-medium">{{ item.site }}</div>
+                    </td>
+
+                    <!-- Detected Anomaly & Diagnostic -->
+                    <td>
+                        <div class="text-gray-200 font-semibold text-[11px]">{{ item.anomaly }}</div>
+                        <div class="text-[10px] text-gray-400">{{ item.detail }}</div>
+                    </td>
+
+                    <!-- Observed Timestamp -->
+                    <td class="font-mono text-[10.5px]">
+                        <div class="text-gray-300">{{ item.timestamp }}</div>
+                    </td>
+
+                    <!-- Freshness -->
+                    <td>
+                        {% if item.freshness == 'Stale' %}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-950/40 text-amber-400 border border-amber-800/30">Stale</span>
+                        {% elif item.freshness == 'Fresh' %}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-cyan-950/40 text-cyan-400 border border-cyan-800/30">Fresh</span>
+                        {% else %}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-950/40 text-blue-400 border border-blue-800/30">Valid</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Quick Remediation Action -->
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1.5 justify-end">
+                            {% for act in item.actions %}
+                                <button hx-post="{{ act.url }}"
+                                        hx-target="#toast-container"
+                                        hx-swap="beforeend"
+                                        class="action-btn {% if act.type == 'danger' %}action-btn-danger{% elif act.type == 'accent' %}action-btn-accent{% endif %}">
+                                    <span>{{ act.icon }}</span>
+                                    <span>{{ act.label }}</span>
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not exceptions %}
+                <tr id="no-exceptions-row">
+                    <td colspan="7" class="p-6 text-center text-gray-400">
+                        <div class="flex items-center justify-center gap-2 text-emerald-400 text-xs font-semibold">
+                            <span>✓</span>
+                            <span>No anomalies detected. All physical chargers and certificate chains operational.</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-1">To test exception alerts, click <strong>"⚠️ Inject Fault"</strong> in the toolbar above.</div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

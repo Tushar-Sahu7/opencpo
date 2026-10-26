@@ -93,7 +93,7 @@ async def list_sessions(
 # appear before the /{session_id} wildcard or it will be swallowed.
 
 @router.get("/stats/today")
-async def session_stats_today():
+async def session_stats_today(simulated: bool = Query(None)):
     """Today's energy (kWh) and session count."""
     today = date_type.today().isoformat()
     async with db.read() as conn:
@@ -102,10 +102,10 @@ async def session_stats_today():
                 COALESCE(SUM(energy_kwh) FILTER (WHERE status = 'completed'), 0) AS energy_kwh,
                 COUNT(*) AS session_count
             FROM ocpp.sessions
-            WHERE simulated = FALSE
+            WHERE ($1::boolean IS NULL OR simulated = $1)
               AND start_time >= CURRENT_DATE
               AND start_time < CURRENT_DATE + INTERVAL '1 day'
-        """)
+        """, simulated)
     return {
         "energy_kwh": float(row["energy_kwh"]) if row else 0.0,
         "session_count": int(row["session_count"]) if row else 0,
@@ -114,7 +114,7 @@ async def session_stats_today():
 
 
 @router.get("/stats/summary")
-async def session_stats():
+async def session_stats(simulated: bool = Query(None)):
     """Aggregate session statistics including avg_duration_min."""
     async with db.read() as conn:
         stats = await conn.fetchrow("""
@@ -133,8 +133,8 @@ async def session_stats():
                     0
                 ) as avg_duration_min
             FROM ocpp.sessions
-            WHERE simulated = FALSE
-        """)
+            WHERE ($1::boolean IS NULL OR simulated = $1)
+        """, simulated)
 
     result = dict(stats) if stats else {}
     # Ensure float for JSON serialisation
@@ -147,6 +147,7 @@ async def session_stats():
 @router.get("/stats/daily")
 async def session_stats_daily(
     days: int = Query(7, ge=1, le=90, description="Number of days to include"),
+    simulated: bool = Query(None),
 ):
     """Daily energy and session counts for the last N days."""
     async with db.read() as conn:
@@ -156,12 +157,12 @@ async def session_stats_daily(
                 COALESCE(SUM(energy_kwh) FILTER (WHERE status = 'completed'), 0) AS energy_kwh,
                 COUNT(*) AS sessions
             FROM ocpp.sessions
-            WHERE simulated = FALSE
+            WHERE ($2::boolean IS NULL OR simulated = $2)
               AND start_time >= CURRENT_DATE - ($1 - 1) * INTERVAL '1 day'
               AND start_time < CURRENT_DATE + INTERVAL '1 day'
             GROUP BY DATE_TRUNC('day', start_time)
             ORDER BY DATE_TRUNC('day', start_time) ASC
-        """, days)
+        """, days, simulated)
     return {
         "days": [
             {

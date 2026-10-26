@@ -112,23 +112,32 @@ def _build_real_exceptions(chargers: list, pki: dict) -> list:
 
 async def _get_dashboard_context(request: Request) -> dict:
     """Fetch complete live data from ocpp-core, PostgreSQL, and Redis."""
+    days = int(request.query_params.get("days", 7))
+    sim_param = request.query_params.get("simulated")
+    is_simulated = (sim_param == "1" or sim_param.lower() == "true") if sim_param is not None else None
+    region_filter = request.query_params.get("region", "all")
+    selected_tz = request.query_params.get("tz", "IST")
+
+    sim_qs = f"&simulated={str(is_simulated).lower()}" if is_simulated is not None else ""
+    sim_prefix = f"?simulated={str(is_simulated).lower()}" if is_simulated is not None else ""
+
     # 1. Fetch real chargers
     try:
-        chargers_data = await api("/chargers?limit=200")
+        chargers_data = await api(f"/chargers?limit=200{sim_qs}")
     except Exception as e:
         logger.warning("Failed to fetch /chargers: %s", e)
         chargers_data = {"chargers": [], "total": 0}
 
     # 2. Fetch session summary stats
     try:
-        stats = await api("/sessions/stats/summary")
+        stats = await api(f"/sessions/stats/summary{sim_prefix}")
     except Exception as e:
         logger.warning("Failed to fetch /sessions/stats/summary: %s", e)
         stats = {}
 
-    # 3. Fetch 7-day daily session stats
+    # 3. Fetch N-day daily session stats
     try:
-        daily = await api("/sessions/stats/daily?days=7")
+        daily = await api(f"/sessions/stats/daily?days={days}{sim_qs}")
     except Exception as e:
         logger.warning("Failed to fetch /sessions/stats/daily: %s", e)
         daily = {"days": []}
@@ -142,7 +151,7 @@ async def _get_dashboard_context(request: Request) -> dict:
 
     # 5. Fetch recent sessions for energy distribution
     try:
-        sessions_data = await api("/sessions?limit=200")
+        sessions_data = await api(f"/sessions?limit=200{sim_qs}")
         recent_sessions = sessions_data.get("sessions", [])
     except Exception:
         recent_sessions = []
@@ -226,16 +235,16 @@ async def _get_dashboard_context(request: Request) -> dict:
     grid_contract_kw = 740.0
     grid_contract_pct = round((current_load_kw / grid_contract_kw * 100), 1) if grid_contract_kw else 0.0
 
-    # ── Live 7-Day Daily Chart ─────────────────────────────────────────
+    # ── Live Daily Timeline Chart ──────────────────────────────────────
     raw_days = {d["date"]: d for d in daily.get("days", [])}
     today = datetime.now(timezone.utc).date()
     daily_data = []
 
-    # Build clean real 7-day timeline
-    for i in range(6, -1, -1):
+    num_days = max(1, min(days, 90))
+    for i in range(num_days - 1, -1, -1):
         day_date = today - timedelta(days=i)
         date_key = day_date.strftime("%Y-%m-%d")
-        display_label = day_date.strftime("%b %d")
+        display_label = day_date.strftime("%b %d") if num_days > 1 else "Today"
         if date_key in raw_days:
             daily_data.append({
                 "date": display_label,
@@ -322,10 +331,16 @@ async def _get_dashboard_context(request: Request) -> dict:
         "mean_sessions": mean_sessions,
         "energy_distribution": energy_distribution,
         "total_sampled": total_sampled,
-        "co2_offset": co2_offset,
         "pki": pki,
         "exceptions": exceptions,
         "exception_count": len(exceptions),
+        "selected_days": days,
+        "selected_region": region_filter,
+        "selected_tz": selected_tz,
+        "is_simulated": is_simulated,
+        "is_simulated_bool": bool(is_simulated),
+        "regions_list": sorted(list(regions)) if regions else ["Delhi NCR", "Maharashtra West", "Karnataka South", "Telangana"],
+        "sites_list": sorted(list(sites)) if sites else ["Delhi Central Hub", "Mumbai BKC Depot", "Bengaluru Tech Station"],
         "user": user,
     }
 
@@ -339,9 +354,37 @@ async def dashboard(request: Request):
 
 @router.get("/partials/dashboard/live", response_class=HTMLResponse)
 async def dashboard_live_partial(request: Request):
-    """HTMX partial endpoint polled automatically every 5s for real-time live updates."""
+    """HTMX partial endpoint polled automatically for real-time live updates."""
     ctx = await _get_dashboard_context(request)
     return templates.TemplateResponse(request, "partials/dashboard_live.html", context=ctx)
+
+
+@router.get("/partials/dashboard/kpis", response_class=HTMLResponse)
+async def dashboard_kpis_partial(request: Request):
+    """HTMX partial for the 5 top metric cards."""
+    ctx = await _get_dashboard_context(request)
+    return templates.TemplateResponse(request, "partials/dashboard_kpis.html", context=ctx)
+
+
+@router.get("/partials/dashboard/energy-profile", response_class=HTMLResponse)
+async def dashboard_energy_profile_partial(request: Request):
+    """HTMX partial for energy intensity distribution bar."""
+    ctx = await _get_dashboard_context(request)
+    return templates.TemplateResponse(request, "partials/dashboard_energy_profile.html", context=ctx)
+
+
+@router.get("/partials/dashboard/fleet", response_class=HTMLResponse)
+async def dashboard_fleet_partial(request: Request):
+    """HTMX partial for live charger fleet table."""
+    ctx = await _get_dashboard_context(request)
+    return templates.TemplateResponse(request, "partials/dashboard_fleet.html", context=ctx)
+
+
+@router.get("/partials/dashboard/exceptions", response_class=HTMLResponse)
+async def dashboard_exceptions_partial(request: Request):
+    """HTMX partial for actionable exception queue."""
+    ctx = await _get_dashboard_context(request)
+    return templates.TemplateResponse(request, "partials/dashboard_exceptions.html", context=ctx)
 
 
 # ── Live Remote OCPP Actions (Two-Way Communication) ───────────────────
@@ -707,8 +750,14 @@ async def api_dashboard_chart_data(request: Request):
         "daily_data": ctx.get("daily_data", []),
         "connector_statuses": ctx.get("connector_statuses", {}),
         "total_connectors": ctx.get("total_connectors", 0),
+        "ready_pct": ctx.get("ready_pct", 0),
         "current_load_kw": ctx.get("current_load_kw", 0),
         "actively_charging": ctx.get("actively_charging", 0),
         "charger_count": ctx.get("charger_count", 0),
         "online_count": ctx.get("online_count", 0),
+        "min_day": ctx.get("min_day", {"date": "—", "energy": 0}),
+        "max_day": ctx.get("max_day", {"date": "—", "energy": 0}),
+        "mean_energy": ctx.get("mean_energy", 0),
+        "mean_sessions": ctx.get("mean_sessions", 0),
+        "co2_offset": ctx.get("co2_offset", 0),
     })

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% set active = "dashboard" %}
-{% block title %}Dashboard — Network Operations{% endblock %}
+{% block title %}Dashboard — Real-Time Network Operations{% endblock %}
 
 {% block content %}
 <style>
@@ -41,8 +41,9 @@
         padding: 5px 10px;
         outline: none;
         cursor: pointer;
+        transition: border-color 0.15s;
     }
-    .filter-select:hover {
+    .filter-select:hover, .filter-select:focus {
         border-color: #00bcd4;
     }
 
@@ -133,7 +134,7 @@
         font-size: 12px;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         animation: slideIn 0.2s ease-out;
-        max-width: 400px;
+        max-width: 420px;
     }
     .toast-success {
         background: #062b1e;
@@ -156,10 +157,10 @@
     }
 </style>
 
-<!-- Live Toast Container -->
+<!-- Live Toast Notifications Container -->
 <div id="toast-container"></div>
 
-<!-- ═══ Top Breadcrumb & Live Connection Header ══════════════════════════ -->
+<!-- ═══ Top Breadcrumb & Live Filters Bar ═════════════════════════════════ -->
 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
     <div class="flex items-center gap-2">
         <span class="text-cyan-400 font-bold text-sm">⊞</span>
@@ -167,50 +168,291 @@
         <span class="text-gray-600">/</span>
         <span class="text-xs text-emerald-400 flex items-center gap-1.5 font-mono bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Real-Time CSMS Linked (Auto-polling 4s)
+            Real-Time CSMS Linked (TimescaleDB + Redis)
         </span>
     </div>
 
+    <!-- Interactive Top Filters -->
     <div class="flex flex-wrap items-center gap-2">
-        <!-- Region Filter -->
+        <!-- 1. Region / Hub Filter -->
         <div class="relative">
-            <select class="filter-select pr-6 appearance-none">
-                <option>🌐 All Sites &amp; Hubs</option>
-                <option>Delhi Central Hub</option>
-                <option>Mumbai BKC Depot</option>
-                <option>Bengaluru Tech Station</option>
+            <select id="filter-region" onchange="applyDashboardFilters()" class="filter-select pr-6 appearance-none">
+                <option value="all" {% if selected_region == 'all' or not selected_region %}selected{% endif %}>🌐 All Regions &amp; Sites</option>
+                {% for r in regions_list %}
+                    <option value="{{ r }}" {% if selected_region == r %}selected{% endif %}>📍 {{ r }}</option>
+                {% endfor %}
             </select>
-            <span class="absolute right-2 top-2 text-[9px] text-gray-400 pointer-events-none">▼</span>
+            <span class="absolute right-2 top-2.5 text-[9px] text-gray-400 pointer-events-none">▼</span>
         </div>
 
-        <!-- Date Range Filter -->
+        <!-- 2. Date Range Filter -->
         <div class="relative">
-            <select class="filter-select pr-6 appearance-none">
-                <option>📅 Live (Past 7 Days)</option>
-                <option>📅 Last 24 Hours</option>
-                <option>📅 Last 30 Days</option>
+            <select id="filter-days" onchange="applyDashboardFilters()" class="filter-select pr-6 appearance-none">
+                <option value="7" {% if selected_days == 7 %}selected{% endif %}>📅 Live (Past 7 Days)</option>
+                <option value="1" {% if selected_days == 1 %}selected{% endif %}>📅 Today / Last 24 Hours</option>
+                <option value="30" {% if selected_days == 30 %}selected{% endif %}>📅 Last 30 Days</option>
+                <option value="90" {% if selected_days == 90 %}selected{% endif %}>📅 Last Quarter (90 Days)</option>
             </select>
-            <span class="absolute right-2 top-2 text-[9px] text-gray-400 pointer-events-none">▼</span>
+            <span class="absolute right-2 top-2.5 text-[9px] text-gray-400 pointer-events-none">▼</span>
         </div>
 
-        <!-- Manual Refresh Button -->
-        <button hx-get="/partials/dashboard/live"
-                hx-target="#dashboard-live-container"
-                hx-swap="innerHTML"
-                title="Sync now"
-                class="px-2.5 py-1 rounded bg-[#0b1422] border border-[#192d48] text-[11px] text-gray-300 hover:border-cyan-500 hover:text-white transition flex items-center gap-1">
-            <span>↻</span>
+        <!-- 3. Timezone Selector -->
+        <div class="relative">
+            <select id="filter-tz" onchange="applyDashboardFilters()" class="filter-select pr-6 appearance-none">
+                <option value="IST" {% if selected_tz == 'IST' %}selected{% endif %}>🕒 IST (UTC+5:30)</option>
+                <option value="UTC" {% if selected_tz == 'UTC' %}selected{% endif %}>🕒 UTC</option>
+                <option value="EST" {% if selected_tz == 'EST' %}selected{% endif %}>🕒 EST (UTC-5)</option>
+            </select>
+            <span class="absolute right-2 top-2.5 text-[9px] text-gray-400 pointer-events-none">▼</span>
+        </div>
+
+        <!-- 4. Simulated Data Switch Pill -->
+        <div class="relative">
+            <select id="filter-simulated" onchange="applyDashboardFilters()" class="filter-select pr-6 appearance-none">
+                <option value="all" {% if is_simulated is none %}selected{% endif %}>🧪 All Data (Live + Simulated)</option>
+                <option value="0" {% if is_simulated is sameas false %}selected{% endif %}>🔌 Physical Chargers Only</option>
+                <option value="1" {% if is_simulated is sameas true %}selected{% endif %}>⚡ Simulated Farm Only</option>
+            </select>
+            <span class="absolute right-2 top-2.5 text-[9px] text-gray-400 pointer-events-none">▼</span>
+        </div>
+
+        <!-- 5. Manual Sync Button -->
+        <button onclick="applyDashboardFilters(true)"
+                title="Force refresh now"
+                class="px-2.5 py-1 rounded bg-[#0b1422] border border-[#192d48] text-[11px] text-gray-300 hover:border-cyan-500 hover:text-white transition flex items-center gap-1.5 cursor-pointer">
+            <span id="sync-icon">↻</span>
             <span>Sync</span>
         </button>
     </div>
 </div>
 
-<!-- ═══ Live Dynamic Dashboard Container (Polled every 4s via HTMX) ════════ -->
-<div id="dashboard-live-container"
-     hx-get="/partials/dashboard/live"
+<!-- ═══ Interactive Operations & Command Center Toolbar ═══════════════════ -->
+<div class="mb-4 p-3 rounded-lg bg-[#0b1422] border border-[#1a2f4d] flex flex-wrap items-center justify-between gap-3 shadow-lg">
+    <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-bold text-gray-200 uppercase tracking-wider">Live Control Center</span>
+        </div>
+        <span class="text-gray-600">|</span>
+        <span class="text-xs text-gray-400">
+            Connected: <strong id="tb-chargers" class="text-cyan-400 font-mono">{{ online_count }}/{{ charger_count }}</strong> Chargers
+            &bull;
+            Load: <strong id="tb-load" class="text-cyan-400 font-mono">{{ current_load_kw }} kW</strong>
+            &bull;
+            Plugs: <strong id="tb-charging" class="text-emerald-400 font-mono">{{ actively_charging }}</strong> Charging / <strong id="tb-ready" class="text-gray-300 font-mono">{{ connector_statuses.Available }}</strong> Ready
+        </span>
+    </div>
+
+    <!-- Live Command Action Buttons -->
+    <div class="flex flex-wrap items-center gap-2">
+        <button hx-post="/action/dashboard/spawn-virtual?count=3"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Connect 3 simulated OCPP 1.6 chargers via Charger Farm"
+                class="px-2.5 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/60 text-cyan-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>⚡</span>
+            <span>+3 Chargers</span>
+        </button>
+
+        <button hx-post="/action/dashboard/simulate-session-start"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Plug in EV and stream live active meter values (kW load)"
+                class="px-2.5 py-1 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>▶</span>
+            <span>Plug &amp; Charge</span>
+        </button>
+
+        <button hx-post="/action/dashboard/simulate-session-stop"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Finish transaction and write CDR to database"
+                class="px-2.5 py-1 bg-amber-950/80 hover:bg-amber-900 border border-amber-700/60 text-amber-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>⏹</span>
+            <span>Stop Charge</span>
+        </button>
+
+        <button hx-post="/action/dashboard/inject-fault?error_code=GroundFailure"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Inject hardware ground fault to trigger Exception Queue alert"
+                class="px-2.5 py-1 bg-red-950/80 hover:bg-red-900 border border-red-700/60 text-red-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>⚠️</span>
+            <span>Inject Fault</span>
+        </button>
+
+        <button hx-post="/action/dashboard/recover-fault"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Clear hardware fault and restore connector to Available"
+                class="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>✓</span>
+            <span>Clear Faults</span>
+        </button>
+
+        <button hx-post="/action/dashboard/stop-virtual"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Disconnect all farm chargers"
+                class="px-2 py-1 bg-gray-900 hover:bg-red-950/60 border border-gray-700 hover:border-red-700 text-gray-400 hover:text-red-300 text-xs rounded transition">
+            <span>Disconnect Farm</span>
+        </button>
+    </div>
+</div>
+
+<!-- ═══ Row 1: 5 Top Metric KPI Cards (Polled every 3s via HTMX) ═════════ -->
+<div id="kpi-cards-container"
+     class="mb-4"
+     hx-get="/partials/dashboard/kpis?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
+     hx-trigger="every 3s"
+     hx-swap="innerHTML">
+    {% include "partials/dashboard_kpis.html" %}
+</div>
+
+<!-- ═══ Row 2: Permanent Chart Surfaces (Dual-Axis & Status Donut) ════════ -->
+<!-- Canvases are kept stable and permanent so Chart.js transitions are buttery smooth without flicker -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-4">
+
+    <!-- Left Chart: Daily Delivered Energy & Session Throughput (8 cols) -->
+    <div class="lg:col-span-8 dashboard-panel p-4 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-xs font-bold text-gray-200">Daily Delivered Energy &amp; Session Throughput</h2>
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/40">Dual Axis</span>
+                </div>
+                <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-sm bg-cyan-500"></span> Delivered Energy (kWh)
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Session Count
+                    </span>
+                </div>
+            </div>
+            <p class="text-[10px] text-gray-500 mb-3">Energy dispensed (kWh) correlated against active OCPP transaction completions from TimescaleDB</p>
+
+            <!-- Stable Permanent Canvas -->
+            <div class="relative w-full" style="height: 220px;">
+                <canvas id="dailyEnergyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 4-Stat Metric Summary Bar under chart -->
+        <div class="grid grid-cols-4 gap-2 pt-3 mt-2 border-t border-gray-800/60 text-center text-[10px]">
+            <div>
+                <div class="text-gray-400">Min Output Day</div>
+                <div id="stat-min-day" class="font-semibold text-gray-200 font-mono">{{ min_day.date }} ({{ min_day.energy }} kWh)</div>
+            </div>
+            <div>
+                <div class="text-gray-400">Max Output Day</div>
+                <div id="stat-max-day" class="font-semibold text-cyan-400 font-mono">{{ max_day.date }} ({{ max_day.energy }} kWh)</div>
+            </div>
+            <div>
+                <div class="text-gray-400">Average Output / Day</div>
+                <div id="stat-mean-energy" class="font-semibold text-gray-200 font-mono">{{ mean_energy }} kWh</div>
+            </div>
+            <div>
+                <div class="text-gray-400">Completed Runs</div>
+                <div id="stat-mean-sessions" class="font-semibold text-emerald-400 font-mono">{{ mean_sessions }} sess / day</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Chart: Connector Status Share (4 cols) -->
+    <div class="lg:col-span-4 dashboard-panel p-4 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-xs font-bold text-gray-200">Connector Status Share</h2>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40">LIVE BREAKDOWN</span>
+            </div>
+            <p class="text-[10px] text-gray-500 mb-3">Instant physical port state across all charging pedestals</p>
+
+            <!-- Stable Permanent Doughnut Canvas with Center Badge -->
+            <div class="relative flex items-center justify-center" style="height: 170px;">
+                <canvas id="connectorDonutChart"></canvas>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span id="donut-total-plugs" class="text-2xl font-bold text-white font-mono leading-none">{{ total_connectors }}</span>
+                    <span class="text-[9px] text-gray-400 tracking-wider">TOTAL PLUGS</span>
+                    <span id="donut-ready-pct" class="text-[10px] font-bold text-emerald-400 mt-0.5">{{ ready_pct }}% READY</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend Breakdown -->
+        <div class="space-y-1 pt-2 border-t border-gray-800/60 text-[11px]">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-gray-300">Available</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span id="legend-available" class="font-semibold">{{ connector_statuses.Available }}</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span class="text-gray-300">Charging</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span id="legend-charging" class="font-semibold">{{ connector_statuses.Charging }}</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    <span class="text-gray-300">Preparing / Handshake</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span id="legend-preparing" class="font-semibold">{{ connector_statuses.Preparing }}</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                    <span class="text-gray-300">Suspended EV</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span id="legend-suspended" class="font-semibold">{{ connector_statuses.SuspendedEV }}</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                    <span class="text-gray-300">Faulted / Lockout</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span id="legend-faulted" class="font-semibold">{{ connector_statuses.Faulted }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══ Row 3: Energy Intensity Distribution Profile (Polled every 4s via HTMX) ═ -->
+<div id="energy-profile-container"
+     hx-get="/partials/dashboard/energy-profile?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
      hx-trigger="every 4s"
      hx-swap="innerHTML">
-    {% include "partials/dashboard_live.html" %}
+    {% include "partials/dashboard_energy_profile.html" %}
+</div>
+
+<!-- ═══ Row 4: Live Connected Chargers Fleet Table (Polled every 3s via HTMX) ═ -->
+<div id="fleet-table-container"
+     hx-get="/partials/dashboard/fleet?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
+     hx-trigger="every 3s"
+     hx-swap="innerHTML">
+    {% include "partials/dashboard_fleet.html" %}
+</div>
+
+<!-- ═══ Row 5: Actionable Exception Queue (Polled every 3s via HTMX) ════════ -->
+<div id="exceptions-container"
+     hx-get="/partials/dashboard/exceptions?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
+     hx-trigger="every 3s"
+     hx-swap="innerHTML">
+    {% include "partials/dashboard_exceptions.html" %}
 </div>
 
 <!-- ═══ Bottom Footer Status ═════════════════════════════════════════════ -->
@@ -227,121 +469,138 @@
     </div>
 </div>
 
-<!-- ═══ Chart Engine & Live Sync Script ════════════════════════════════════ -->
+<!-- ═══ Initial Raw Data for Fast First Render ═══════════════════════════ -->
+<script id="initial-chart-data" type="application/json">
+{
+    "daily_data": {{ daily_data | tojson }},
+    "connector_statuses": {{ connector_statuses | tojson }},
+    "total_connectors": {{ total_connectors }},
+    "ready_pct": {{ ready_pct }},
+    "charger_count": {{ charger_count }},
+    "online_count": {{ online_count }},
+    "current_load_kw": {{ current_load_kw }},
+    "actively_charging": {{ actively_charging }},
+    "min_day": {{ min_day | tojson }},
+    "max_day": {{ max_day | tojson }},
+    "mean_energy": {{ mean_energy }},
+    "mean_sessions": {{ mean_sessions }}
+}
+</script>
+
+<!-- ═══ Smooth Chart Engine & Comprehensive Filter Scripts ════════════════ -->
 <script>
 window.dailyChartInstance = null;
 window.donutChartInstance = null;
+let currentExceptionTab = 'unresolved';
 
-function renderOrUpdateCharts() {
-    const dataScript = document.getElementById('live-chart-data');
-    if (!dataScript) return;
-
-    let payload;
-    try {
-        payload = JSON.parse(dataScript.textContent);
-    } catch(e) {
-        return;
+// ── 1. Chart Initialization ──────────────────────────────────────────
+function initCharts() {
+    const rawEl = document.getElementById('initial-chart-data');
+    let initData = {};
+    if (rawEl) {
+        try { initData = JSON.parse(rawEl.textContent); } catch(e) {}
     }
 
-    const dailyData = payload.daily_data || [];
+    const dailyData = initData.daily_data || [];
     const labels = dailyData.map(d => d.date);
     const energyData = dailyData.map(d => d.energy_kwh);
     const sessionData = dailyData.map(d => d.sessions);
-    const statuses = payload.connector_statuses || {};
+    const statuses = initData.connector_statuses || {};
 
     // 1. Dual-Axis Bar + Line Chart
     const canvasEnergy = document.getElementById('dailyEnergyChart');
-    if (canvasEnergy) {
+    if (canvasEnergy && !window.dailyChartInstance) {
         const ctxEnergy = canvasEnergy.getContext('2d');
-        if (window.dailyChartInstance) {
-            window.dailyChartInstance.data.labels = labels;
-            window.dailyChartInstance.data.datasets[0].data = energyData;
-            window.dailyChartInstance.data.datasets[1].data = sessionData;
-            window.dailyChartInstance.update('none');
-        } else {
-            window.dailyChartInstance = new Chart(ctxEnergy, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        {
-                            type: 'bar',
-                            label: 'Delivered Energy (kWh)',
-                            data: energyData,
-                            backgroundColor: '#00bcd4',
-                            hoverBackgroundColor: '#26c6da',
-                            borderRadius: 4,
-                            barPercentage: 0.45,
-                            yAxisID: 'y'
-                        },
-                        {
-                            type: 'line',
-                            label: 'Session Count',
-                            data: sessionData,
-                            borderColor: '#10b981',
-                            backgroundColor: '#10b981',
-                            borderWidth: 2.5,
-                            pointBackgroundColor: '#10b981',
-                            pointBorderColor: '#060b13',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            tension: 0.3,
-                            yAxisID: 'y1'
-                        }
-                    ]
+        window.dailyChartInstance = new Chart(ctxEnergy, {
+            type: 'bar',
+            data: {
+                labels: labels.length ? labels : ['Today'],
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Delivered Energy (kWh)',
+                        data: energyData.length ? energyData : [0],
+                        backgroundColor: '#00bcd4',
+                        hoverBackgroundColor: '#26c6da',
+                        borderRadius: 4,
+                        barPercentage: 0.45,
+                        yAxisID: 'y'
+                    },
+                    {
+                        type: 'line',
+                        label: 'Session Count',
+                        data: sessionData.length ? sessionData : [0],
+                        borderColor: '#10b981',
+                        backgroundColor: '#10b981',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#060b13',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        tension: 0.3,
+                        yAxisID: 'y1'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 600,
+                    easing: 'easeOutQuart'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: { mode: 'index', intersect: false },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0c1726',
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#cbd5e1',
-                            borderColor: '#192d47',
-                            borderWidth: 1,
-                            padding: 10
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0c1726',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#192d47',
+                        borderWidth: 1,
+                        padding: 10
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#64748b', font: { size: 10, family: 'monospace' } }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        suggestedMax: 10,
+                        grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 10, family: 'monospace' },
+                            callback: function(v) { return v + ' kWh'; }
                         }
                     },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#64748b', font: { size: 10, family: 'monospace' } }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 10, family: 'monospace' },
-                                callback: function(value) { return value + ' kWh'; }
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            grid: { drawOnChartArea: false },
-                            ticks: {
-                                color: '#64748b',
-                                font: { size: 10, family: 'monospace' },
-                                precision: 0
-                            }
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        suggestedMax: 5,
+                        grid: { drawOnChartArea: false },
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 10, family: 'monospace' },
+                            precision: 0
                         }
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     // 2. Connector Donut Chart
     const canvasDonut = document.getElementById('connectorDonutChart');
-    if (canvasDonut) {
+    if (canvasDonut && !window.donutChartInstance) {
         const ctxDonut = canvasDonut.getContext('2d');
         const donutValues = [
             statuses.Available || 0,
@@ -350,64 +609,300 @@ function renderOrUpdateCharts() {
             statuses.SuspendedEV || 0,
             statuses.Faulted || 0
         ];
-        // If all zeroes, show small placeholder slice
-        const total = donutValues.reduce((a, b) => a + b, 0);
-        const finalValues = total > 0 ? donutValues : [1, 0, 0, 0, 0];
-        const finalColors = total > 0
+        const sumVal = donutValues.reduce((a, b) => a + b, 0);
+        const finalValues = sumVal > 0 ? donutValues : [1, 0, 0, 0, 0];
+        const finalColors = sumVal > 0
             ? ['#10b981', '#00bcd4', '#f59e0b', '#6366f1', '#ef4444']
             : ['#1e293b', '#1e293b', '#1e293b', '#1e293b', '#1e293b'];
 
-        if (window.donutChartInstance) {
-            window.donutChartInstance.data.datasets[0].data = finalValues;
-            window.donutChartInstance.data.datasets[0].backgroundColor = finalColors;
-            window.donutChartInstance.update('none');
-        } else {
-            window.donutChartInstance = new Chart(ctxDonut, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Available', 'Charging', 'Preparing', 'Suspended EV', 'Faulted'],
-                    datasets: [{
-                        data: finalValues,
-                        backgroundColor: finalColors,
-                        borderWidth: 3,
-                        borderColor: '#0b1422',
-                        hoverOffset: 4
-                    }]
+        window.donutChartInstance = new Chart(ctxDonut, {
+            type: 'doughnut',
+            data: {
+                labels: ['Available', 'Charging', 'Preparing', 'Suspended EV', 'Faulted'],
+                datasets: [{
+                    data: finalValues,
+                    backgroundColor: finalColors,
+                    borderWidth: 3,
+                    borderColor: '#0b1422',
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '72%',
+                animation: {
+                    duration: 600,
+                    easing: 'easeOutQuart'
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '72%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#0c1726',
-                            titleColor: '#f1f5f9',
-                            bodyColor: '#cbd5e1',
-                            borderColor: '#192d47',
-                            borderWidth: 1,
-                            padding: 8
-                        }
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#0c1726',
+                        titleColor: '#f1f5f9',
+                        bodyColor: '#cbd5e1',
+                        borderColor: '#192d47',
+                        borderWidth: 1,
+                        padding: 8
                     }
                 }
-            });
+            }
+        });
+    }
+}
+
+// ── 2. Live Chart & Stat Sync (Smooth Updates without Canvas destruction) ──
+async function syncCharts() {
+    const region = document.getElementById('filter-region')?.value || 'all';
+    const days = document.getElementById('filter-days')?.value || '7';
+    const tz = document.getElementById('filter-tz')?.value || 'IST';
+    const sim = document.getElementById('filter-simulated')?.value || 'all';
+
+    let qs = `?days=${days}&region=${encodeURIComponent(region)}&tz=${tz}`;
+    if (sim !== 'all') {
+        qs += `&simulated=${sim}`;
+    }
+
+    try {
+        const res = await fetch(`/api/dashboard/chart-data${qs}`);
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // 1. Update Daily Energy Chart
+        if (window.dailyChartInstance && data.daily_data) {
+            const labels = data.daily_data.map(d => d.date);
+            const energyData = data.daily_data.map(d => d.energy_kwh);
+            const sessionData = data.daily_data.map(d => d.sessions);
+
+            window.dailyChartInstance.data.labels = labels.length ? labels : ['Today'];
+            window.dailyChartInstance.data.datasets[0].data = energyData.length ? energyData : [0];
+            window.dailyChartInstance.data.datasets[1].data = sessionData.length ? sessionData : [0];
+            window.dailyChartInstance.update();
+        }
+
+        // 2. Update Donut Chart
+        if (window.donutChartInstance && data.connector_statuses) {
+            const st = data.connector_statuses;
+            const values = [
+                st.Available || 0,
+                st.Charging || 0,
+                st.Preparing || 0,
+                st.SuspendedEV || 0,
+                st.Faulted || 0
+            ];
+            const sumVal = values.reduce((a, b) => a + b, 0);
+            const finalValues = sumVal > 0 ? values : [1, 0, 0, 0, 0];
+            const finalColors = sumVal > 0
+                ? ['#10b981', '#00bcd4', '#f59e0b', '#6366f1', '#ef4444']
+                : ['#1e293b', '#1e293b', '#1e293b', '#1e293b', '#1e293b'];
+
+            window.donutChartInstance.data.datasets[0].data = finalValues;
+            window.donutChartInstance.data.datasets[0].backgroundColor = finalColors;
+            window.donutChartInstance.update();
+        }
+
+        // 3. Update Stat Numbers
+        if (data.min_day && document.getElementById('stat-min-day')) {
+            document.getElementById('stat-min-day').textContent = `${data.min_day.date} (${data.min_day.energy} kWh)`;
+        }
+        if (data.max_day && document.getElementById('stat-max-day')) {
+            document.getElementById('stat-max-day').textContent = `${data.max_day.date} (${data.max_day.energy} kWh)`;
+        }
+        if (data.mean_energy !== undefined && document.getElementById('stat-mean-energy')) {
+            document.getElementById('stat-mean-energy').textContent = `${data.mean_energy} kWh`;
+        }
+        if (data.mean_sessions !== undefined && document.getElementById('stat-mean-sessions')) {
+            document.getElementById('stat-mean-sessions').textContent = `${data.mean_sessions} sess / day`;
+        }
+        if (data.total_connectors !== undefined && document.getElementById('donut-total-plugs')) {
+            document.getElementById('donut-total-plugs').textContent = data.total_connectors;
+        }
+        if (data.ready_pct !== undefined && document.getElementById('donut-ready-pct')) {
+            document.getElementById('donut-ready-pct').textContent = `${data.ready_pct}% READY`;
+        }
+
+        // Update Legend Pills
+        if (data.connector_statuses) {
+            const st = data.connector_statuses;
+            if (document.getElementById('legend-available')) document.getElementById('legend-available').textContent = st.Available || 0;
+            if (document.getElementById('legend-charging')) document.getElementById('legend-charging').textContent = st.Charging || 0;
+            if (document.getElementById('legend-preparing')) document.getElementById('legend-preparing').textContent = st.Preparing || 0;
+            if (document.getElementById('legend-suspended')) document.getElementById('legend-suspended').textContent = st.SuspendedEV || 0;
+            if (document.getElementById('legend-faulted')) document.getElementById('legend-faulted').textContent = st.Faulted || 0;
+        }
+
+        // Update Toolbar Stats
+        if (document.getElementById('tb-chargers')) {
+            document.getElementById('tb-chargers').textContent = `${data.online_count}/${data.charger_count}`;
+        }
+        if (document.getElementById('tb-load')) {
+            document.getElementById('tb-load').textContent = `${data.current_load_kw} kW`;
+        }
+        if (document.getElementById('tb-charging')) {
+            document.getElementById('tb-charging').textContent = data.actively_charging;
+        }
+        if (document.getElementById('tb-ready') && data.connector_statuses) {
+            document.getElementById('tb-ready').textContent = data.connector_statuses.Available || 0;
+        }
+
+    } catch (e) {
+        console.warn('Live chart sync error:', e);
+    }
+}
+
+// ── 3. Filter Application (Updates HTMX Partial URLs & Triggers Refresh) ──
+function applyDashboardFilters(manual = false) {
+    const region = document.getElementById('filter-region')?.value || 'all';
+    const days = document.getElementById('filter-days')?.value || '7';
+    const tz = document.getElementById('filter-tz')?.value || 'IST';
+    const sim = document.getElementById('filter-simulated')?.value || 'all';
+
+    let qs = `?days=${days}&region=${encodeURIComponent(region)}&tz=${tz}`;
+    if (sim !== 'all') {
+        qs += `&simulated=${sim}`;
+    }
+
+    // Update browser URL query without reloading the page
+    window.history.replaceState({}, '', window.location.pathname + qs);
+
+    // Update HTMX URLs on all partial containers
+    const kpiEl = document.getElementById('kpi-cards-container');
+    const energyEl = document.getElementById('energy-profile-container');
+    const fleetEl = document.getElementById('fleet-table-container');
+    const excEl = document.getElementById('exceptions-container');
+
+    if (kpiEl) {
+        kpiEl.setAttribute('hx-get', `/partials/dashboard/kpis${qs}`);
+        htmx.process(kpiEl);
+        htmx.trigger(kpiEl, 'refresh');
+    }
+    if (energyEl) {
+        energyEl.setAttribute('hx-get', `/partials/dashboard/energy-profile${qs}`);
+        htmx.process(energyEl);
+        htmx.trigger(energyEl, 'refresh');
+    }
+    if (fleetEl) {
+        fleetEl.setAttribute('hx-get', `/partials/dashboard/fleet${qs}`);
+        htmx.process(fleetEl);
+        htmx.trigger(fleetEl, 'refresh');
+    }
+    if (excEl) {
+        excEl.setAttribute('hx-get', `/partials/dashboard/exceptions${qs}`);
+        htmx.process(excEl);
+        htmx.trigger(excEl, 'refresh');
+    }
+
+    // Update charts smoothly
+    syncCharts();
+
+    if (manual) {
+        const icon = document.getElementById('sync-icon');
+        if (icon) {
+            icon.classList.add('animate-spin');
+            setTimeout(() => icon.classList.remove('animate-spin'), 600);
         }
     }
 }
 
-// Initial render
-document.addEventListener('DOMContentLoaded', function() {
-    renderOrUpdateCharts();
-});
+// ── 4. Client-side Fleet Table Filtering ─────────────────────────────
+function filterFleet(type) {
+    const btnAll = document.getElementById('fleet-tab-all');
+    const btnOnline = document.getElementById('fleet-tab-online');
 
-// Update charts after HTMX polls
-document.addEventListener('htmx:afterSwap', function(evt) {
-    if (evt.detail.target && evt.detail.target.id === 'dashboard-live-container') {
-        renderOrUpdateCharts();
+    if (type === 'all') {
+        if (btnAll) btnAll.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-cyan-950 text-cyan-400 border border-cyan-800/50";
+        if (btnOnline) btnOnline.className = "px-2 py-0.5 rounded text-[10px] font-medium bg-[#08101a] text-gray-400 border border-[#192d48] hover:text-gray-200";
+    } else {
+        if (btnOnline) btnOnline.className = "px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950 text-emerald-400 border border-emerald-800/50";
+        if (btnAll) btnAll.className = "px-2 py-0.5 rounded text-[10px] font-medium bg-[#08101a] text-gray-400 border border-[#192d48] hover:text-gray-200";
     }
+
+    const rows = document.querySelectorAll('.fleet-row');
+    rows.forEach(r => {
+        if (type === 'all') {
+            r.style.display = '';
+        } else if (type === 'online') {
+            r.style.display = r.dataset.status === 'online' ? '' : 'none';
+        }
+    });
+}
+
+function searchFleetTable() {
+    const query = document.getElementById('fleet-search')?.value.toLowerCase().trim() || '';
+    const rows = document.querySelectorAll('.fleet-row');
+    rows.forEach(r => {
+        const id = r.dataset.id?.toLowerCase() || '';
+        const model = r.dataset.model?.toLowerCase() || '';
+        const site = r.dataset.site?.toLowerCase() || '';
+        if (id.includes(query) || model.includes(query) || site.includes(query)) {
+            r.style.display = '';
+        } else {
+            r.style.display = 'none';
+        }
+    });
+}
+
+// ── 5. Client-side Exception Queue Filtering ─────────────────────────
+function setExceptionTab(tab) {
+    currentExceptionTab = tab;
+    const tabUnres = document.getElementById('tab-exc-unresolved');
+    const tabAck = document.getElementById('tab-exc-acknowledged');
+
+    if (tab === 'unresolved') {
+        if (tabUnres) tabUnres.className = "px-2.5 py-1 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/50";
+        if (tabAck) tabAck.className = "px-2.5 py-1 rounded text-[10px] font-medium text-gray-400 hover:text-gray-200";
+    } else {
+        if (tabAck) tabAck.className = "px-2.5 py-1 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800/50";
+        if (tabUnres) tabUnres.className = "px-2.5 py-1 rounded text-[10px] font-medium text-gray-400 hover:text-gray-200";
+    }
+    filterExceptionsTable();
+}
+
+function filterExceptionsTable() {
+    const sev = document.getElementById('exception-severity-filter')?.value || 'ALL';
+    const query = document.getElementById('exception-search')?.value.toLowerCase().trim() || '';
+    const rows = document.querySelectorAll('.exception-row');
+    let visibleCount = 0;
+
+    rows.forEach(r => {
+        // Tab check
+        if (currentExceptionTab === 'acknowledged') {
+            r.style.display = 'none';
+            return;
+        }
+
+        // Severity check
+        const rowSev = r.dataset.severity;
+        const matchesSev = (sev === 'ALL' || rowSev === sev);
+
+        // Text search check
+        const asset = r.dataset.asset || '';
+        const site = r.dataset.site || '';
+        const anomaly = r.dataset.anomaly || '';
+        const matchesQuery = !query || asset.includes(query) || site.includes(query) || anomaly.includes(query);
+
+        if (matchesSev && matchesQuery) {
+            r.style.display = '';
+            visibleCount++;
+        } else {
+            r.style.display = 'none';
+        }
+    });
+
+    const noRow = document.getElementById('no-exceptions-row');
+    if (noRow) {
+        noRow.style.display = (visibleCount === 0 && currentExceptionTab === 'unresolved') ? '' : 'none';
+    }
+}
+
+// ── 6. Lifecycle & Timers ────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    initCharts();
+    // Periodically sync charts every 3 seconds
+    setInterval(syncCharts, 3000);
 });
 
-// Auto-dismiss toasts after 4 seconds
+// Toast dismiss timer
 document.addEventListener('htmx:afterOnLoad', function(evt) {
     const toasts = document.querySelectorAll('.toast-alert');
     toasts.forEach(toast => {
