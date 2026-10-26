@@ -1,0 +1,20 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Force shell scripts to always use LF
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Force batch files to use CRLF (Windows needs this)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files (don't touch these)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary

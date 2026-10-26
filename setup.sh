@@ -34,6 +34,7 @@ trap cleanup EXIT
 
 ORG="${ORG:-opencpo}"
 BASE_URL="https://github.com/$ORG"
+AUTO=0
 # Auto-detect non-interactive mode: when piped (curl | bash), stdin is not a TTY
 if [ ! -t 0 ]; then
   AUTO=1
