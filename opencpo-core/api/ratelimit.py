@@ -12,6 +12,16 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 
 
+import ipaddress
+
+def _is_private_or_loopback(ip: str) -> bool:
+    try:
+        obj = ipaddress.ip_address(ip)
+        return obj.is_private or obj.is_loopback
+    except ValueError:
+        return ip in ("127.0.0.1", "::1", "localhost", "testclient")
+
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Per-IP rate limiting with configurable limits per path prefix."""
 
@@ -43,8 +53,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in ("/health", "/health/ready", "/api/v1/admin/auth/me"):
             return await call_next(request)
 
-        ip = request.headers.get("X-Real-IP") or request.client.host
-        if ip in ("127.0.0.1", "::1", "localhost"):
+        ip = request.headers.get("X-Real-IP") or (request.client.host if request.client else "127.0.0.1")
+        if _is_private_or_loopback(ip):
             return await call_next(request)
         path = request.url.path
         limit = self._get_limit(path)

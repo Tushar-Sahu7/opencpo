@@ -4,6 +4,7 @@ All route modules import from here — never from main.py.
 """
 import os
 import json
+import time
 import logging
 from datetime import datetime, timezone
 
@@ -58,15 +59,31 @@ def _verify_token_local(token: str) -> dict | None:
         return None
 
 
+_setup_cache = {"complete": None, "timestamp": 0.0}
+
 async def get_setup_status() -> dict:
-    """Check if the platform has been configured (first-time setup)."""
+    """Check if the platform has been configured (first-time setup). Cached in memory."""
+    global _setup_cache
+    now = time.time()
+    # Cache positive setup complete for 5 minutes
+    if _setup_cache["complete"] is True and (now - _setup_cache["timestamp"]) < 300:
+        return {"complete": True, "steps": {}}
+
     try:
         async with httpx.AsyncClient(base_url=CORE_API, timeout=5) as client:
             r = await client.get("/api/v1/admin/setup/status")
             if r.status_code == 200:
-                return r.json()
+                data = r.json()
+                if data.get("complete"):
+                    _setup_cache = {"complete": True, "timestamp": now}
+                return data
+            # If core returns 429 or transient error, keep existing cached state rather than kicking user out
+            if _setup_cache["complete"] is True:
+                return {"complete": True, "steps": {}}
     except Exception:
-        pass
+        if _setup_cache["complete"] is True:
+            return {"complete": True, "steps": {}}
+
     return {"complete": False, "steps": {}}
 
 
