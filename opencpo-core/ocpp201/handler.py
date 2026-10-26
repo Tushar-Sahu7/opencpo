@@ -177,11 +177,17 @@ class ChargePointHandler201(TransactionMixin, MeterMixin, SecurityMixin):
 
         async with db.write() as conn:
             await conn.execute("""
-                INSERT INTO ocpp.connectors (charge_point, connector_id, status, updated_at)
-                VALUES ($1, $2, $3, $4)
-                ON CONFLICT (charge_point, connector_id) DO UPDATE SET
-                    status = $3, updated_at = $4
-            """, self.cp_id, connector_id, status, timestamp)
+                INSERT INTO ocpp.charge_points (id, ocpp_version, status, last_heartbeat)
+                VALUES ($1, '2.0.1', 'online', NOW())
+                ON CONFLICT (id) DO UPDATE SET status = 'online', last_heartbeat = NOW()
+            """, self.cp_id)
+            if connector_id > 0:
+                await conn.execute("""
+                    INSERT INTO ocpp.connectors (charge_point, connector_id, status, updated_at)
+                    VALUES ($1, $2, $3, $4)
+                    ON CONFLICT (charge_point, connector_id) DO UPDATE SET
+                        status = $3, updated_at = $4
+                """, self.cp_id, connector_id, status, timestamp)
 
         await redis_state.set_charger(self.cp_id, {
             f"evse_{evse_id}_connector_{connector_id}_status": status,

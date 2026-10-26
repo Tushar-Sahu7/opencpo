@@ -203,9 +203,14 @@ class ChargePointHandler(ChargePointHelpersMixin):
         status = payload.get("status", "Unknown")
         error_code = payload.get("errorCode", "NoError")
 
-        # Connector 0 = whole charger status, not a physical port
-        if connector_id > 0:
-            async with db.write() as conn:
+        # Ensure charge point exists in DB and update status
+        async with db.write() as conn:
+            await conn.execute("""
+                INSERT INTO ocpp.charge_points (id, ocpp_version, status, last_heartbeat)
+                VALUES ($1, '1.6', 'online', NOW())
+                ON CONFLICT (id) DO UPDATE SET status = 'online', last_heartbeat = NOW()
+            """, self.cp_id)
+            if connector_id > 0:
                 await conn.execute("""
                     INSERT INTO ocpp.connectors (charge_point, connector_id, status, error_code, updated_at)
                     VALUES ($1, $2, $3, $4, NOW())

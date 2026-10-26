@@ -74,6 +74,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./:/app/opencpo:rw
+      - ./opencpo-core:/app:rw
       - backup-data:/app/backups
 
   # ── Operator Dashboard ────────────────────────────────────────────────────
@@ -86,12 +87,15 @@ services:
         condition: service_healthy
     ports:
       - "${CPO_ADMIN_PORT:-8080}:8080"
+    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
     environment:
       OCPP_CORE_API: http://ocpp-core:8000
       CORE_API_KEY: ${MANAGEMENT_API_KEY:-CHANGE_ME_IN_PROD}
       JWT_SECRET: ${MANAGEMENT_API_KEY:-CHANGE_ME_IN_PROD}
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost}
       ORG_NAME: ${ORG_NAME:-My CPO}
+    volumes:
+      - ./opencpo-admin:/app:rw
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 10s
@@ -113,12 +117,14 @@ services:
       OCPP_CORE_API: http://ocpp-core:8000
       PUBLIC_URL: ${PUBLIC_URL:-http://localhost}
       SKIN: ${SKIN:-default}
+    volumes:
+      - ./opencpo-charge-app:/app:rw
 
   # ── Compliance Tester ─────────────────────────────────────────────────────
 
   compliance-tester:
     build: ./opencpo-tester
-    restart: unless-stopped
+    restart: "no"
     ports:
       - "${COMPLIANCE_PORT:-8090}:8090"
     environment:
@@ -138,6 +144,8 @@ services:
       OCPP16_URL: ws://ocpp-core:9100
       OCPP201_URL: ws://ocpp-core:9201
       FARM_UI_PORT: 8087
+    volumes:
+      - ./opencpo-charger-farm:/app:rw
 
 volumes:
   pgdata:

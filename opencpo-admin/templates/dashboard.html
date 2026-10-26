@@ -1,95 +1,426 @@
 {% extends "base.html" %}
 {% set active = "dashboard" %}
-{% block title %}Dashboard — CPO Admin{% endblock %}
+{% block title %}Dashboard — Network Operations{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-2">Network Overview</h1>
-<p style="color:#4a6580;font-size:13px;margin-top:4px;margin-bottom:0;">Your charging network at a glance — how many chargers are connected, how many cars are charging right now, and how much energy has been delivered in total. Numbers refresh automatically every 10 seconds.</p>
+<style>
+    /* Card & Panel Base */
+    .dashboard-panel {
+        background: #0b1422;
+        border: 1px solid #14243b;
+        border-radius: 8px;
+        position: relative;
+    }
 
-<!-- Stats Cards (auto-refresh every 10s) -->
-<div hx-get="/partials/stats" hx-trigger="load, every 10s" hx-swap="innerHTML" id="stats-cards">
-    <div class="grid grid-cols-4 gap-4 mb-8">
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <div class="text-3xl font-bold text-brand-green">{{ charger_count }}</div>
-            <div class="text-sm text-gray-400">Chargers</div>
+    .panel-header-title {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: #7997b7;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* Metric card styles */
+    .metric-value-huge {
+        font-size: 26px;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.5px;
+    }
+
+    /* Filters bar */
+    .filter-select {
+        background: #0b1422;
+        border: 1px solid #192d48;
+        border-radius: 6px;
+        color: #cbd5e1;
+        font-size: 11px;
+        padding: 5px 10px;
+        outline: none;
+        cursor: pointer;
+    }
+    .filter-select:hover {
+        border-color: #00bcd4;
+    }
+
+    /* Custom Table */
+    .exception-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 11.5px;
+    }
+    .exception-table th {
+        background: #09101b;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 8px 12px;
+        border-bottom: 1px solid #14243b;
+        text-align: left;
+    }
+    .exception-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid #0f1c30;
+        vertical-align: middle;
+    }
+    .exception-table tr:hover td {
+        background: rgba(255, 255, 255, 0.015);
+    }
+
+    /* Action buttons */
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.15s;
+        cursor: pointer;
+        background: #111e31;
+        color: #cbd5e1;
+        border: 1px solid #1e3556;
+    }
+    .action-btn:hover {
+        background: #192c48;
+        border-color: #00bcd4;
+        color: #fff;
+    }
+    .action-btn-danger {
+        background: rgba(239, 68, 68, 0.12);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .action-btn-danger:hover {
+        background: rgba(239, 68, 68, 0.25);
+        color: #fca5a5;
+    }
+    .action-btn-accent {
+        background: rgba(0, 188, 212, 0.12);
+        color: #00bcd4;
+        border: 1px solid rgba(0, 188, 212, 0.3);
+    }
+    .action-btn-accent:hover {
+        background: rgba(0, 188, 212, 0.25);
+        color: #e0f2fe;
+    }
+
+    /* Live Toast Alerts */
+    #toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        pointer-events: none;
+    }
+    .toast-alert {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        animation: slideIn 0.2s ease-out;
+        max-width: 400px;
+    }
+    .toast-success {
+        background: #062b1e;
+        border: 1px solid #10b981;
+        color: #a7f3d0;
+    }
+    .toast-info {
+        background: #0c2338;
+        border: 1px solid #00bcd4;
+        color: #cffafe;
+    }
+    .toast-danger {
+        background: #381216;
+        border: 1px solid #ef4444;
+        color: #fecaca;
+    }
+    @keyframes slideIn {
+        from { transform: translateY(20px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+</style>
+
+<!-- Live Toast Container -->
+<div id="toast-container"></div>
+
+<!-- ═══ Top Breadcrumb & Live Connection Header ══════════════════════════ -->
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div class="flex items-center gap-2">
+        <span class="text-cyan-400 font-bold text-sm">⊞</span>
+        <h1 class="text-sm font-semibold text-gray-200">Dashboard</h1>
+        <span class="text-gray-600">/</span>
+        <span class="text-xs text-emerald-400 flex items-center gap-1.5 font-mono bg-emerald-950/40 border border-emerald-800/40 px-2 py-0.5 rounded">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            Real-Time CSMS Linked (Auto-polling 4s)
+        </span>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+        <!-- Region Filter -->
+        <div class="relative">
+            <select class="filter-select pr-6 appearance-none">
+                <option>🌐 All Sites &amp; Hubs</option>
+                <option>Delhi Central Hub</option>
+                <option>Mumbai BKC Depot</option>
+                <option>Bengaluru Tech Station</option>
+            </select>
+            <span class="absolute right-2 top-2 text-[9px] text-gray-400 pointer-events-none">▼</span>
         </div>
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <div class="text-3xl font-bold text-brand-blue">{{ stats.active or 0 }}</div>
-            <div class="text-sm text-gray-400">Active Sessions</div>
+
+        <!-- Date Range Filter -->
+        <div class="relative">
+            <select class="filter-select pr-6 appearance-none">
+                <option>📅 Live (Past 7 Days)</option>
+                <option>📅 Last 24 Hours</option>
+                <option>📅 Last 30 Days</option>
+            </select>
+            <span class="absolute right-2 top-2 text-[9px] text-gray-400 pointer-events-none">▼</span>
         </div>
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <div class="text-3xl font-bold text-white">{{ "%.1f"|format(stats.total_energy_kwh or 0) }}</div>
-            <div class="text-sm text-gray-400">Total kWh</div>
-        </div>
-        <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-            <div class="text-3xl font-bold text-yellow-400">{{ pki.active or 0 }}</div>
-            <div class="text-sm text-gray-400">Active Certs</div>
-        </div>
+
+        <!-- Manual Refresh Button -->
+        <button hx-get="/partials/dashboard/live"
+                hx-target="#dashboard-live-container"
+                hx-swap="innerHTML"
+                title="Sync now"
+                class="px-2.5 py-1 rounded bg-[#0b1422] border border-[#192d48] text-[11px] text-gray-300 hover:border-cyan-500 hover:text-white transition flex items-center gap-1">
+            <span>↻</span>
+            <span>Sync</span>
+        </button>
     </div>
 </div>
 
-<!-- Charger List (auto-refresh) -->
-<div class="bg-gray-900 rounded-lg border border-gray-800">
-    <div class="p-4 border-b border-gray-800 flex justify-between items-center">
-        <div>
-            <h2 class="text-lg font-semibold">Chargers</h2>
-            <p style="color:#4a6580;font-size:12px;margin-top:2px;margin-bottom:0;"><span style="color:#4ade80;">● Online</span> = connected and ready to charge &nbsp;·&nbsp; <span style="color:#f87171;">● Offline</span> = not reachable (check power and network)</p>
-        </div>
-        <span class="htmx-indicator text-sm text-gray-500">⟳ updating...</span>
+<!-- ═══ Live Dynamic Dashboard Container (Polled every 4s via HTMX) ════════ -->
+<div id="dashboard-live-container"
+     hx-get="/partials/dashboard/live"
+     hx-trigger="every 4s"
+     hx-swap="innerHTML">
+    {% include "partials/dashboard_live.html" %}
+</div>
+
+<!-- ═══ Bottom Footer Status ═════════════════════════════════════════════ -->
+<div class="flex items-center justify-between text-[11px] text-gray-500 pt-3 border-t border-[#132238] mt-2">
+    <div class="flex items-center gap-3">
+        <span>&copy; 2026 OpenCPO Enterprise Operations</span>
+        <span>•</span>
+        <span>OCPP 1.6j &amp; 2.0.1 Live Engine</span>
     </div>
-    <div hx-get="/partials/charger-rows" hx-trigger="load, every 5s" hx-swap="innerHTML">
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="border-b border-gray-800 text-gray-400">
-                    <th class="text-left p-3">ID</th>
-                    <th class="text-left p-3">Vendor / Model</th>
-                    <th class="text-left p-3">Status</th>
-                    <th class="text-left p-3">Version</th>
-                    <th class="text-left p-3">Last Seen</th>
-                    <th class="text-right p-3">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cp in chargers %}
-                <tr class="border-b border-gray-800 hover:bg-gray-800/50">
-                    <td class="p-3 font-mono">{{ cp.id }}</td>
-                    <td class="p-3">{{ cp.vendor }} {{ cp.model }}</td>
-                    <td class="p-3">
-                        <span class="status-{{ cp.status }}">●</span> {{ cp.status }}
-                    </td>
-                    <td class="p-3">{{ cp.ocpp_version }}</td>
-                    <td class="p-3 text-gray-400">{{ cp.last_heartbeat or '—' }}</td>
-                    <td class="p-3 text-right space-x-2">
-                        <button hx-post="/action/start/{{ cp.id }}" hx-swap="outerHTML"
-                                class="px-2 py-1 bg-green-700 rounded text-xs hover:bg-green-600">▶ Start</button>
-                        <button hx-post="/action/stop/{{ cp.id }}" hx-swap="outerHTML"
-                                class="px-2 py-1 bg-yellow-700 rounded text-xs hover:bg-yellow-600">⏹ Stop</button>
-                        <button hx-post="/action/reset/{{ cp.id }}" hx-swap="outerHTML"
-                                class="px-2 py-1 bg-blue-700 rounded text-xs hover:bg-blue-600">↻ Reset</button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="flex items-center gap-2">
+        <span>CSMS Backend: <span class="font-mono text-cyan-400">ocpp-core:8000</span></span>
+        <span>•</span>
+        <span class="text-emerald-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> TimescaleDB + Redis Synchronized</span>
     </div>
 </div>
 
-<!-- Event Bus Status -->
-<div class="mt-6 bg-gray-900 rounded-lg border border-gray-800 p-4">
-    <h2 class="text-lg font-semibold mb-2">Event Bus</h2>
-    <div class="grid grid-cols-3 gap-4 text-sm">
-        <div>
-            <span class="text-gray-400">Stream:</span>
-            <span class="font-mono">{{ events.stream or '—' }}</span>
-        </div>
-        <div>
-            <span class="text-gray-400">Length:</span>
-            <span>{{ events.length or 0 }} events</span>
-        </div>
-        <div>
-            <span class="text-gray-400">Consumer Groups:</span>
-            <span>{{ (events.groups or [])|length }}</span>
-        </div>
-    </div>
-</div>
+<!-- ═══ Chart Engine & Live Sync Script ════════════════════════════════════ -->
+<script>
+window.dailyChartInstance = null;
+window.donutChartInstance = null;
+
+function renderOrUpdateCharts() {
+    const dataScript = document.getElementById('live-chart-data');
+    if (!dataScript) return;
+
+    let payload;
+    try {
+        payload = JSON.parse(dataScript.textContent);
+    } catch(e) {
+        return;
+    }
+
+    const dailyData = payload.daily_data || [];
+    const labels = dailyData.map(d => d.date);
+    const energyData = dailyData.map(d => d.energy_kwh);
+    const sessionData = dailyData.map(d => d.sessions);
+    const statuses = payload.connector_statuses || {};
+
+    // 1. Dual-Axis Bar + Line Chart
+    const canvasEnergy = document.getElementById('dailyEnergyChart');
+    if (canvasEnergy) {
+        const ctxEnergy = canvasEnergy.getContext('2d');
+        if (window.dailyChartInstance) {
+            window.dailyChartInstance.data.labels = labels;
+            window.dailyChartInstance.data.datasets[0].data = energyData;
+            window.dailyChartInstance.data.datasets[1].data = sessionData;
+            window.dailyChartInstance.update('none');
+        } else {
+            window.dailyChartInstance = new Chart(ctxEnergy, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Delivered Energy (kWh)',
+                            data: energyData,
+                            backgroundColor: '#00bcd4',
+                            hoverBackgroundColor: '#26c6da',
+                            borderRadius: 4,
+                            barPercentage: 0.45,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'Session Count',
+                            data: sessionData,
+                            borderColor: '#10b981',
+                            backgroundColor: '#10b981',
+                            borderWidth: 2.5,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#060b13',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            tension: 0.3,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0c1726',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#192d47',
+                            borderWidth: 1,
+                            padding: 10
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#64748b', font: { size: 10, family: 'monospace' } }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10, family: 'monospace' },
+                                callback: function(value) { return value + ' kWh'; }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: {
+                                color: '#64748b',
+                                font: { size: 10, family: 'monospace' },
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    // 2. Connector Donut Chart
+    const canvasDonut = document.getElementById('connectorDonutChart');
+    if (canvasDonut) {
+        const ctxDonut = canvasDonut.getContext('2d');
+        const donutValues = [
+            statuses.Available || 0,
+            statuses.Charging || 0,
+            statuses.Preparing || 0,
+            statuses.SuspendedEV || 0,
+            statuses.Faulted || 0
+        ];
+        // If all zeroes, show small placeholder slice
+        const total = donutValues.reduce((a, b) => a + b, 0);
+        const finalValues = total > 0 ? donutValues : [1, 0, 0, 0, 0];
+        const finalColors = total > 0
+            ? ['#10b981', '#00bcd4', '#f59e0b', '#6366f1', '#ef4444']
+            : ['#1e293b', '#1e293b', '#1e293b', '#1e293b', '#1e293b'];
+
+        if (window.donutChartInstance) {
+            window.donutChartInstance.data.datasets[0].data = finalValues;
+            window.donutChartInstance.data.datasets[0].backgroundColor = finalColors;
+            window.donutChartInstance.update('none');
+        } else {
+            window.donutChartInstance = new Chart(ctxDonut, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Available', 'Charging', 'Preparing', 'Suspended EV', 'Faulted'],
+                    datasets: [{
+                        data: finalValues,
+                        backgroundColor: finalColors,
+                        borderWidth: 3,
+                        borderColor: '#0b1422',
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '72%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0c1726',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#cbd5e1',
+                            borderColor: '#192d47',
+                            borderWidth: 1,
+                            padding: 8
+                        }
+                    }
+                }
+            });
+        }
+    }
+}
+
+// Initial render
+document.addEventListener('DOMContentLoaded', function() {
+    renderOrUpdateCharts();
+});
+
+// Update charts after HTMX polls
+document.addEventListener('htmx:afterSwap', function(evt) {
+    if (evt.detail.target && evt.detail.target.id === 'dashboard-live-container') {
+        renderOrUpdateCharts();
+    }
+});
+
+// Auto-dismiss toasts after 4 seconds
+document.addEventListener('htmx:afterOnLoad', function(evt) {
+    const toasts = document.querySelectorAll('.toast-alert');
+    toasts.forEach(toast => {
+        if (!toast.dataset.timerSet) {
+            toast.dataset.timerSet = "true";
+            setTimeout(() => {
+                toast.style.transition = "opacity 0.4s ease, transform 0.4s ease";
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(10px)";
+                setTimeout(() => toast.remove(), 400);
+            }, 3500);
+        }
+    });
+});
+</script>
 {% endblock %}

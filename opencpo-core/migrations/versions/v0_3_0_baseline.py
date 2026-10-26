@@ -34,6 +34,12 @@ from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
+
+class Point(sa.types.UserDefinedType):
+    def get_col_spec(self, **kw):
+        return "POINT"
+
+
 revision: str = "v0_3_0_baseline"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
@@ -109,15 +115,15 @@ def upgrade() -> None:
         sa.Column("start_time", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
         sa.Column("stop_time", sa.DateTime(timezone=True), nullable=True),
         sa.Column("stop_reason", sa.Text(), nullable=True),
-        sa.Column("energy_kwh", sa.Real(), nullable=False, server_default=sa.text("0")),
-        sa.Column("peak_power_kw", sa.Real(), nullable=False, server_default=sa.text("0")),
+        sa.Column("energy_kwh", sa.REAL(), nullable=False, server_default=sa.text("0")),
+        sa.Column("peak_power_kw", sa.REAL(), nullable=False, server_default=sa.text("0")),
         sa.Column("start_soc", sa.SmallInteger(), nullable=True),
         sa.Column("end_soc", sa.SmallInteger(), nullable=True),
         sa.Column("simulated", sa.Boolean(), nullable=False, server_default=sa.text("FALSE")),
         sa.Column("metadata", postgresql.JSONB(), nullable=False, server_default="{}"),
         sa.Column("billing_type", sa.Text(), server_default="prepaid"),
-        sa.Column("meter_start", sa.Real(), nullable=True),
-        sa.Column("meter_stop", sa.Real(), nullable=True),
+        sa.Column("meter_start", sa.REAL(), nullable=True),
+        sa.Column("meter_stop", sa.REAL(), nullable=True),
         sa.Column("billing_group_id", sa.Uuid(), nullable=True),
         sa.ForeignKeyConstraint(["charge_point"], ["ocpp.charge_points.id"]),
         sa.PrimaryKeyConstraint("id"),
@@ -133,12 +139,12 @@ def upgrade() -> None:
         sa.Column("charge_point", sa.Text(), nullable=False),
         sa.Column("connector_id", sa.SmallInteger(), nullable=False),
         sa.Column("session_id", sa.Uuid(), nullable=True),
-        sa.Column("energy_kwh", sa.Real(), nullable=True),
-        sa.Column("power_kw", sa.Real(), nullable=True),
+        sa.Column("energy_kwh", sa.REAL(), nullable=True),
+        sa.Column("power_kw", sa.REAL(), nullable=True),
         sa.Column("soc_pct", sa.SmallInteger(), nullable=True),
-        sa.Column("voltage_v", postgresql.ARRAY(sa.Real()), nullable=True),
-        sa.Column("current_a", postgresql.ARRAY(sa.Real()), nullable=True),
-        sa.Column("temperature_c", sa.Real(), nullable=True),
+        sa.Column("voltage_v", postgresql.ARRAY(sa.REAL()), nullable=True),
+        sa.Column("current_a", postgresql.ARRAY(sa.REAL()), nullable=True),
+        sa.Column("temperature_c", sa.REAL(), nullable=True),
         schema="ocpp",
     )
 
@@ -152,8 +158,8 @@ def upgrade() -> None:
         sa.Column("auth_id", sa.Text(), nullable=True),
         sa.Column("start_time", sa.DateTime(timezone=True), nullable=False),
         sa.Column("stop_time", sa.DateTime(timezone=True), nullable=False),
-        sa.Column("energy_kwh", sa.Real(), nullable=False),
-        sa.Column("duration_min", sa.Real(), nullable=False),
+        sa.Column("energy_kwh", sa.REAL(), nullable=False),
+        sa.Column("duration_min", sa.REAL(), nullable=False),
         sa.Column("tariff_id", sa.Text(), nullable=True),
         sa.Column("cost", postgresql.JSONB(), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
@@ -276,10 +282,10 @@ def upgrade() -> None:
         sa.Column("id", sa.Text(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("currency", sa.Text(), nullable=False, server_default="EUR"),
-        sa.Column("energy_rate", sa.Real(), nullable=False, server_default=sa.text("0")),
-        sa.Column("time_rate", sa.Real(), nullable=False, server_default=sa.text("0")),
-        sa.Column("idle_rate", sa.Real(), nullable=False, server_default=sa.text("0")),
-        sa.Column("flat_fee", sa.Real(), nullable=False, server_default=sa.text("0")),
+        sa.Column("energy_rate", sa.REAL(), nullable=False, server_default=sa.text("0")),
+        sa.Column("time_rate", sa.REAL(), nullable=False, server_default=sa.text("0")),
+        sa.Column("idle_rate", sa.REAL(), nullable=False, server_default=sa.text("0")),
+        sa.Column("flat_fee", sa.REAL(), nullable=False, server_default=sa.text("0")),
         sa.Column("valid_from", sa.DateTime(timezone=True), nullable=True),
         sa.Column("valid_until", sa.DateTime(timezone=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
@@ -495,7 +501,7 @@ def upgrade() -> None:
         sa.Column("address", sa.Text(), nullable=False),
         sa.Column("city", sa.Text(), nullable=False),
         sa.Column("country", sa.Text(), nullable=False, server_default="NLD"),
-        sa.Column("coordinates", postgresql.POINT(), nullable=True),
+        sa.Column("coordinates", Point(), nullable=True),
         sa.Column("charge_points", postgresql.ARRAY(sa.Text()), nullable=True),
         sa.Column("published", sa.Boolean(), nullable=False, server_default=sa.text("FALSE")),
         sa.Column("last_updated", sa.DateTime(timezone=True), nullable=False, server_default=sa.text("NOW()")),
@@ -596,7 +602,7 @@ def upgrade() -> None:
         sa.Column("message_id", sa.Text(), nullable=True),
         sa.Column("payload", postgresql.JSONB(), nullable=True),
         sa.Column("response", postgresql.JSONB(), nullable=True),
-        sa.Column("latency_ms", sa.Real(), nullable=True),
+        sa.Column("latency_ms", sa.REAL(), nullable=True),
         schema="ocpp",
     )
 

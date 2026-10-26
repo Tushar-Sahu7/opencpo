@@ -1,0 +1,681 @@
+<!-- ═══ Interactive Operations & Command Center Toolbar ═══════════════ -->
+<div class="mb-4 p-3 rounded-lg bg-[#0b1422] border border-[#1a2f4d] flex flex-wrap items-center justify-between gap-3 shadow-lg">
+    <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-xs font-bold text-gray-200 uppercase tracking-wider">Live Control Center</span>
+        </div>
+        <span class="text-gray-600">|</span>
+        <span class="text-xs text-gray-400">
+            Connected: <strong class="text-cyan-400 font-mono">{{ online_count }}/{{ charger_count }}</strong> Chargers
+            &bull;
+            Load: <strong class="text-cyan-400 font-mono">{{ current_load_kw }} kW</strong>
+            &bull;
+            Plugs: <strong class="text-emerald-400 font-mono">{{ connector_statuses.Charging }}</strong> Charging / <strong class="text-gray-300 font-mono">{{ connector_statuses.Available }}</strong> Ready
+        </span>
+    </div>
+
+    <!-- Live Command Action Buttons -->
+    <div class="flex flex-wrap items-center gap-2">
+        <button hx-post="/action/dashboard/spawn-virtual?count=3"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Connect 3 simulated OCPP 1.6 chargers via Charger Farm"
+                class="px-2.5 py-1 bg-cyan-950/80 hover:bg-cyan-900 border border-cyan-700/60 text-cyan-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>⚡</span>
+            <span>+3 Chargers</span>
+        </button>
+
+        <button hx-post="/action/dashboard/simulate-session-start"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Plug in EV and stream live active meter values (kW load)"
+                class="px-2.5 py-1 bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-700/60 text-emerald-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>▶</span>
+            <span>Plug &amp; Charge</span>
+        </button>
+
+        <button hx-post="/action/dashboard/simulate-session-stop"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Finish transaction and write CDR to database"
+                class="px-2.5 py-1 bg-amber-950/80 hover:bg-amber-900 border border-amber-700/60 text-amber-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>⏹</span>
+            <span>Stop Charge</span>
+        </button>
+
+        <button hx-post="/action/dashboard/inject-fault?error_code=GroundFailure"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Inject hardware ground fault to trigger Exception Queue alert"
+                class="px-2.5 py-1 bg-red-950/80 hover:bg-red-900 border border-red-700/60 text-red-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>⚠️</span>
+            <span>Inject Fault</span>
+        </button>
+
+        <button hx-post="/action/dashboard/recover-fault"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Clear hardware fault and restore connector to Available"
+                class="px-2.5 py-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 text-xs font-semibold rounded flex items-center gap-1.5 transition">
+            <span>✓</span>
+            <span>Clear Faults</span>
+        </button>
+
+        <button hx-post="/action/dashboard/stop-virtual"
+                hx-target="#toast-container"
+                hx-swap="beforeend"
+                title="Disconnect all farm chargers"
+                class="px-2 py-1 bg-gray-900 hover:bg-red-950/60 border border-gray-700 hover:border-red-700 text-gray-400 hover:text-red-300 text-xs rounded transition">
+            <span>Disconnect Farm</span>
+        </button>
+    </div>
+</div>
+
+<!-- ═══ Row 1: 5 Top Metric Cards ═══════════════════════════════════════ -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+
+    <!-- Card 1: Asset Inventory & Connectivity -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-2">
+            <div class="panel-header-title">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                <span>Asset Inventory &amp; Connectivity</span>
+            </div>
+            <div class="flex items-center gap-1 text-[9px] font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-800/40 px-1.5 py-0.5 rounded">
+                <span class="text-[8px] animate-pulse">●</span>
+                <span>LIVE</span>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+            <div>
+                <div class="text-[10px] text-gray-400">Chargers / Pedestals</div>
+                <div class="metric-value-huge text-cyan-400 font-mono">{{ charger_count }} <span class="text-xs font-normal text-cyan-300">Units</span></div>
+                <div class="text-[10px] {% if online_count == charger_count and charger_count > 0 %}text-emerald-400{% else %}text-gray-400{% endif %} mt-0.5">
+                    {{ online_count }} Online &bull; {{ charger_count - online_count }} Offline
+                </div>
+            </div>
+            <div class="text-2xl text-cyan-500/30 px-2">⛽</div>
+            <div class="flex flex-col gap-1 text-[11px] border-l border-gray-800/60 pl-3">
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-gray-400">Areas</span>
+                    <span class="font-semibold text-gray-200">{{ region_count or 1 }} <span class="text-[9px] text-gray-500 font-normal">Regions</span></span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-gray-400">Sites</span>
+                    <span class="font-semibold text-gray-200">{{ site_count or 1 }} <span class="text-[9px] text-gray-500 font-normal">Hubs</span></span>
+                </div>
+                <div class="flex items-center justify-between gap-3">
+                    <span class="text-gray-400">Connectors</span>
+                    <span class="font-semibold text-cyan-400">{{ total_connectors }} <span class="text-[9px] text-gray-500 font-normal">Plugs</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 2: Connector Slots -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+            <div class="panel-header-title">
+                <span>CONNECTOR SLOTS ({{ total_connectors }} PLUGS)</span>
+            </div>
+            <span class="text-xs text-emerald-400">🔌</span>
+        </div>
+
+        <div class="flex items-baseline justify-between pt-1">
+            <div>
+                <div class="metric-value-huge text-white font-mono">{{ available_ratio }}%</div>
+                <div class="text-[10px] text-gray-400">Available Ratio</div>
+            </div>
+            <div class="text-right">
+                <div class="text-sm font-bold text-cyan-400">{{ actively_charging }} Actively Charging</div>
+                <div class="text-[10px] text-gray-400">{{ ((actively_charging / total_connectors * 100)|round(1)) if total_connectors else 0 }}% utilization</div>
+            </div>
+        </div>
+
+        <!-- Status mini pills -->
+        <div class="grid grid-cols-5 gap-1 pt-2 border-t border-gray-800/60 text-center text-[10px]">
+            <div>
+                <div class="font-bold text-emerald-400 font-mono">{{ connector_statuses.Available }}</div>
+                <div class="text-[9px] text-gray-500">Available</div>
+            </div>
+            <div>
+                <div class="font-bold text-cyan-400 font-mono">{{ connector_statuses.Charging }}</div>
+                <div class="text-[9px] text-gray-500">Charging</div>
+            </div>
+            <div>
+                <div class="font-bold text-amber-400 font-mono">{{ connector_statuses.Preparing }}</div>
+                <div class="text-[9px] text-gray-500">Preparing</div>
+            </div>
+            <div>
+                <div class="font-bold text-indigo-400 font-mono">{{ connector_statuses.SuspendedEV }}</div>
+                <div class="text-[9px] text-gray-500">Suspended</div>
+            </div>
+            <div>
+                <div class="font-bold text-red-400 font-mono">{{ connector_statuses.Faulted }}</div>
+                <div class="text-[9px] text-gray-500">Faulted</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Aggregate Charging Load -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+            <div class="panel-header-title">
+                <span>AGGREGATE CHARGING LOAD</span>
+            </div>
+            <span class="text-xs text-cyan-400">⚡</span>
+        </div>
+
+        <div>
+            <div class="metric-value-huge text-cyan-400 font-mono">{{ current_load_kw }} <span class="text-xs font-normal text-cyan-300">kW</span></div>
+            <div class="text-[10px] text-gray-400 mt-0.5">Across {{ actively_charging }} ongoing session(s)</div>
+        </div>
+
+        <div class="pt-2 border-t border-gray-800/60">
+            <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                <span>Grid Contract Capacity</span>
+                <span class="font-semibold text-gray-200">{{ grid_contract_pct }}% <span class="text-gray-500 font-normal">({{ grid_contract_kw }} kW)</span></span>
+            </div>
+            <div class="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500" style="width: {{ grid_contract_pct }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Completed Sessions -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+            <div class="panel-header-title">
+                <span>COMPLETED SESSIONS</span>
+            </div>
+            <span class="text-[9px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-1.5 py-0.5 rounded">
+                LIVE DB
+            </span>
+        </div>
+
+        <div>
+            <div class="metric-value-huge text-white font-mono">{{ "{:,}".format(completed_sessions) }} <span class="text-xs font-normal text-gray-400">sessions</span></div>
+        </div>
+
+        <div class="pt-2 border-t border-gray-800/60">
+            <div class="flex items-center justify-between text-[10px] text-gray-400 mb-0.5">
+                <span class="flex items-center gap-1"><span>⚡</span> TOTAL ENERGY DISPENSED</span>
+            </div>
+            <div class="text-sm font-bold text-gray-100 font-mono">{{ "{:,.1f}".format(total_energy) }} <span class="text-[10px] font-normal text-gray-400">kWh</span></div>
+        </div>
+    </div>
+
+    <!-- Card 5: Session Benchmarks -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-1">
+            <div class="panel-header-title">
+                <span>SESSION BENCHMARKS</span>
+            </div>
+            <span class="text-xs text-purple-400">📈</span>
+        </div>
+
+        <div class="space-y-1.5 text-[11px] pt-1">
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Avg Energy</span>
+                <span class="font-bold text-gray-200 font-mono">{{ avg_energy }} <span class="text-[9px] text-gray-500 font-normal">kWh/sess</span></span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Avg Duration</span>
+                <span class="font-bold text-gray-200 font-mono">{{ avg_duration }} <span class="text-[9px] text-gray-500 font-normal">min</span></span>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-gray-400">Peak Demand</span>
+                <span class="font-bold text-cyan-400 font-mono">{{ max_power }} <span class="text-[9px] text-gray-500 font-normal">kW</span></span>
+            </div>
+        </div>
+
+        <div class="pt-1.5 border-t border-gray-800/60 text-[9px] text-gray-500">
+            Active sessions: <span class="text-cyan-400 font-bold font-mono">{{ active_sessions }}</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══ Row 2: Charts (Dual Axis + Doughnut) ═════════════════════════════ -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-4">
+
+    <!-- Left Chart: Daily Delivered Energy & Session Throughput (8 cols) -->
+    <div class="lg:col-span-8 dashboard-panel p-4 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-xs font-bold text-gray-200">Daily Delivered Energy &amp; Session Throughput</h2>
+                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/40">Dual Axis</span>
+                </div>
+                <div class="flex items-center gap-3 text-[10px] text-gray-400">
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-sm bg-cyan-500"></span> Delivered Energy (kWh)
+                    </span>
+                    <span class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Session Count
+                    </span>
+                </div>
+            </div>
+            <p class="text-[10px] text-gray-500 mb-3">Energy dispensed (kWh) correlated against active OCPP transaction completions from TimescaleDB</p>
+
+            <!-- Chart Canvas Container -->
+            <div class="relative w-full" style="height: 220px;">
+                <canvas id="dailyEnergyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 4-Stat Metric Summary Bar under chart -->
+        <div class="grid grid-cols-4 gap-2 pt-3 mt-2 border-t border-gray-800/60 text-center text-[10px]">
+            <div>
+                <div class="text-gray-400">Min Output Day</div>
+                <div class="font-semibold text-gray-200 font-mono">{{ min_day.date }} ({{ min_day.energy }} kWh)</div>
+            </div>
+            <div>
+                <div class="text-gray-400">Max Output Day</div>
+                <div class="font-semibold text-cyan-400 font-mono">{{ max_day.date }} ({{ max_day.energy }} kWh)</div>
+            </div>
+            <div>
+                <div class="text-gray-400">7-Day Mean / Day</div>
+                <div class="font-semibold text-gray-200 font-mono">{{ mean_energy }} kWh</div>
+            </div>
+            <div>
+                <div class="text-gray-400">Completed Runs</div>
+                <div class="font-semibold text-emerald-400 font-mono">{{ mean_sessions }} sess / day</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Chart: Connector Status Share (4 cols) -->
+    <div class="lg:col-span-4 dashboard-panel p-4 flex flex-col justify-between">
+        <div>
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-xs font-bold text-gray-200">Connector Status Share</h2>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40">LIVE BREAKDOWN</span>
+            </div>
+            <p class="text-[10px] text-gray-500 mb-3">Instant physical port state across all {{ charger_count }} charging pedestals</p>
+
+            <!-- Doughnut Chart Container with Center Badge -->
+            <div class="relative flex items-center justify-center" style="height: 170px;">
+                <canvas id="connectorDonutChart"></canvas>
+                <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <span class="text-2xl font-bold text-white font-mono leading-none">{{ total_connectors }}</span>
+                    <span class="text-[9px] text-gray-400 tracking-wider">TOTAL PLUGS</span>
+                    <span class="text-[10px] font-bold text-emerald-400 mt-0.5">{{ ready_pct }}% READY</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend Breakdown -->
+        <div class="space-y-1 pt-2 border-t border-gray-800/60 text-[11px]">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-gray-300">Available</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span class="font-semibold">{{ connector_statuses.Available }}</span>
+                    <span class="text-[10px] text-gray-500 ml-1">({{ (connector_statuses.Available / total_connectors * 100)|round(1) if total_connectors else 0 }}%)</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span class="text-gray-300">Charging</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span class="font-semibold">{{ connector_statuses.Charging }}</span>
+                    <span class="text-[10px] text-gray-500 ml-1">({{ (connector_statuses.Charging / total_connectors * 100)|round(1) if total_connectors else 0 }}%)</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    <span class="text-gray-300">Preparing / Handshake</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span class="font-semibold">{{ connector_statuses.Preparing }}</span>
+                    <span class="text-[10px] text-gray-500 ml-1">({{ (connector_statuses.Preparing / total_connectors * 100)|round(1) if total_connectors else 0 }}%)</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                    <span class="text-gray-300">Suspended EV</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span class="font-semibold">{{ connector_statuses.SuspendedEV }}</span>
+                    <span class="text-[10px] text-gray-500 ml-1">({{ (connector_statuses.SuspendedEV / total_connectors * 100)|round(1) if total_connectors else 0 }}%)</span>
+                </div>
+            </div>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-red-400"></span>
+                    <span class="text-gray-300">Faulted / Lockout</span>
+                </div>
+                <div class="font-mono text-gray-200">
+                    <span class="font-semibold">{{ connector_statuses.Faulted }}</span>
+                    <span class="text-[10px] text-gray-500 ml-1">({{ (connector_statuses.Faulted / total_connectors * 100)|round(1) if total_connectors else 0 }}%)</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-2 mt-1 border-t border-gray-800/60 flex items-center justify-between text-[10px] text-emerald-400">
+            <span class="flex items-center gap-1">🌱 Zero-Emissions Offsetting Impact:</span>
+            <span class="font-bold">~{{ co2_offset }} Metric Tons CO₂e</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══ Row 3: Energy Intensity Distribution Profile ═════════════════════ -->
+<div class="dashboard-panel p-3.5 mb-4">
+    <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center gap-2">
+            <span class="text-cyan-400 text-xs">📊</span>
+            <h2 class="text-xs font-bold text-gray-200">Energy Intensity Distribution Profile</h2>
+        </div>
+        <span class="text-[10px] text-gray-400 font-mono">{{ total_sampled }} Live Database Sessions Analyzed</span>
+    </div>
+
+    <!-- Segmented Multi-Bar -->
+    <div class="w-full h-3 rounded bg-gray-900 flex overflow-hidden mb-2">
+        {% for bucket in energy_distribution %}
+            <div style="width: {{ bucket.pct }}%; background: {{ bucket.color }};"
+                 title="{{ bucket.label }}: {{ bucket.pct }}% ({{ bucket.sessions }} sessions)"></div>
+        {% endfor %}
+        {% if total_sampled == 0 %}
+            <div style="width: 100%; background: #1e293b;" title="No sessions recorded yet"></div>
+        {% endif %}
+    </div>
+
+    <!-- Legend and breakdown details -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px]">
+        {% for bucket in energy_distribution %}
+        <div class="flex items-center justify-between bg-[#08101a] p-2 rounded border border-[#14243b]">
+            <div>
+                <div class="text-gray-300 font-medium">{{ bucket.label }}</div>
+                <div class="text-[10px] text-gray-400">{{ bucket.sessions }} sessions</div>
+            </div>
+            <span class="font-bold font-mono text-sm" style="color: {{ bucket.color }};">{{ bucket.pct }}%</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- ═══ Row 4: Live Connected Chargers & Remote Command Table ═════════════ -->
+<div class="dashboard-panel p-4 mb-4">
+    <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+            <span class="text-emerald-400 text-sm">⛽</span>
+            <h2 class="text-xs font-bold text-gray-200">Live Charger Fleet &amp; Direct Command Console</h2>
+            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/40">
+                {{ charger_count }} ONLINE UNITS
+            </span>
+        </div>
+        <div class="text-[10px] text-gray-400">
+            Commands stream directly through <span class="font-mono text-cyan-400">ocpp-core:8000</span> WebSocket registry
+        </div>
+    </div>
+
+    <div class="overflow-x-auto rounded border border-[#14243b]">
+        <table class="exception-table">
+            <thead>
+                <tr>
+                    <th style="width: 140px;">Charger ID</th>
+                    <th style="width: 90px;">OCPP Ver</th>
+                    <th style="width: 90px;">Status</th>
+                    <th>Site / Model</th>
+                    <th style="width: 160px;">Connectors &amp; State</th>
+                    <th style="width: 140px;">Last Heartbeat</th>
+                    <th style="width: 250px;" class="text-right">Live CSMS Commands</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cp in chargers %}
+                <tr>
+                    <!-- ID -->
+                    <td class="font-mono font-bold text-cyan-300 text-xs">
+                        <a href="/remote/{{ cp.id }}" class="hover:underline flex items-center gap-1 text-cyan-300 no-underline">
+                            <span>⚡</span>
+                            <span>{{ cp.id }}</span>
+                        </a>
+                    </td>
+
+                    <!-- Version -->
+                    <td class="font-mono text-[11px] text-gray-400">{{ cp.ocpp_version or '1.6' }}</td>
+
+                    <!-- Status -->
+                    <td>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold {% if cp.status == 'online' %}bg-emerald-950/60 text-emerald-400 border border-emerald-800/40{% else %}bg-red-950/60 text-red-400 border border-red-800/40{% endif %}">
+                            <span class="w-1.5 h-1.5 rounded-full {% if cp.status == 'online' %}bg-emerald-400 animate-pulse{% else %}bg-red-400{% endif %}"></span>
+                            {{ cp.status|upper }}
+                        </span>
+                    </td>
+
+                    <!-- Site / Model -->
+                    <td>
+                        <div class="text-gray-200 font-medium text-xs">{{ cp.site or 'Central Depot' }}</div>
+                        <div class="text-[10px] text-gray-500">{{ cp.vendor or 'ABB' }} {{ cp.model or 'Terra 54' }}</div>
+                    </td>
+
+                    <!-- Connectors & State -->
+                    <td>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            {% set live = cp.live or {} %}
+                            {% set has_live = false %}
+                            {% for k, v in live.items() %}
+                                {% if k.startswith("connector_") and k.endswith("_status") %}
+                                    {% set has_live = true %}
+                                    {% set cid = k.replace("connector_", "").replace("_status", "") %}
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold {% if v == 'Charging' %}bg-cyan-950 text-cyan-400 border border-cyan-800/50 animate-pulse{% elif v == 'Available' %}bg-emerald-950 text-emerald-400 border border-emerald-800/50{% elif v == 'Faulted' %}bg-red-950 text-red-400 border border-red-800/50{% else %}bg-gray-800 text-gray-400{% endif %}">
+                                        #{{ cid }}: {{ v }}
+                                    </span>
+                                {% endif %}
+                            {% endfor %}
+                            {% if not has_live %}
+                                <span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-950 text-emerald-400 border border-emerald-800/50">#1: Ready</span>
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <!-- Last Heartbeat -->
+                    <td class="font-mono text-[10px] text-gray-400">
+                        {{ cp.last_heartbeat or 'Just now' }}
+                    </td>
+
+                    <!-- Quick Command Actions -->
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1 justify-end">
+                            <button hx-post="/action/start/{{ cp.id }}?connector=1"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="RemoteStartTransaction"
+                                    class="action-btn action-btn-accent">
+                                <span>▶</span>
+                                <span>Start</span>
+                            </button>
+                            <button hx-post="/action/stop/{{ cp.id }}?connector=1"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="RemoteStopTransaction"
+                                    class="action-btn">
+                                <span>⏹</span>
+                                <span>Stop</span>
+                            </button>
+                            <button hx-post="/action/reset/{{ cp.id }}?type=Soft"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="Soft Reset"
+                                    class="action-btn">
+                                <span>↻</span>
+                                <span>Reset</span>
+                            </button>
+                            <button hx-post="/action/unlock/{{ cp.id }}?connector=1"
+                                    hx-target="#toast-container"
+                                    hx-swap="beforeend"
+                                    title="Unlock Stuck Connector"
+                                    class="action-btn">
+                                <span>🔓</span>
+                                <span>Unlock</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not chargers %}
+                <tr>
+                    <td colspan="7" class="p-8 text-center text-gray-500">
+                        <div class="text-base mb-1">⛽ No Charge Points Registered</div>
+                        <div class="text-xs text-gray-400 mb-3">Spawn virtual chargers above or register physical chargers via OCPP WebSocket.</div>
+                        <button hx-post="/action/dashboard/spawn-virtual?count=3"
+                                hx-target="#toast-container"
+                                hx-swap="beforeend"
+                                class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded text-xs font-semibold">
+                            ⚡ Spawn 3 Virtual Chargers Now
+                        </button>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ═══ Row 5: Actionable Exception Queue ════════════════════════════════ -->
+<div class="dashboard-panel p-4 mb-4">
+    <!-- Header with Alert Badge & Filter Controls -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div>
+            <div class="flex items-center gap-2">
+                <span class="text-red-400 text-sm">⚠️</span>
+                <h2 class="text-xs font-bold text-gray-200">Actionable Exception Queue</h2>
+                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full {% if exception_count > 0 %}bg-red-950 text-red-400 border border-red-800/40{% else %}bg-emerald-950 text-emerald-400 border border-emerald-800/40{% endif %}">
+                    {% if exception_count > 0 %}{{ exception_count }} ITEMS NEED ATTENTION{% else %}ALL SYSTEMS HEALTHY{% endif %}
+                </span>
+            </div>
+            <p class="text-[10px] text-gray-500 mt-0.5">Live anomalies detected in hardware interlocks, heartbeat drops, and expiring certificates</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+            <span class="text-[11px] text-gray-400">Total Exceptions: <strong class="text-gray-200 font-mono">{{ exception_count }}</strong></span>
+            <!-- Direct JSON Export -->
+            <a href="/api/dashboard/export-exceptions" download class="action-btn no-underline">
+                Export Anomaly Incident Bundle (.JSON)
+            </a>
+            <!-- Acknowledge All Action -->
+            <button hx-post="/action/dashboard/acknowledge-all"
+                    hx-target="#toast-container"
+                    hx-swap="beforeend"
+                    class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs transition">
+                Acknowledge All
+            </button>
+        </div>
+    </div>
+
+    <!-- Table of Exceptions -->
+    <div class="overflow-x-auto rounded border border-[#14243b]">
+        <table class="exception-table">
+            <thead>
+                <tr>
+                    <th style="width: 100px;">Severity</th>
+                    <th style="width: 150px;">Asset Identifier</th>
+                    <th>Site Location</th>
+                    <th>Detected Anomaly &amp; Diagnostic</th>
+                    <th style="width: 160px;">Observed Timestamp</th>
+                    <th style="width: 90px;">Freshness</th>
+                    <th style="width: 240px;" class="text-right">Quick Remediation Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in exceptions %}
+                <tr>
+                    <!-- Severity -->
+                    <td>
+                        {% if item.severity == 'CRITICAL' %}
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-red-950/60 text-red-400 border border-red-800/40">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span> CRITICAL
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-950/60 text-amber-400 border border-amber-800/40">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> WARNING
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Asset Identifier -->
+                    <td>
+                        <div class="flex items-center gap-1.5 font-mono text-cyan-300 font-semibold text-xs">
+                            <span>⚡</span>
+                            <span>{{ item.asset }}</span>
+                        </div>
+                    </td>
+
+                    <!-- Site Location -->
+                    <td>
+                        <div class="text-gray-200 font-medium">{{ item.site }}</div>
+                    </td>
+
+                    <!-- Detected Anomaly & Diagnostic -->
+                    <td>
+                        <div class="text-gray-200 font-semibold text-[11px]">{{ item.anomaly }}</div>
+                        <div class="text-[10px] text-gray-400">{{ item.detail }}</div>
+                    </td>
+
+                    <!-- Observed Timestamp -->
+                    <td class="font-mono text-[10.5px]">
+                        <div class="text-gray-300">{{ item.timestamp }}</div>
+                    </td>
+
+                    <!-- Freshness -->
+                    <td>
+                        {% if item.freshness == 'Stale' %}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-950/40 text-amber-400 border border-amber-800/30">Stale</span>
+                        {% elif item.freshness == 'Fresh' %}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-cyan-950/40 text-cyan-400 border border-cyan-800/30">Fresh</span>
+                        {% else %}
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-950/40 text-blue-400 border border-blue-800/30">Valid</span>
+                        {% endif %}
+                    </td>
+
+                    <!-- Quick Remediation Action -->
+                    <td class="text-right">
+                        <div class="inline-flex items-center gap-1.5 justify-end">
+                            {% for act in item.actions %}
+                                <button hx-post="{{ act.url }}"
+                                        hx-target="#toast-container"
+                                        hx-swap="beforeend"
+                                        class="action-btn {% if act.type == 'danger' %}action-btn-danger{% elif act.type == 'accent' %}action-btn-accent{% endif %}">
+                                    <span>{{ act.icon }}</span>
+                                    <span>{{ act.label }}</span>
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not exceptions %}
+                <tr>
+                    <td colspan="7" class="p-6 text-center text-gray-400">
+                        <div class="flex items-center justify-center gap-2 text-emerald-400 text-xs font-semibold">
+                            <span>✓</span>
+                            <span>No anomalies detected. All physical chargers and certificate chains operational.</span>
+                        </div>
+                        <div class="text-[10px] text-gray-500 mt-1">To test exception alerts, click <strong>"⚠️ Inject Fault"</strong> in the toolbar above.</div>
+                    </td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Embedded Live Chart Data Script for Client-Side Chart Updates -->
+<script id="live-chart-data" type="application/json">
+{
+    "daily_data": {{ daily_data | tojson }},
+    "connector_statuses": {{ connector_statuses | tojson }},
+    "total_connectors": {{ total_connectors }}
+}
+</script>

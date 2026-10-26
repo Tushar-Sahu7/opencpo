@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
-    <title>{% block title %}Admin{% endblock %} — {{ app_title }}</title>
+    <title>{% block title %}Dashboard{% endblock %} — OpenCPO / ChargeQ</title>
     <script src="/static/tailwind.js"></script>
     <script src="/static/htmx.min.js"></script>
     <script src="/static/chart.min.js"></script>
@@ -13,105 +13,476 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { dark: '#0C2340', green: '#84BD00', blue: '#00B0E4' }
+                        brand: { dark: '#060b13', green: '#10b981', blue: '#00bcd4', cyan: '#00e5ff' }
                     },
                     fontSize: {
-                        'xs': ['13px', '18px'],
-                        'sm': ['15px', '22px'],
-                        'base': ['16px', '24px'],
-                        'lg': ['18px', '26px'],
+                        'xs': ['12px', '16px'],
+                        'sm': ['13px', '18px'],
+                        'base': ['14px', '20px'],
+                        'lg': ['16px', '22px'],
                     }
                 }
             }
         }
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #060b13;
+            color: #d1dbe5;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         .htmx-indicator { display: none; }
         .htmx-request .htmx-indicator { display: inline-block; }
         .htmx-request.htmx-indicator { display: inline-block; }
-        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-        .status-online { color: #84BD00; animation: pulse-dot 2s infinite; }
-        .status-offline { color: #ef4444; }
-        .top-link { color:#6b8299; text-decoration:none; padding:5px 12px; border-radius:6px; transition: all 0.15s; }
-        .top-link:hover { color:#c0cdd8; background:rgba(255,255,255,0.05); }
-        .top-link.active { color:#00B0E4; background:rgba(0,176,228,0.1); }
-        .nav-item { display:block; padding:9px 20px; color:#6b8299; text-decoration:none; font-size:14px; border-left:2px solid transparent; transition: all 0.15s; }
-        .nav-item:hover { color:#c0cdd8; background:rgba(255,255,255,0.03); }
-        .nav-item.active { color:#e8edf2; border-left-color:#00B0E4; background:rgba(0,176,228,0.05); }
-        .nav-section { font-size:11px; color:#3d5870; text-transform:uppercase; letter-spacing:1.5px; padding:18px 20px 6px; font-weight:600; }
+
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.85); } }
+        .status-dot {
+            width: 7px; height: 7px; border-radius: 50%; display: inline-block;
+            box-shadow: 0 0 8px currentColor;
+        }
+        .status-dot-green { background-color: #10b981; color: #10b981; animation: pulse-dot 2s infinite ease-in-out; }
+
+        /* ── Top Header ───────────────────────────────────────────── */
+        .top-navbar {
+            height: 48px;
+            background: #080f1a;
+            border-bottom: 1px solid #132238;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 220px;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: -0.2px;
+            color: #f1f5f9;
+            text-decoration: none;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 440px;
+            position: relative;
+        }
+
+        .search-container input {
+            width: 100%;
+            background: #0c1626;
+            border: 1px solid #192d47;
+            border-radius: 6px;
+            padding: 6px 36px 6px 32px;
+            font-size: 12px;
+            color: #cbd5e1;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-container input:focus {
+            border-color: #00bcd4;
+            background: #0f1c30;
+            box-shadow: 0 0 0 1px rgba(0, 188, 212, 0.2);
+        }
+
+        .search-container .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .search-container .kbd-shortcut {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #14243b;
+            border: 1px solid #1e3556;
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #94a3b8;
+        }
+
+        .simulated-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #94a3b8;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-track {
+            width: 32px;
+            height: 18px;
+            background: #00bcd4;
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.2s;
+        }
+
+        .toggle-thumb {
+            width: 14px;
+            height: 14px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .user-profile-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0d1727;
+            border: 1px solid #192d47;
+            border-radius: 20px;
+            padding: 3px 10px 3px 4px;
+        }
+
+        .user-avatar-circle {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #00bcd4, #0284c7);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #fff;
+        }
+
+        /* ── Sidebar ──────────────────────────────────────────────── */
+        .sidebar-nav {
+            width: 220px;
+            background: #080f1a;
+            border-right: 1px solid #132238;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex-shrink: 0;
+            height: calc(100vh - 48px);
+            overflow-y: auto;
+        }
+
+        .sidebar-section-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #475569;
+            padding: 16px 14px 6px;
+        }
+
+        .nav-item-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 12px;
+            margin: 1px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #8da2bb;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .nav-item-link:hover {
+            background: rgba(255, 255, 255, 0.04);
+            color: #f1f5f9;
+        }
+
+        .nav-item-link.active {
+            background: #00bcd4;
+            color: #041423;
+            font-weight: 600;
+        }
+
+        .nav-item-link.active .badge-pill {
+            background: rgba(4, 20, 35, 0.2);
+            color: #041423;
+        }
+
+        .nav-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-icon {
+            font-size: 13px;
+            width: 16px;
+            text-align: center;
+            opacity: 0.85;
+        }
+
+        .badge-pill {
+            font-size: 9px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            background: #13243a;
+            color: #7997b7;
+        }
+
+        .badge-pill.badge-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .badge-pill.badge-cyan { background: rgba(0, 188, 212, 0.15); color: #00bcd4; }
+        .badge-pill.badge-gray { background: #15273e; color: #738ba5; }
+
+        /* ── Main Area ────────────────────────────────────────────── */
+        .dashboard-main-content {
+            flex: 1;
+            height: calc(100vh - 48px);
+            overflow-y: auto;
+            background: #060b13;
+            padding: 18px 22px 40px;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #060b13; }
+        ::-webkit-scrollbar-thumb { background: #192c47; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #26436c; }
     </style>
 </head>
-<body class="h-full bg-gray-950 text-gray-100" style="font-size:15px;">
+<body class="h-full">
 
-<!-- Update Banner — auto-loaded via HTMX on every page -->
-<div id="update-banner"
-     hx-get="/partials/update-banner"
-     hx-trigger="load delay:2s"
-     hx-swap="outerHTML">
+<!-- ═══ Top Header ═══════════════════════════════════════════════════════ -->
+<header class="top-navbar">
+    <div class="nav-logo-area">
+        <a href="/" class="nav-logo">
+            <span style="color:#00bcd4; font-size:18px;">⚡</span>
+            <span>ChargeQ</span>
+        </a>
+    </div>
+
+    <div class="search-container">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Search assets, sites, transactions..." id="global-search">
+        <span class="kbd-shortcut">⌘K</span>
+    </div>
+
+    <div class="header-actions">
+        <div class="status-pill">
+            <span class="status-dot status-dot-green"></span>
+            <span>Live Grid &amp; Charger Status</span>
+        </div>
+
+        <div class="simulated-toggle" title="Toggle simulation mode" onclick="this.querySelector('.toggle-track').classList.toggle('bg-gray-700');">
+            <span>Simulated</span>
+            <div class="toggle-track">
+                <div class="toggle-thumb"></div>
+            </div>
+        </div>
+
+        <div class="user-profile-pill">
+            <div class="user-avatar-circle">👤</div>
+            <div class="flex flex-col text-left leading-tight">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-semibold text-gray-200">Operations Admin</span>
+                    <span class="text-[9px] font-bold px-1 py-0.5 rounded bg-cyan-950 text-cyan-400 uppercase tracking-wider">SuperAdmin</span>
+                </div>
+                <span class="text-[10px] text-gray-400">admin@chargeq.io</span>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ═══ App Container ═════════════════════════════════════════════════════ -->
+<div class="flex">
+
+    <!-- ── Sidebar Navigation ────────────────────────────────────────── -->
+    <aside class="sidebar-nav" id="app-sidebar">
+        <div class="pb-6">
+            <div class="sidebar-section-title">Overview</div>
+            <a href="/" class="nav-item-link {% if active == 'dashboard' or not active %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">⊞</span>
+                    <span>Dashboard</span>
+                </div>
+            </a>
+
+            <div class="sidebar-section-title">Hierarchy &amp; Assets</div>
+            <a href="/network" class="nav-item-link {% if active == 'network' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🗺️</span>
+                    <span>Areas &amp; Sites</span>
+                </div>
+                <span class="badge-pill badge-gray">4 Areas</span>
+            </a>
+            <a href="/chargers" class="nav-item-link {% if active == 'chargers' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">⚡</span>
+                    <span>Charger Network</span>
+                </div>
+                <span class="badge-pill badge-cyan">42 Units</span>
+            </a>
+            <a href="/sessions" class="nav-item-link {% if active == 'sessions' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">⏱️</span>
+                    <span>Charging Sessions</span>
+                </div>
+                <span class="badge-pill badge-green">18 Active</span>
+            </a>
+
+            <div class="sidebar-section-title">Commercial &amp; Access</div>
+            <a href="/tariffs" class="nav-item-link {% if active == 'tariffs' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🏷️</span>
+                    <span>Tariffs &amp; Pricing</span>
+                </div>
+            </a>
+            <a href="/tokens" class="nav-item-link {% if active == 'tokens' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">💳</span>
+                    <span>RFID Tokens</span>
+                </div>
+                <span class="badge-pill badge-gray">Whitelist</span>
+            </a>
+            <a href="/groups" class="nav-item-link {% if active == 'groups' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">👥</span>
+                    <span>Token Groups &amp; Drivers</span>
+                </div>
+            </a>
+
+            <div class="sidebar-section-title">Security &amp; Cryptography</div>
+            <a href="/pki" class="nav-item-link {% if active == 'pki' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🛡️</span>
+                    <span>PKI &amp; Certificates</span>
+                </div>
+                <span class="badge-pill badge-cyan">Sub-CAs</span>
+            </a>
+            <a href="/security" class="nav-item-link {% if active == 'security' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🔒</span>
+                    <span>Security &amp; Features</span>
+                </div>
+            </a>
+
+            <div class="sidebar-section-title">Protocols &amp; Interconnect</div>
+            <a href="/ocpp" class="nav-item-link {% if active == 'ocpp' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">📡</span>
+                    <span>OCPP Live Stream</span>
+                </div>
+                <span class="badge-pill badge-gray font-mono">WS2:9100</span>
+            </a>
+            <a href="/ocpi" class="nav-item-link {% if active == 'ocpi' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🌐</span>
+                    <span>OCPI Roaming</span>
+                </div>
+                <span class="badge-pill badge-gray font-mono">v2.2.1</span>
+            </a>
+
+            <div class="sidebar-section-title">System Administration</div>
+            <a href="/settings" class="nav-item-link {% if active == 'settings' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings &amp; Services</span>
+                </div>
+            </a>
+            <a href="/backups" class="nav-item-link {% if active == 'backups' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">💾</span>
+                    <span>Backups &amp; Recovery</span>
+                </div>
+            </a>
+            <a href="/updates" class="nav-item-link {% if active == 'updates' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🔄</span>
+                    <span>System Updates</span>
+                </div>
+            </a>
+            <a href="/receipts" class="nav-item-link {% if active == 'receipts' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">🧾</span>
+                    <span>Receipts &amp; Billing</span>
+                </div>
+            </a>
+            <a href="/docs" class="nav-item-link {% if active == 'docs' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <span class="nav-icon">📖</span>
+                    <span>Documentation</span>
+                </div>
+                <span class="badge-pill badge-gray">Help</span>
+            </a>
+        </div>
+
+        <div class="p-3 border-t border-[#132238] text-[10px] text-gray-500 flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                <span>v2.4 LTS</span>
+            </div>
+            <span class="text-gray-400 font-medium">CSMS Ready</span>
+        </div>
+    </aside>
+
+    <!-- ── Main Dashboard Content ────────────────────────────────────── -->
+    <main class="dashboard-main-content">
+        {% block content %}{% endblock %}
+    </main>
 </div>
 
-<!-- Top Nav — platform-level navigation between apps -->
-<nav style="display:flex;align-items:center;gap:2px;padding:8px 16px;background:#050b14;border-bottom:1px solid #15283f;font-size:13px;position:sticky;top:0;z-index:9999;">
-  <span style="color:#e8edf2;font-weight:600;font-size:14px;margin-right:20px;letter-spacing:-0.3px;">Open<span style="color:#4a6580;">CPO</span></span>
-  <a href="/" class="top-link active" title="Fleet management dashboard">Admin</a>
-  <a href="{{ charge_app_url }}" class="top-link" title="Driver-facing charging app">Charge App</a>
-  <a href="{{ charger_farm_url }}" class="top-link" title="Virtual charger simulator">Charger Farm</a>
-  <a href="{{ compliance_url }}" class="top-link" title="OCPP compliance testing">Certification</a>
-  <a href="{{ core_api_public_url }}/docs" class="top-link" title="REST API documentation">API Docs</a>
-</nav>
-
-    <div class="flex" style="height:calc(100vh - 37px);">
-        <!-- Sidebar -->
-        <nav style="width:220px;background:#0a1221;border-right:1px solid #15283f;display:flex;flex-direction:column;flex-shrink:0;">
-            <div style="padding:24px 20px 20px;">
-                <div style="font-size:24px;font-weight:600;letter-spacing:-0.5px;line-height:1;">
-                    <span style="color:#e8edf2;">Open</span><span style="color:#4a6580;">CPO</span>
-                </div>
-                <div style="font-size:10px;color:#3d5870;letter-spacing:2px;text-transform:uppercase;margin-top:8px;">Admin Panel</div>
-            </div>
-
-            <div style="flex:1;overflow-y:auto;padding:8px 0;">
-                <div class="nav-section">Overview</div>
-                <a href="/" class="nav-item {% if active == 'dashboard' %}active{% endif %}">Dashboard</a>
-
-                <div class="nav-section">Fleet</div>
-                <a href="/chargers" class="nav-item {% if active == 'chargers' %}active{% endif %}">Chargers</a>
-                <a href="/sessions" class="nav-item {% if active == 'sessions' %}active{% endif %}">Charging Sessions</a>
-
-                <div class="nav-section">Configuration</div>
-                <a href="/tariffs" class="nav-item {% if active == 'tariffs' %}active{% endif %}">Tariffs & Pricing</a>
-                <a href="/tokens" class="nav-item {% if active == 'tokens' %}active{% endif %}">RFID Tokens</a>
-                <a href="/groups" class="nav-item {% if active == 'groups' %}active{% endif %}">Token Groups</a>
-
-                <div class="nav-section">Security</div>
-                <a href="/pki" class="nav-item {% if active == 'pki' %}active{% endif %}">PKI & Certificates</a>
-
-                <div class="nav-section">Protocol</div>
-                <a href="/ocpp" class="nav-item {% if active == 'ocpp' %}active{% endif %}">OCPP Messages</a>
-                <a href="/ocpi" class="nav-item {% if active == 'ocpi' %}active{% endif %}">OCPI Roaming</a>
-
-                <div class="nav-section">Charge App</div>
-                <a href="/skins" class="nav-item {% if active == 'skins' %}active{% endif %}">🎨 Skins</a>
-
-                <div class="nav-section">System</div>
-                <a href="/network" class="nav-item {% if active == 'network' %}active{% endif %}">Network & Sites</a>
-                <a href="/settings" class="nav-item {% if active == 'settings' %}active{% endif %}">Settings</a>
-
-                <div class="nav-section">Help</div>
-                <a href="/docs" class="nav-item {% if active == 'docs' %}active{% endif %}">Documentation</a>
-            </div>
-
-            <div style="padding:16px 20px;border-top:1px solid #15283f;font-size:11px;color:#2d4a63;">
-                OpenCPO v1.0
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main style="flex:1;overflow-y:auto;">
-            <div class="p-6">
-                {% block content %}{% endblock %}
-            </div>
-        </main>
-    </div>
+<script>
+    // Global ⌘K / Ctrl+K focus
+    document.addEventListener('keydown', function(e) {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('global-search')?.focus();
+        }
+    });
+</script>
 </body>
 </html>

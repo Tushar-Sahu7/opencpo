@@ -98,14 +98,14 @@ async def connect_and_run(charger: "VirtualCharger16") -> None:
         farm_metrics.record_connection()
         farm_metrics.log_event("info", charger.cp_id, "Connected")
 
+        shutdown_task = asyncio.create_task(charger._shutdown_event.wait())
+        handler_task = asyncio.create_task(charger._cp.start())
+
         if charger.quirks.stop_transaction_on_reconnect:
             await replay_reconnect_stops(charger)
 
         await replay_offline_buffer(charger)
         await boot(charger)
-
-        shutdown_task = asyncio.create_task(charger._shutdown_event.wait())
-        handler_task = asyncio.create_task(charger._cp.start())
 
         done, pending = await asyncio.wait(
             [handler_task, shutdown_task],

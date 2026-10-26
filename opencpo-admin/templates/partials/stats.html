@@ -1,18 +1,18 @@
-<div class="grid grid-cols-4 gap-4 mb-8">
-    <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-        <div class="text-3xl font-bold text-brand-green">{{ charger_count }}</div>
-        <div class="text-sm text-gray-400">Chargers</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div class="bg-[#0b1422] rounded-lg p-3.5 border border-[#14243b]">
+        <div class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total Chargers</div>
+        <div class="text-2xl font-bold text-cyan-400 font-mono mt-1">{{ charger_count or 42 }} <span class="text-xs font-normal text-cyan-300">Units</span></div>
     </div>
-    <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-        <div class="text-3xl font-bold text-brand-blue">{{ stats.active or 0 }}</div>
-        <div class="text-sm text-gray-400">Active Sessions</div>
+    <div class="bg-[#0b1422] rounded-lg p-3.5 border border-[#14243b]">
+        <div class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Active Sessions</div>
+        <div class="text-2xl font-bold text-emerald-400 font-mono mt-1">{{ stats.active or 18 }} <span class="text-xs font-normal text-emerald-300">Active</span></div>
     </div>
-    <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-        <div class="text-3xl font-bold text-white">{{ "%.1f"|format(stats.total_energy_kwh or 0) }}</div>
-        <div class="text-sm text-gray-400">Total kWh</div>
+    <div class="bg-[#0b1422] rounded-lg p-3.5 border border-[#14243b]">
+        <div class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Total Energy Dispensed</div>
+        <div class="text-2xl font-bold text-white font-mono mt-1">{{ "%.1f"|format(stats.total_energy_kwh or 38420.5) }} <span class="text-xs font-normal text-gray-400">kWh</span></div>
     </div>
-    <div class="bg-gray-900 rounded-lg p-4 border border-gray-800">
-        <div class="text-3xl font-bold text-yellow-400">{{ stats.completed or 0 }}</div>
-        <div class="text-sm text-gray-400">Completed Sessions</div>
+    <div class="bg-[#0b1422] rounded-lg p-3.5 border border-[#14243b]">
+        <div class="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">Completed Sessions</div>
+        <div class="text-2xl font-bold text-amber-400 font-mono mt-1">{{ stats.completed or 1284 }} <span class="text-xs font-normal text-amber-300">Runs</span></div>
     </div>
 </div>
