@@ -32,22 +32,22 @@
   <!-- Summary cards -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;">
     <div class="ems-card" style="border-top:3px solid #10b981;text-align:center;">
-      <div class="ems-lbl">⚡ Grid</div>
+      <div class="ems-lbl flex items-center justify-center gap-1"><i data-lucide="zap" class="w-3.5 h-3.5 inline-block"></i> Grid</div>
       <div id="sc-grid" class="ems-mono" style="font-size:22px;font-weight:800;color:#10b981;">—</div>
       <div id="sc-grid-dir" style="font-size:10px;color:#64748b;margin-top:2px;">—</div>
     </div>
     <div class="ems-card" style="border-top:3px solid #fbbf24;text-align:center;">
-      <div class="ems-lbl">☀️ Solar</div>
+      <div class="ems-lbl flex items-center justify-center gap-1"><i data-lucide="sun" class="w-3.5 h-3.5 inline-block"></i> Solar</div>
       <div id="sc-solar" class="ems-mono" style="font-size:22px;font-weight:800;color:#64748b;">—</div>
       <div style="font-size:10px;color:#64748b;margin-top:2px;">kW</div>
     </div>
     <div class="ems-card" style="border-top:3px solid #8b5cf6;text-align:center;">
-      <div class="ems-lbl">🔋 Battery SoC</div>
+      <div class="ems-lbl flex items-center justify-center gap-1"><i data-lucide="battery-charging" class="w-3.5 h-3.5 inline-block"></i> Battery SoC</div>
       <div id="sc-soc" class="ems-mono" style="font-size:22px;font-weight:800;color:#8b5cf6;">—%</div>
       <div id="sc-batt-state" style="font-size:10px;color:#64748b;margin-top:2px;">—</div>
     </div>
     <div class="ems-card" style="border-top:3px solid #00B0E4;text-align:center;">
-      <div class="ems-lbl">🔌 Chargers</div>
+      <div class="ems-lbl flex items-center justify-center gap-1"><i data-lucide="plug-zap" class="w-3.5 h-3.5 inline-block"></i> Chargers</div>
       <div id="sc-ev" class="ems-mono" style="font-size:22px;font-weight:800;color:#64748b;">—</div>
       <div id="sc-ev-state" style="font-size:10px;color:#64748b;margin-top:2px;">no sessions</div>
     </div>
@@ -107,7 +107,7 @@
 
     <!-- Grid detail -->
     <div class="ems-card" id="ems-grid-card" style="border-top:3px solid #10b981;">
-      <div class="ems-lbl">⚡ Grid</div>
+      <div class="ems-lbl flex items-center gap-1"><i data-lucide="zap" class="w-3.5 h-3.5 inline-block"></i> Grid</div>
       <div id="ems-grid-value" class="ems-mono" style="font-size:28px;font-weight:800;color:#10b981;">0,0 <span style="font-size:12px;color:#64748b;">kW</span></div>
       <div id="ems-grid-dir" style="font-size:11px;color:#64748b;margin-bottom:10px;">import</div>
       <table class="ems-ph">
@@ -134,7 +134,7 @@
 
     <!-- Solar detail -->
     <div class="ems-card" id="ems-solar-card" style="border-top:3px solid #64748b;">
-      <div class="ems-lbl">☀️ Solar</div>
+      <div class="ems-lbl flex items-center gap-1"><i data-lucide="sun" class="w-3.5 h-3.5 inline-block"></i> Solar</div>
       <div style="text-align:center;margin-bottom:10px;">
         <div id="ems-solar-value" class="ems-mono" style="font-size:36px;font-weight:800;color:#64748b;">0,0 <span style="font-size:14px;">kW</span></div>
         <div id="ems-solar-state" style="font-size:11px;color:#64748b;margin-top:4px;">— Idle</div>
@@ -146,7 +146,7 @@
 
     <!-- Battery detail -->
     <div class="ems-card" id="ems-batt-card" style="border-top:3px solid #8b5cf6;">
-      <div class="ems-lbl">🔋 Battery</div>
+      <div class="ems-lbl flex items-center gap-1"><i data-lucide="battery-charging" class="w-3.5 h-3.5 inline-block"></i> Battery</div>
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;">
         <svg width="90" height="90" viewBox="0 0 100 100" style="flex-shrink:0;">
           <circle cx="50" cy="50" r="40" fill="none" stroke="#1a3a5c" stroke-width="8"/>
@@ -174,7 +174,7 @@
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
 
     <div class="ems-card" style="border-top:3px solid #00B0E4;">
-      <div class="ems-lbl">🔌 Chargers</div>
+      <div class="ems-lbl flex items-center gap-1"><i data-lucide="plug-zap" class="w-3.5 h-3.5 inline-block"></i> Chargers</div>
       <div style="text-align:center;margin-bottom:10px;">
         <div id="ems-ev-value" class="ems-mono" style="font-size:28px;font-weight:800;color:#64748b;">0,0 <span style="font-size:12px;">kW</span></div>
         <div id="ems-ev-state" style="font-size:11px;color:#64748b;">no sessions</div>
@@ -183,7 +183,7 @@
     </div>
 
     <div class="ems-card" style="border-top:3px solid #64748b;">
-      <div class="ems-lbl">🏢 Gebouw / Building</div>
+      <div class="ems-lbl flex items-center gap-1"><i data-lucide="building-2" class="w-3.5 h-3.5 inline-block"></i> Gebouw / Building</div>
       <div style="text-align:center;">
         <div id="ems-bld-value" class="ems-mono" style="font-size:28px;font-weight:800;color:#64748b;">0,0 <span style="font-size:12px;">kW</span></div>
         <div style="font-size:11px;color:#64748b;margin-top:4px;">calculated consumption</div>
@@ -191,7 +191,7 @@
     </div>
 
     <div class="ems-card" style="border-top:3px solid #00B0E4;">
-      <div class="ems-lbl">🧠 EMS Modus</div>
+      <div class="ems-lbl flex items-center gap-1"><i data-lucide="cpu" class="w-3.5 h-3.5 inline-block"></i> EMS Modus</div>
       <div id="ems-mode" style="font-size:18px;font-weight:700;color:#10b981;margin-bottom:6px;">—</div>
       <div id="ems-reason" style="font-size:11px;color:#64748b;line-height:1.4;"></div>
       <div style="margin-top:12px;">
@@ -406,7 +406,7 @@
     // Solar detail
     $('ems-solar-value').innerHTML = `${fmt(solar)} <span style="font-size:14px;">kW</span>`;
     $('ems-solar-value').style.color = solarColor;
-    $('ems-solar-state').textContent = solar > 0.5 ? '🌞 Producerend' : '— Idle';
+    $('ems-solar-state').textContent = solar > 0.5 ? 'Producing' : '— Idle';
     $('ems-solar-card').style.borderTopColor = solarColor;
     $('ems-solar-bar').style.width = Math.min(100, solar / 50 * 100) + '%';
 

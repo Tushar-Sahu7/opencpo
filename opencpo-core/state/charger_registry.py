@@ -80,6 +80,34 @@ async def send_remote_start(cp_id: str, connector_id: int, id_tag: str) -> Optio
         return None
 
 
+async def send_remote_stop(cp_id: str, transaction_id: int) -> Optional[str]:
+    """
+    Send RemoteStopTransaction to a charger.
+    Returns the unique_id of the sent message, or None if not connected.
+    """
+    if _ocpp16_server is None:
+        logger.warning("OCPP 1.6j server not registered in charger_registry")
+        return None
+
+    import time
+    msg_id = str(uuid.uuid4())
+    payload = json.dumps([2, msg_id, "RemoteStopTransaction", {
+        "transactionId": transaction_id,
+    }])
+
+    # Register pending call so handler tracks the response
+    if _handlers_16 and cp_id in _handlers_16:
+        _handlers_16[cp_id]._pending_calls[msg_id] = ("RemoteStopTransaction", time.monotonic())
+
+    ok = await _ocpp16_server.send_to(cp_id, payload)
+    if ok:
+        logger.info(f"RemoteStopTransaction sent to {cp_id} transaction_id={transaction_id} msg_id={msg_id}")
+        return msg_id
+    else:
+        logger.warning(f"RemoteStopTransaction: {cp_id} not connected")
+        return None
+
+
 def is_connected(cp_id: str) -> bool:
     """Check if a charger is currently connected."""
     if _ocpp16_server is None:

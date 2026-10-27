@@ -6,15 +6,15 @@
 {% block content %}
 <div class="flex items-center justify-between mb-6">
     <div>
-        <h1 class="text-2xl font-bold text-gray-100">🚗 Driver Accounts</h1>
-        <p class="text-sm text-gray-500 mt-1">💡 Manage driver accounts and their PKI certificates.</p>
+        <h1 class="text-2xl font-bold text-gray-100 flex items-center gap-2"><i data-lucide="users" class="w-6 h-6 text-blue-500"></i> Driver Accounts</h1>
+        <p class="text-sm text-gray-500 mt-1 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 text-blue-400"></i> Manage driver accounts and their PKI certificates.</p>
         <p class="text-sm text-gray-400 mt-1">{{ total }} registered driver{{ 's' if total != 1 else '' }}</p>
     </div>
 </div>
 
 {% if not accounts %}
 <div class="rounded-xl border border-gray-800 bg-gray-900 p-12 text-center text-gray-500">
-    <div class="text-4xl mb-3">🚗</div>
+    <div class="mb-3 flex justify-center text-slate-500"><i data-lucide="users" class="w-10 h-10"></i></div>
     <div class="text-lg font-medium text-gray-400">No driver accounts yet</div>
     <div class="text-sm mt-1">Drivers will appear here once they register in the charge app.</div>
 </div>
@@ -105,7 +105,7 @@
                         </div>
                         <form hx-post="/action/driver/cert/issue" hx-target="#cert-status-{{ account.id }}" hx-swap="innerHTML" class="mt-1">
                             <input type="hidden" name="email" value="{{ account.email }}" />
-                            <button type="submit" class="text-[10px] px-2 py-0.5 rounded bg-brand-blue/20 text-brand-blue hover:bg-brand-blue/30 border border-brand-blue/30">🔑 Issue cert</button>
+                            <button type="submit" class="text-[10px] px-2 py-0.5 rounded bg-brand-blue/20 text-brand-blue hover:bg-brand-blue/30 border border-brand-blue/30 inline-flex items-center gap-1"><i data-lucide="key" class="w-3 h-3"></i> <span>Issue cert</span></button>
                         </form>
                     {% endif %}
                     </div>

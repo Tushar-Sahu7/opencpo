@@ -12,7 +12,7 @@
     <div class="bg-gray-900 rounded-lg border border-gray-800">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold">📱 SMS Provider</h2>
+                <h2 class="text-base font-semibold flex items-center gap-2"><i data-lucide="smartphone" class="w-4 h-4 text-brand-blue"></i> SMS Provider</h2>
                 <p class="text-xs text-gray-500 mt-0.5">Used for OTP login codes and session notifications.</p>
             </div>
             {% if sms.provider == "demo" or not sms.provider %}
@@ -37,7 +37,7 @@
                 </select>
             </div>
 
-            <div id="sms-fields" class="space-y-4" style="{% if sms.provider == 'demo' or not sms.provider %}display:none{% endif %}">
+            <div id="sms-fields" class="space-y-4 {% if sms.provider == 'demo' or not sms.provider %}hidden{% endif %}">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1" id="sms-key-label">API Key</label>
@@ -103,7 +103,7 @@
     <div class="bg-gray-900 rounded-lg border border-gray-800">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold">✉️ Email (SMTP)</h2>
+                <h2 class="text-base font-semibold flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4 text-brand-blue"></i> Email (SMTP)</h2>
                 <p class="text-xs text-gray-500 mt-0.5">Used for charging receipts sent to drivers.</p>
             </div>
             {% if smtp.host and smtp.user %}
@@ -196,7 +196,7 @@
     <div class="bg-gray-900 rounded-lg border border-gray-800">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold">🔐 OTP / Driver Login</h2>
+                <h2 class="text-base font-semibold flex items-center gap-2"><i data-lucide="key-round" class="w-4 h-4 text-brand-blue"></i> OTP / Driver Login</h2>
                 <p class="text-xs text-gray-500 mt-0.5">One-time password settings for the driver-facing charge app.</p>
             </div>
             {% if otp.demo_mode %}
@@ -264,7 +264,7 @@
     <div class="bg-gray-900 rounded-lg border border-gray-800">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold">🌐 OCPI Identity</h2>
+                <h2 class="text-base font-semibold flex items-center gap-2"><i data-lucide="globe" class="w-4 h-4 text-brand-blue"></i> OCPI Identity</h2>
                 <p class="text-xs text-gray-500 mt-0.5">Your operator identity advertised to roaming partners via OCPI.</p>
             </div>
             {% if ocpi.operator_name and ocpi.base_url %}
@@ -432,7 +432,7 @@
     <div class="bg-gray-900 rounded-lg border border-gray-800" id="backup-panel">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold">💾 Backup & Restore</h2>
+                <h2 class="text-base font-semibold flex items-center gap-2"><i data-lucide="save" class="w-4 h-4 text-brand-blue"></i> Backup & Restore</h2>
                 <p class="text-xs text-gray-500 mt-0.5">
                     Create backups of your platform data, restore from a previous backup,
                     or import an external backup file.
@@ -450,7 +450,7 @@
     <div class="bg-gray-900 rounded-lg border border-gray-800" id="platform-update">
         <div class="p-4 border-b border-gray-800 flex items-center justify-between">
             <div>
-                <h2 class="text-base font-semibold">⬆ Platform Update</h2>
+                <h2 class="text-base font-semibold flex items-center gap-2"><i data-lucide="arrow-up-circle" class="w-4 h-4 text-brand-blue"></i> Platform Update</h2>
                 <p class="text-xs text-gray-500 mt-0.5">
                     Check for new OpenCPO releases and update with one click.
                     Your data and configuration are preserved.
@@ -471,8 +471,10 @@ function toggleSmsFields(provider) {
     const workspaceLabel = document.getElementById('sms-workspace-label');
     const channelLabel = document.getElementById('sms-channel-label');
     if (provider === 'demo') {
+        fields.classList.add('hidden');
         fields.style.display = 'none';
     } else {
+        fields.classList.remove('hidden');
         fields.style.display = 'block';
         if (provider === 'twilio') {
             keyLabel.textContent = 'Auth Token';

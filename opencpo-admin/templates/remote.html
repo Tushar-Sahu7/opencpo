@@ -29,7 +29,7 @@
 <div id="panel-status">
     <!-- Charger info card -->
     <div class="grid grid-cols-2 gap-4 mb-6">
-        <div class="bg-gray-900 rounded-xl p-5 border border-gray-800" style="border-top: 3px solid {% if cp.status == 'online' %}#22c55e{% else %}#ef4444{% endif %};">
+        <div class="bg-gray-900 rounded-xl p-5 border border-gray-800 border-t-[3px] {% if cp.status == 'online' %}border-t-green-500{% else %}border-t-red-500{% endif %}">
             <div class="text-[9px] tracking-[2px] text-gray-500 mb-3">CHARGER STATUS</div>
             <div class="flex items-center gap-2 mb-3">
                 <span class="w-2.5 h-2.5 rounded-full {% if cp.status == 'online' %}bg-green-500 shadow-[0_0_6px_#22c55e]{% else %}bg-red-500{% endif %}"></span>
@@ -57,16 +57,51 @@
 
         <!-- Meter readings -->
         <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
-            <div class="text-[9px] tracking-[2px] text-gray-500 mb-3">LIVE READINGS</div>
-            <div id="live-power" class="text-4xl font-black text-green-400 mb-1" style="font-variant-numeric:tabular-nums;">0.0 <span class="text-sm font-semibold">kW</span></div>
-            <div id="live-energy" class="text-lg font-bold text-gray-300" style="font-variant-numeric:tabular-nums;">0.00 <span class="text-sm font-normal text-gray-500">kWh session</span></div>
-            <div id="live-soc" class="mt-2 hidden">
-                <div class="text-[9px] tracking-[1px] text-blue-400 mb-1 font-semibold">🔋 BATTERY</div>
-                <div class="flex items-center gap-2">
-                    <div class="flex-1 h-4 bg-gray-800 rounded overflow-hidden border border-gray-700">
-                        <div id="soc-bar" class="h-full bg-green-500 rounded transition-all duration-500" style="width:0%"></div>
+            <div class="flex items-center justify-between mb-3">
+                <div class="text-[9px] tracking-[2px] text-gray-500">LIVE READINGS</div>
+                <div class="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold bg-emerald-950/40 border border-emerald-800/50 px-2 py-0.5 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>ACTIVE OCPP STREAM</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Power (kW) -->
+                <div class="p-3 bg-gray-800/50 rounded-lg border border-gray-800">
+                    <div class="text-[10px] text-gray-400 font-medium mb-1">Delivered Power</div>
+                    <div id="live-power" class="text-3xl font-black text-green-400 tabular-nums">
+                        <span id="live-power-val">0.0</span> <span class="text-xs font-semibold text-gray-400">kW</span>
                     </div>
-                    <span id="soc-pct" class="text-lg font-bold text-green-400 min-w-[48px] text-right">—%</span>
+                </div>
+
+                <!-- Energy (kWh) -->
+                <div class="p-3 bg-gray-800/50 rounded-lg border border-gray-800">
+                    <div class="text-[10px] text-gray-400 font-medium mb-1">Session Energy</div>
+                    <div id="live-energy" class="text-3xl font-bold text-gray-100 tabular-nums">
+                        <span id="live-energy-val">0.00</span> <span class="text-xs font-normal text-gray-400">kWh</span>
+                    </div>
+                </div>
+
+                <!-- Live Estimated Cost (€) -->
+                <div class="p-3 bg-gray-800/50 rounded-lg border border-gray-800">
+                    <div class="text-[10px] text-gray-400 font-medium mb-1">Estimated Cost</div>
+                    <div id="live-cost" class="text-3xl font-bold text-emerald-400 tabular-nums">
+                        <span class="text-lg font-normal text-emerald-500 mr-0.5">€</span><span id="live-cost-val">0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Battery SoC -->
+            <div id="live-soc" class="mt-3 pt-3 border-t border-gray-800 hidden">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-1.5 text-[10px] tracking-[1px] text-blue-400 font-semibold">
+                        <i data-lucide="battery-charging" class="w-3.5 h-3.5 inline-block"></i>
+                        <span>VEHICLE BATTERY SOC</span>
+                    </div>
+                    <span id="soc-pct" class="text-sm font-bold text-green-400 tabular-nums"><span id="soc-pct-val">—</span>%</span>
+                </div>
+                <div class="h-3 bg-gray-800 rounded-full overflow-hidden border border-gray-700">
+                    <div id="soc-bar" class="h-full bg-green-500 rounded-full transition-all duration-500" style="width:0%"></div>
                 </div>
             </div>
         </div>
@@ -77,7 +112,7 @@
         <div class="text-[9px] tracking-[2px] text-gray-500 mb-4">CONNECTORS & REMOTE CONTROL</div>
         <div id="connectors-area" hx-get="/partials/remote/connectors/{{ cp.id }}" hx-trigger="load, every 5s" hx-swap="innerHTML">
             {% for conn in connectors %}
-            <div class="rounded-xl p-4 mb-3 border {% if conn.status == 'Charging' %}border-green-800 bg-green-900/10{% else %}border-gray-700{% endif %}" style="border-top: 3px solid {% if conn.status == 'Available' %}#22c55e{% elif conn.status == 'Charging' %}#3b82f6{% elif conn.status == 'Faulted' %}#ef4444{% else %}#64748b{% endif %};">
+            <div class="rounded-xl p-4 mb-3 border border-t-[3px] {% if conn.status == 'Charging' %}border-green-800 bg-green-900/10 border-t-blue-500{% elif conn.status == 'Available' %}border-gray-700 border-t-green-500{% elif conn.status == 'Faulted' %}border-gray-700 border-t-red-500{% else %}border-gray-700 border-t-slate-500{% endif %}">
                 <div class="flex items-center justify-between mb-3">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full {% if conn.status == 'Available' %}bg-green-500{% elif conn.status == 'Charging' %}bg-blue-500 animate-pulse{% else %}bg-gray-500{% endif %}"></span>
@@ -87,14 +122,18 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <button hx-post="/action/start/{{ cp.id }}?connector={{ conn.connector_id }}" hx-swap="outerHTML"
-                            class="py-3 rounded-lg font-bold text-sm {% if cp.status == 'online' and conn.status in ('Available', 'Preparing') %}bg-gradient-to-br from-green-600 to-green-500 text-white shadow-lg shadow-green-500/30 cursor-pointer hover:from-green-500{% else %}bg-gray-800 text-gray-500 cursor-not-allowed{% endif %}"
+                            class="py-3 rounded-lg font-bold text-sm {% if cp.status == 'online' and conn.status in ('Available', 'Preparing') %}bg-gradient-to-br from-green-600 to-green-500 text-white shadow-lg shadow-green-500/30 cursor-pointer hover:from-green-500{% else %}bg-gray-800 text-gray-500 cursor-not-allowed{% endif %} flex items-center justify-center gap-2 btn-press"
                             {% if cp.status != 'online' or conn.status not in ('Available', 'Preparing') %}disabled{% endif %}>
-                        ▶ Start
+                        <i data-lucide="play" class="w-4 h-4 fill-current inline-block btn-icon-default"></i>
+                        <span class="btn-spinner"></span>
+                        <span>Start</span>
                     </button>
                     <button hx-post="/action/stop/{{ cp.id }}" hx-swap="outerHTML"
-                            class="py-3 rounded-lg font-bold text-sm {% if cp.status == 'online' and conn.status in ('Charging', 'SuspendedEV') %}bg-gradient-to-br from-red-600 to-red-500 text-white shadow-lg shadow-red-500/30 cursor-pointer hover:from-red-500{% else %}bg-gray-800 text-gray-500 cursor-not-allowed{% endif %}"
+                            class="py-3 rounded-lg font-bold text-sm {% if cp.status == 'online' and conn.status in ('Charging', 'SuspendedEV') %}bg-gradient-to-br from-red-600 to-red-500 text-white shadow-lg shadow-red-500/30 cursor-pointer hover:from-red-500{% else %}bg-gray-800 text-gray-500 cursor-not-allowed{% endif %} flex items-center justify-center gap-2 btn-press"
                             {% if cp.status != 'online' or conn.status not in ('Charging', 'SuspendedEV') %}disabled{% endif %}>
-                        ■ Stop
+                        <i data-lucide="square" class="w-4 h-4 fill-current inline-block btn-icon-default"></i>
+                        <span class="btn-spinner"></span>
+                        <span>Stop</span>
                     </button>
                 </div>
             </div>
@@ -110,24 +149,30 @@
         <div class="text-[9px] tracking-[2px] text-gray-500 mb-4">ACTIONS</div>
         <div class="grid grid-cols-3 gap-3">
             <button hx-post="/action/reset/{{ cp.id }}?type=Soft" hx-swap="outerHTML"
-                    class="py-3 rounded-lg text-sm font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20">
-                ↺ Soft Reset
+                    class="py-3 rounded-lg text-sm font-semibold bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/20 flex items-center justify-center gap-1.5">
+                <i data-lucide="rotate-ccw" class="w-4 h-4 inline-block"></i>
+                <span>Soft Reset</span>
             </button>
             <button hx-post="/action/reset/{{ cp.id }}?type=Hard" hx-swap="outerHTML"
                     hx-confirm="Hard reset will disconnect all sessions. Continue?"
-                    class="py-3 rounded-lg text-sm font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/30 hover:bg-orange-500/20">
-                ⚠ Hard Reset
+                    class="py-3 rounded-lg text-sm font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/30 hover:bg-orange-500/20 flex items-center justify-center gap-1.5">
+                <i data-lucide="alert-triangle" class="w-4 h-4 inline-block"></i>
+                <span>Hard Reset</span>
             </button>
             <button onclick="showTab('terminal')"
-                    class="py-3 rounded-lg text-sm font-semibold bg-brand-blue/10 text-brand-blue border border-brand-blue/30 hover:bg-brand-blue/20">
-                >_ Terminal
+                    class="py-3 rounded-lg text-sm font-semibold bg-brand-blue/10 text-brand-blue border border-brand-blue/30 hover:bg-brand-blue/20 flex items-center justify-center gap-1.5">
+                <i data-lucide="terminal" class="w-4 h-4 inline-block"></i>
+                <span>Terminal</span>
             </button>
         </div>
     </div>
 
     <!-- Recent sessions -->
     <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-        <div class="p-4 border-b border-gray-800 text-[11px] font-semibold tracking-[1px]">📋 RECENT SESSIONS</div>
+        <div class="p-4 border-b border-gray-800 text-[11px] font-semibold tracking-[1px] flex items-center gap-1.5">
+            <i data-lucide="clipboard-list" class="w-4 h-4 inline-block"></i>
+            <span>RECENT SESSIONS</span>
+        </div>
         <div hx-get="/partials/remote/sessions/{{ cp.id }}" hx-trigger="load" hx-swap="innerHTML">
             <div class="p-6 text-center text-gray-500 text-sm">Loading...</div>
         </div>
@@ -141,8 +186,8 @@
         <div class="text-sm text-gray-400">
             Configuration viewer will show OCPP GetConfiguration results.
             <button hx-post="/action/getconfig/{{ cp.id }}" hx-target="#config-result" 
-                    class="mt-3 px-4 py-2 bg-gray-800 rounded text-sm hover:bg-gray-700 block">
-                📥 Get Configuration
+                    class="mt-3 px-4 py-2 bg-gray-800 rounded text-sm hover:bg-gray-700 inline-flex items-center gap-1.5">
+                <i data-lucide="download" class="w-4 h-4"></i> Get Configuration
             </button>
             <div id="config-result" class="mt-4 font-mono text-xs"></div>
         </div>
@@ -161,8 +206,8 @@
 <div id="panel-ocpp" class="hidden">
     <div class="bg-gray-900 rounded-xl border border-gray-800">
         <div class="p-4 border-b border-gray-800 flex justify-between items-center">
-            <span class="text-[11px] font-semibold tracking-[1px]">📡 OCPP MESSAGES</span>
-            <span id="ocpp-status" class="text-green-400 text-xs">● Live</span>
+            <span class="text-[11px] font-semibold tracking-[1px] flex items-center gap-1.5"><i data-lucide="radio" class="w-3.5 h-3.5 text-brand-blue"></i> OCPP MESSAGES</span>
+            <span id="ocpp-status" class="text-green-400 text-xs flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Live</span>
         </div>
         <div id="ocpp-log" class="p-4 font-mono text-xs max-h-[500px] overflow-y-auto space-y-1">
             <div class="text-gray-500">Connecting to event stream...</div>
@@ -173,7 +218,7 @@
 <!-- ═══ PKI TAB ═══ -->
 <div id="panel-pki" class="hidden">
     <div class="bg-gray-900 rounded-xl p-5 border border-gray-800">
-        <div class="text-[9px] tracking-[2px] text-gray-500 mb-4">🔐 CERTIFICATE STATUS</div>
+        <div class="text-[9px] tracking-[2px] text-gray-500 mb-4 flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5"></i> CERTIFICATE STATUS</div>
         <div hx-get="/partials/remote/pki/{{ cp.id }}" hx-trigger="load" hx-swap="innerHTML">
             <div class="text-sm text-gray-400">Loading PKI status...</div>
         </div>
@@ -225,14 +270,54 @@ const source = new EventSource(CORE + '/api/v1/events/chargers/' + cpId + '/live
 
 source.addEventListener('session.meter', (e) => {
     const d = JSON.parse(e.data).data || {};
-    if (d.power_kw !== undefined) document.getElementById('live-power').innerHTML = d.power_kw.toFixed(1) + ' <span class="text-sm font-semibold">kW</span>';
-    if (d.energy_kwh !== undefined) document.getElementById('live-energy').innerHTML = d.energy_kwh.toFixed(2) + ' <span class="text-sm font-normal text-gray-500">kWh session</span>';
+    if (d.power_kw !== undefined) {
+        window.animateNumber('live-power-val', d.power_kw, { decimals: 1, duration: 250 });
+    }
+    if (d.energy_kwh !== undefined) {
+        window.animateNumber('live-energy-val', d.energy_kwh, { decimals: 2, duration: 280 });
+        // Live estimated cost (€0.45/kWh default rate)
+        const estCost = d.energy_kwh * 0.45;
+        window.animateNumber('live-cost-val', estCost, { decimals: 2, duration: 280 });
+    }
     if (d.soc_pct !== undefined && d.soc_pct > 0) {
         document.getElementById('live-soc').classList.remove('hidden');
         document.getElementById('soc-bar').style.width = d.soc_pct + '%';
-        document.getElementById('soc-bar').className = 'h-full rounded transition-all duration-500 ' + (d.soc_pct > 50 ? 'bg-green-500' : d.soc_pct > 20 ? 'bg-yellow-500' : 'bg-red-500');
-        document.getElementById('soc-pct').textContent = d.soc_pct + '%';
+        document.getElementById('soc-bar').className = 'h-full rounded-full transition-all duration-500 ' + (d.soc_pct > 50 ? 'bg-green-500' : d.soc_pct > 20 ? 'bg-yellow-500' : 'bg-red-500');
+        window.animateNumber('soc-pct-val', d.soc_pct, { decimals: 0, duration: 250 });
     }
+});
+
+// Live charger fault alerts via Sonner toast
+source.addEventListener('charger.status', (e) => {
+    const d = JSON.parse(e.data);
+    const payload = d.data || {};
+    if (payload.status === 'Faulted' || (payload.error_code && payload.error_code !== 'NoError')) {
+        window.toast.fault({
+            chargerId: cpId,
+            errorCode: payload.error_code || 'HardwareFault',
+            info: payload.info || `Connector ${payload.connector_id || 1} transitioned to Faulted`
+        });
+    }
+});
+
+source.addEventListener('charger.offline', (e) => {
+    window.toast.error(`Charger Disconnected: ${cpId}`, {
+        description: 'Heartbeat ping missed. Connection dropped to offline.'
+    });
+});
+
+source.addEventListener('session.start', (e) => {
+    window.toast.success(`Session Started: ${cpId}`, {
+        description: 'Vehicle cable locked. Live meter stream active.'
+    });
+});
+
+source.addEventListener('session.stop', (e) => {
+    const d = JSON.parse(e.data).data || {};
+    const finalKwh = d.energy_kwh !== undefined ? d.energy_kwh.toFixed(2) + ' kWh' : '';
+    window.toast.info(`Session Completed: ${cpId}`, {
+        description: `Vehicle unplugged. ${finalKwh ? 'Delivered: ' + finalKwh : 'CDR stored in database.'}`
+    });
 });
 
 // OCPP log — load history first, then overlay live

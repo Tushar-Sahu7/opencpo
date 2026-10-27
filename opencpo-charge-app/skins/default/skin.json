@@ -1,12 +1,13 @@
 {
   "name": "Default",
   "version": "1.0",
+  "mode": "light",
   "colors": {
     "primary": "#2563eb",
-    "secondary": "#16a34a",
-    "background": "#0f172a",
-    "card": "#1e293b",
-    "border": "#334155"
+    "secondary": "#22c55e",
+    "background": "#f8fafc",
+    "card": "#ffffff",
+    "border": "#e2e8f0"
   },
   "logo": "logo.svg",
   "favicon": "favicon.svg"

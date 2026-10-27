@@ -7,21 +7,26 @@
 }
 
 :root {
-  --bg: #0f172a;
-  --bg2: #1e293b;
-  --bg3: #263448;
-  --card: #1e293b;
-  --border: #334155;
+  --bg: #f8fafc;
+  --bg2: #f1f5f9;
+  --bg3: #e2e8f0;
+  --bg-deep: #ffffff;
+  --card: #ffffff;
+  --card-hover: #f1f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
   --accent: #2563eb;
   --accent2: #1d4ed8;
+  --on-accent: #ffffff;
   --green: #22c55e;
+  --green-bright: #4ade80;
   --red: #ef4444;
-  --yellow: #eab308;
-  --card2: rgba(255,255,255,0.05);
-  --text1: #f1f5f9;
-  --text: #f1f5f9;
-  --text2: #94a3b8;
-  --text3: #64748b;
+  --yellow: #f59e0b;
+  --card2: rgba(0, 0, 0, 0.04);
+  --text1: #0f172a;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
   --radius: 16px;
   --radius-sm: 10px;
   --primary: var(--accent);

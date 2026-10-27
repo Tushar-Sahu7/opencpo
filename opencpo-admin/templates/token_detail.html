@@ -22,13 +22,13 @@
   <div class="flex gap-2">
     <a href="/tokens" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-xs text-gray-300">← Tokens</a>
     {% if token.status == 'active' %}
-    <button onclick="openModal('modal-block')" class="px-3 py-1.5 bg-red-900/50 hover:bg-red-800 border border-red-800 rounded text-xs text-red-300">🚫 Block</button>
+    <button onclick="openModal('modal-block')" class="px-3 py-1.5 bg-red-900/50 hover:bg-red-800 border border-red-800 rounded text-xs text-red-300 inline-flex items-center gap-1.5"><i data-lucide="ban" class="w-3.5 h-3.5"></i> <span>Block</span></button>
     {% elif token.status == 'blocked' %}
     <button hx-post="/action/token/unblock/{{ token.id }}" hx-target="#feedback" hx-swap="innerHTML"
-      class="px-3 py-1.5 bg-green-900/50 hover:bg-green-800 border border-green-800 rounded text-xs text-green-300">✓ Unblock</button>
+      class="px-3 py-1.5 bg-green-900/50 hover:bg-green-800 border border-green-800 rounded text-xs text-green-300 inline-flex items-center gap-1.5"><i data-lucide="check" class="w-3.5 h-3.5"></i> <span>Unblock</span></button>
     {% endif %}
-    <button onclick="openModal('modal-replace')" class="px-3 py-1.5 bg-yellow-900/50 hover:bg-yellow-800 border border-yellow-800 rounded text-xs text-yellow-300">↩ Replace</button>
-    <button onclick="openModal('modal-edit')" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-xs text-gray-300">✏️ Edit</button>
+    <button onclick="openModal('modal-replace')" class="px-3 py-1.5 bg-yellow-900/50 hover:bg-yellow-800 border border-yellow-800 rounded text-xs text-yellow-300 inline-flex items-center gap-1.5"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> <span>Replace</span></button>
+    <button onclick="openModal('modal-edit')" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded text-xs text-gray-300 inline-flex items-center gap-1.5"><i data-lucide="pencil" class="w-3.5 h-3.5"></i> <span>Edit</span></button>
   </div>
 </div>
 <div id="feedback" class="mb-4"></div>

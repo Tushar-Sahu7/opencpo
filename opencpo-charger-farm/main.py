@@ -224,8 +224,24 @@ templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.on_event("startup")
 async def on_startup():
-    farm_metrics.log_event("info", "farm", "Charger Farm Manager started — waiting for user to start farm")
+    farm_metrics.log_event("info", "farm", "Charger Farm Manager started")
     asyncio.create_task(_metrics_loop())
+
+    # Auto-spawn default farm chargers so they are immediately connected to ocpp-core
+    async def _auto_start():
+        await asyncio.sleep(2)
+        try:
+            count = int(os.environ.get("AUTO_START_COUNT", "3"))
+            profile_name = farm.settings.get("default_profile", "ENC-DCL120B-16")
+            for i in range(count):
+                cp_id = f"FARM-{profile_name}-{i+1:04d}"
+                await farm.spawn_charger(cp_id, profile_name, "1.6")
+            farm.running = True
+            farm_metrics.log_event("info", "farm", f"Auto-started {count} default virtual chargers")
+        except Exception as e:
+            logger.warning(f"Failed to auto-start farm chargers: {e}")
+
+    asyncio.create_task(_auto_start())
 
 
 @app.on_event("shutdown")
@@ -374,6 +390,24 @@ async def api_charger_disconnect(cp_id: str):
 async def api_session_start(cp_id: str, request: Request):
     charger = farm.get_charger(cp_id)
     if not charger:
+        # Auto-spawn if this is a known farm charger
+        profile_name = None
+        for p in sorted(PROFILES.keys(), key=len, reverse=True):
+            if p in cp_id:
+                profile_name = p
+                break
+        if profile_name or cp_id.startswith("FARM-"):
+            p_name = profile_name or farm.settings.get("default_profile", "ENC-DCL120B-16")
+            version = "2.0.1" if "201" in p_name else "1.6"
+            pnc = farm.conditions.get("pnc_enabled", False)
+            charger = await farm.spawn_charger(cp_id, profile_name=p_name, ocpp_version=version, pnc_enabled=pnc)
+            if charger:
+                farm.running = True
+                for _ in range(30):
+                    if charger.is_connected:
+                        break
+                    await asyncio.sleep(0.1)
+    if not charger:
         raise HTTPException(404, f"Charger {cp_id} not found")
     body = await request.json() if request.headers.get("content-type", "").startswith("application/json") else {}
     connector = body.get("connector_id", 1)
@@ -386,7 +420,7 @@ async def api_session_start(cp_id: str, request: Request):
 async def api_session_stop(cp_id: str, request: Request):
     charger = farm.get_charger(cp_id)
     if not charger:
-        raise HTTPException(404, f"Charger {cp_id} not found")
+        return {"stopped": True}
     body = await request.json() if request.headers.get("content-type", "").startswith("application/json") else {}
     connector = body.get("connector_id", 1)
     ok = await charger.stop_charging(connector)

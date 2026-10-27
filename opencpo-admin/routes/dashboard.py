@@ -3,6 +3,7 @@
 All data is dynamically fetched from ocpp-core, TimescaleDB, and Redis.
 No hardcoded static mock data.
 """
+import asyncio
 import json as json_lib
 import logging
 from datetime import datetime, timezone, timedelta
@@ -509,7 +510,7 @@ async def action_simulate_session_start(connector: int = Query(1)):
                     <span>No chargers online. Spawn virtual chargers first!</span>
                 </div>
             """)
-        # Pick first online charger
+        # Pick first online charger, or fallback to first charger
         target_cp = next((c["id"] for c in chargers if c.get("status") == "online"), chargers[0]["id"])
 
         # Trigger farm charging session
@@ -525,6 +526,23 @@ async def action_simulate_session_start(connector: int = Query(1)):
                         <span>Vehicle plugged into <strong>{target_cp}</strong> (Conn {connector}). Meter values streaming live!</span>
                     </div>
                 """)
+            if target_cp.startswith("FARM-"):
+                await client.post(
+                    f"{CHARGER_FARM_INTERNAL_URL}/api/farm/start",
+                    json={"count": 3, "profile": "ENC-DCL120B-16"}
+                )
+                await asyncio.sleep(1.0)
+                res = await client.post(
+                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{target_cp}/session/start",
+                    json={"connector_id": connector, "id_tag": "DRIVER-CARD-77"}
+                )
+                if res.status_code == 200 and res.json().get("started"):
+                    return HTMLResponse(f"""
+                        <div class="toast-alert toast-success">
+                            <span>▶</span>
+                            <span>Vehicle plugged into <strong>{target_cp}</strong> (Conn {connector}). Meter values streaming live!</span>
+                        </div>
+                    """)
     except Exception as e:
         logger.warning("Failed to start farm session: %s", e)
 
@@ -677,17 +695,19 @@ async def action_reset_charger_dashboard(cp_id: str, type: str = Query("Soft")):
 @router.post("/action/start/{cp_id}", response_class=HTMLResponse)
 async def action_start_charger(cp_id: str, connector: int = Query(1)):
     """Dispatch RemoteStartTransaction through ocpp-core."""
+    is_farm = cp_id.startswith("FARM-")
     try:
         res = await api(f"/chargers/{cp_id}/start", method="POST", json={"connector_id": connector, "id_tag": "REMOTE-DASH"})
         # Also trigger farm charging start
-        try:
-            async with httpx.AsyncClient(timeout=3) as client:
-                await client.post(
-                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
-                    json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
-                )
-        except Exception:
-            pass
+        if is_farm:
+            try:
+                async with httpx.AsyncClient(timeout=3) as client:
+                    await client.post(
+                        f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
+                        json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
+                    )
+            except Exception:
+                pass
         return HTMLResponse(f"""
             <div class="toast-alert toast-success">
                 <span>▶</span>
@@ -695,6 +715,38 @@ async def action_start_charger(cp_id: str, connector: int = Query(1)):
             </div>
         """)
     except Exception as e:
+        try:
+            async with httpx.AsyncClient(timeout=8) as client:
+                farm_res = await client.post(
+                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
+                    json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
+                )
+                if farm_res.status_code == 200:
+                    return HTMLResponse(f"""
+                        <div class="toast-alert toast-success">
+                            <span>▶</span>
+                            <span><strong>{cp_id}:</strong> Virtual charger session started via farm!</span>
+                        </div>
+                    """)
+                if is_farm:
+                    await client.post(
+                        f"{CHARGER_FARM_INTERNAL_URL}/api/farm/start",
+                        json={"count": 3, "profile": "ENC-DCL120B-16"}
+                    )
+                    await asyncio.sleep(1.0)
+                    retry_res = await client.post(
+                        f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
+                        json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
+                    )
+                    if retry_res.status_code == 200:
+                        return HTMLResponse(f"""
+                            <div class="toast-alert toast-success">
+                                <span>▶</span>
+                                <span><strong>{cp_id}:</strong> Virtual charger connected and session started!</span>
+                            </div>
+                        """)
+        except Exception as farm_err:
+            logger.warning("Farm session start fallback failed: %s", farm_err)
         return HTMLResponse(f"""
             <div class="toast-alert toast-danger">
                 <span>⚠️</span>
@@ -723,6 +775,21 @@ async def action_stop_charger(cp_id: str, connector: int = Query(1)):
             </div>
         """)
     except Exception as e:
+        try:
+            async with httpx.AsyncClient(timeout=3) as client:
+                farm_res = await client.post(
+                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/stop",
+                    json={"connector_id": connector}
+                )
+                if farm_res.status_code == 200:
+                    return HTMLResponse(f"""
+                        <div class="toast-alert toast-info">
+                            <span>⏹</span>
+                            <span><strong>{cp_id}:</strong> Virtual charger session stopped via farm.</span>
+                        </div>
+                    """)
+        except Exception:
+            pass
         return HTMLResponse(f"""
             <div class="toast-alert toast-danger">
                 <span>⚠️</span>

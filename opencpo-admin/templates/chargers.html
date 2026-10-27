@@ -3,18 +3,22 @@
 {% block title %}Chargers — CPO Admin{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-start mb-4">
+<div class="flex flex-wrap justify-between items-start gap-3 mb-4">
     <div>
         <h1 class="text-2xl font-bold">Chargers <span class="text-gray-500 text-lg" id="charger-count">({{ total }})</span></h1>
         <p style="color:#4a6580;font-size:13px;margin-top:4px;margin-bottom:0;">The physical charging stations in your network. Each row is one charger — click its ID to open the remote control panel where you can start/stop charging or restart the device.</p>
     </div>
-    <div class="flex gap-2 flex-wrap">
-        <button onclick="toggleFilter('all')" id="btn-all" class="px-3 py-1.5 rounded text-xs font-semibold bg-brand-blue text-white">All</button>
-        <button onclick="toggleFilter('real')" id="btn-real" class="px-3 py-1.5 rounded text-xs font-semibold bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">Real Only</button>
-        <button onclick="toggleFilter('online')" id="btn-online" class="px-3 py-1.5 rounded text-xs font-semibold bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">Online</button>
-        <button onclick="toggleFilter('offline')" id="btn-offline" class="px-3 py-1.5 rounded text-xs font-semibold bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700">Offline</button>
-        <button onclick="openModal('modal-charger-create')" class="px-3 py-1.5 rounded text-xs font-semibold bg-green-700 text-white hover:bg-green-600">+ Add</button>
-        <button onclick="confirmPurgeVirtual()" class="px-3 py-1.5 rounded text-xs font-semibold border border-red-700 text-red-400 hover:bg-red-900/30">🗑️ Virtual Chargers</button>
+    <div class="flex gap-2 flex-wrap items-center">
+        <!-- Status filter tabs with smooth sliding indicator -->
+        <div id="charger-status-tabs" class="tabs-sliding-container">
+            <div id="charger-tab-indicator" class="sliding-indicator"></div>
+            <button onclick="toggleFilter('all')" id="btn-all" class="tab-indicator-btn active">All</button>
+            <button onclick="toggleFilter('real')" id="btn-real" class="tab-indicator-btn">Real Only</button>
+            <button onclick="toggleFilter('online')" id="btn-online" class="tab-indicator-btn">Online</button>
+            <button onclick="toggleFilter('offline')" id="btn-offline" class="tab-indicator-btn">Offline</button>
+        </div>
+        <button onclick="openModal('modal-charger-create')" class="h-8 px-3 rounded-md text-xs font-semibold bg-green-700 text-white hover:bg-green-600 transition shadow-sm btn-press">+ Add</button>
+        <button onclick="confirmPurgeVirtual()" class="h-8 px-3 rounded-md text-xs font-semibold border border-red-700 text-red-400 hover:bg-red-900/30 inline-flex items-center gap-1.5 transition shadow-sm btn-press"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span>Virtual Chargers</span></button>
     </div>
 </div>
 
@@ -67,11 +71,17 @@
                 <td class="p-3 text-gray-400 text-xs">{{ cp.last_boot or '—' }}</td>
                 <td class="p-3 text-right space-x-1">
                     <button hx-post="/action/reset/{{ cp.id }}" hx-swap="outerHTML" title="Reset — reboot the charger"
-                            class="px-2 py-1 bg-blue-700 rounded text-xs hover:bg-blue-600">↻</button>
-                    <button onclick="openEditModal('{{ cp.id }}','{{ cp.vendor }}','{{ cp.model }}','{{ cp.serial_number or '' }}','{{ cp.ocpp_version }}','{{ cp.site or '' }}')"
-                            class="px-2 py-1 bg-gray-700 rounded text-xs hover:bg-gray-600" title="Edit charger details">✏️</button>
+                            class="px-2 py-1 bg-blue-700 rounded text-xs hover:bg-blue-600 inline-flex items-center justify-center"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>
+                    <button onclick="editCharger(this)"
+                            data-id="{{ cp.id }}"
+                            data-vendor="{{ cp.vendor }}"
+                            data-model="{{ cp.model }}"
+                            data-serial="{{ cp.serial_number or '' }}"
+                            data-ocpp="{{ cp.ocpp_version }}"
+                            data-site="{{ cp.site or '' }}"
+                            class="px-2 py-1 bg-gray-700 rounded text-xs hover:bg-gray-600 inline-flex items-center justify-center btn-press" title="Edit charger details"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
                     <button onclick="confirmDelete('{{ cp.id }}')"
-                            class="px-2 py-1 bg-red-800 rounded text-xs hover:bg-red-700" title="Delete this charger">🗑</button>
+                            class="px-2 py-1 bg-red-800 rounded text-xs hover:bg-red-700 inline-flex items-center justify-center btn-press" title="Delete this charger"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
                 </td>
             </tr>
             {% endfor %}
@@ -182,7 +192,7 @@
 <!-- ── Delete Confirm Modal ── -->
 <div id="modal-charger-delete" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="bg-gray-900 border border-red-800 rounded-lg p-6 w-full max-w-sm text-center">
-        <div class="text-3xl mb-3">🗑️</div>
+        <div class="mb-3 flex justify-center text-red-500"><i data-lucide="trash-2" class="w-10 h-10"></i></div>
         <h2 class="text-lg font-bold mb-2">Delete charger?</h2>
         <p class="text-sm text-gray-400 mb-1">This will delete charger <span id="delete-cp-id-label" class="font-mono text-red-400 font-bold"></span></p>
         <p class="text-xs text-gray-500 mb-4">Including all sessions and meter values. This cannot be undone.</p>
@@ -197,7 +207,7 @@
 <!-- ── Purge Virtual Confirm Modal ── -->
 <div id="modal-purge-virtual" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50">
     <div class="bg-gray-900 border border-red-800 rounded-lg p-6 w-full max-w-sm text-center">
-        <div class="text-3xl mb-3">⚠️</div>
+        <div class="mb-3 flex justify-center text-amber-500"><i data-lucide="alert-triangle" class="w-10 h-10"></i></div>
         <h2 class="text-lg font-bold mb-2">Remove virtual chargers?</h2>
         <p class="text-sm text-gray-400 mb-4">Are you sure? This will delete all simulated chargers and their data.</p>
         <div id="purge-feedback" class="mb-3"></div>
@@ -219,6 +229,11 @@ function openModal(id) {
 }
 function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
+}
+
+function editCharger(btn) {
+    const d = btn.dataset;
+    openEditModal(d.id, d.vendor, d.model, d.serial || '', d.ocpp, d.site || '');
 }
 
 function openEditModal(cpId, vendor, model, serial, ocpp, site) {
@@ -254,13 +269,28 @@ function confirmPurgeVirtual() {
     openModal('modal-purge-virtual');
 }
 
+function positionChargerTabIndicator() {
+    const container = document.getElementById('charger-status-tabs');
+    const indicator = document.getElementById('charger-tab-indicator');
+    if (!container || !indicator) return;
+    const activeBtn = container.querySelector('.tab-indicator-btn.active') || document.getElementById('btn-all');
+    if (!activeBtn) return;
+    indicator.style.transform = `translateX(${activeBtn.offsetLeft}px)`;
+    indicator.style.width = `${activeBtn.offsetWidth}px`;
+    indicator.style.opacity = '1';
+}
+
 function toggleFilter(f) {
     _filter = f;
     localStorage.setItem('charger_filter', f);
-    document.querySelectorAll('[id^="btn-"]').forEach(b => {
-        b.className = 'px-3 py-1.5 rounded text-xs font-semibold ' +
-            (b.id === 'btn-' + f ? 'bg-brand-blue text-white' : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700');
+    document.querySelectorAll('#charger-status-tabs .tab-indicator-btn').forEach(b => {
+        if (b.id === 'btn-' + f) {
+            b.classList.add('active');
+        } else {
+            b.classList.remove('active');
+        }
     });
+    positionChargerTabIndicator();
     applyFilters();
 }
 
@@ -295,7 +325,11 @@ function applyFilters() {
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => toggleFilter(_filter));
+document.addEventListener('DOMContentLoaded', () => {
+    toggleFilter(_filter);
+    setTimeout(positionChargerTabIndicator, 30);
+});
 document.addEventListener('htmx:afterSwap', () => applyFilters());
+window.addEventListener('resize', positionChargerTabIndicator);
 </script>
 {% endblock %}

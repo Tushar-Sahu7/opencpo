@@ -45,11 +45,18 @@
         <td class="p-4">
           <div class="flex gap-2 justify-end">
             <a href="/groups/{{ g.id }}" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300">View</a>
-            <button onclick="openEditModal('{{ g.id }}','{{ g.name|replace("'","\\'")|e }}','{{ g.billing_email or '' }}','{{ g.billing_address or '' }}','{{ g.billing_reference or '' }}','{{ g.contact_name or '' }}','{{ g.contact_phone or '' }}')"
+            <button onclick="editGroup(this)"
+              data-id="{{ g.id }}"
+              data-name="{{ g.name }}"
+              data-email="{{ g.billing_email or '' }}"
+              data-addr="{{ g.billing_address or '' }}"
+              data-ref="{{ g.billing_reference or '' }}"
+              data-cname="{{ g.contact_name or '' }}"
+              data-cphone="{{ g.contact_phone or '' }}"
               class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300">Edit</button>
             <button hx-delete="/action/group/delete/{{ g.id }}" hx-target="#feedback" hx-swap="innerHTML"
               hx-confirm="Delete group '{{ g.name }}'? (Only works if no active tokens)"
-              class="px-2 py-1 bg-red-900/30 hover:bg-red-900/60 rounded text-xs text-red-400">✕</button>
+              class="px-2 py-1 bg-red-900/30 hover:bg-red-900/60 rounded text-xs text-red-400 inline-flex items-center justify-center" title="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </div>
         </td>
       </tr>
@@ -65,7 +72,7 @@
   <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
     <div class="flex justify-between items-center mb-4">
       <h3 class="font-semibold text-gray-100">Create Group</h3>
-      <button onclick="closeModal('modal-create')" class="text-gray-500 hover:text-gray-300 text-xl">✕</button>
+      <button onclick="closeModal('modal-create')" class="text-gray-500 hover:text-gray-300 p-1 rounded"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <form hx-post="/action/group/create" hx-target="#feedback" hx-swap="innerHTML" class="space-y-3">
       <div><label class="block text-xs text-gray-400 mb-1">Name *</label>
@@ -97,7 +104,7 @@
   <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
     <div class="flex justify-between items-center mb-4">
       <h3 class="font-semibold text-gray-100">Edit Group</h3>
-      <button onclick="closeModal('modal-edit')" class="text-gray-500 hover:text-gray-300 text-xl">✕</button>
+      <button onclick="closeModal('modal-edit')" class="text-gray-500 hover:text-gray-300 p-1 rounded"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <form id="edit-form" hx-target="#feedback" hx-swap="innerHTML" class="space-y-3">
       <div><label class="block text-xs text-gray-400 mb-1">Name *</label>
@@ -127,6 +134,10 @@
 <script>
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function editGroup(btn) {
+  const d = btn.dataset;
+  openEditModal(d.id, d.name, d.email, d.addr, d.ref, d.cname, d.cphone);
+}
 function openEditModal(id, name, email, addr, ref_, cname, cphone) {
   const form = document.getElementById('edit-form');
   form.setAttribute('hx-put', '/action/group/update/' + id);

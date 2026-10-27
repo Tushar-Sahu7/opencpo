@@ -4,7 +4,7 @@
 {% block content %}
 <div class="mb-6 flex items-center justify-between flex-wrap gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-gray-100">🎛️ Feature Flags</h1>
+        <h1 class="text-2xl font-bold text-gray-100 flex items-center gap-2"><i data-lucide="sliders" class="w-6 h-6 text-blue-500"></i> Feature Flags</h1>
         <p class="text-gray-500 text-sm mt-1">
             <span class="text-brand-green font-semibold">{{ active_count }}</span>
             of
@@ -20,14 +20,15 @@
             placeholder="Search feature…"
             oninput="filterFlags(this.value)"
             class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-brand-green w-64">
-        <span class="absolute right-3 top-2.5 text-gray-500 text-xs pointer-events-none">🔍</span>
+        <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 top-3 text-gray-500 pointer-events-none"></i>
     </div>
 </div>
 
 {% if enabled_flags %}
 <div class="mb-2">
-    <h2 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3 px-1">
-        ✅ Active ({{ enabled_flags|length }})
+    <h2 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3 px-1 flex items-center gap-1.5">
+        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
+        <span>Active ({{ enabled_flags|length }})</span>
     </h2>
     <div id="grid-enabled" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
         {% for flag in enabled_flags %}
@@ -96,7 +97,7 @@
 
 {% if not enabled_flags and not disabled_flags %}
 <div class="text-center py-20 text-gray-600">
-    <div class="text-4xl mb-4">🎛️</div>
+    <div class="mb-4 flex justify-center text-slate-500"><i data-lucide="sliders" class="w-10 h-10"></i></div>
     <div class="text-lg font-semibold">No feature flags found</div>
     <div class="text-sm mt-1">Add flags via the Core API or database.</div>
 </div>

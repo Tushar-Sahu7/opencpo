@@ -18,7 +18,7 @@
                     <span class="text-yellow-400 text-xl">→</span>
                     <span class="text-xs text-yellow-500 mt-1">Update available</span>
                     {% else %}
-                    <span class="text-green-500 text-xl">✓</span>
+                    <span class="text-green-500 inline-flex items-center"><i data-lucide="check" class="w-6 h-6"></i></span>
                     <span class="text-xs text-green-500 mt-1">Up to date</span>
                     {% endif %}
                 </div>
@@ -41,8 +41,9 @@
                 hx-swap="innerHTML"
                 hx-confirm="Update to {{ latest }}? The platform will restart. Continue?"
                 hx-indicator="#update-run-spinner"
-                class="px-5 py-2 bg-yellow-700 hover:bg-yellow-600 text-white font-bold rounded-lg text-sm transition-colors">
-            ⬆ Update Now
+                class="px-5 py-2 bg-yellow-700 hover:bg-yellow-600 text-white font-bold rounded-lg text-sm transition-colors inline-flex items-center gap-1.5">
+            <i data-lucide="arrow-up-circle" class="w-4 h-4"></i>
+            <span>Update Now</span>
         </button>
 
         <select onchange="postponeUpdatePanel(this)"
@@ -63,8 +64,9 @@
         <button hx-post="/action/update/check"
                 hx-target="#update-result-panel"
                 hx-swap="innerHTML"
-                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs text-gray-200 transition-colors">
-            🔄 Check for updates
+                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs text-gray-200 transition-colors inline-flex items-center gap-1.5">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>Check for updates</span>
         </button>
         <div id="update-result-panel"></div>
     </div>
@@ -73,8 +75,9 @@
     <!-- Changelog (expandable) -->
     {% if changelog %}
     <details class="bg-gray-900/30 border border-gray-800 rounded-lg">
-        <summary class="px-4 py-3 text-sm text-gray-300 cursor-pointer hover:text-gray-200 font-medium select-none">
-            📋 Changelog — {{ latest }}
+        <summary class="px-4 py-3 text-sm text-gray-300 cursor-pointer hover:text-gray-200 font-medium select-none flex items-center gap-1.5">
+            <i data-lucide="clipboard-list" class="w-4 h-4 inline-block"></i>
+            <span>Changelog — {{ latest }}</span>
         </summary>
         <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed whitespace-pre-wrap font-mono">
             {{ changelog }}
@@ -84,7 +87,7 @@
 
     <!-- Update History Table -->
     <div class="border-t border-gray-800 pt-4 mt-2">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3">📜 Activity History</h3>
+        <h3 class="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-1.5"><i data-lucide="history" class="w-4 h-4 inline-block"></i> Activity History</h3>
         <div hx-get="/partials/update-history"
              hx-trigger="load"
              hx-swap="innerHTML">

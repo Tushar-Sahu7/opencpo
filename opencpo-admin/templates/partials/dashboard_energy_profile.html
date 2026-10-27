@@ -2,33 +2,34 @@
 <div class="dashboard-panel p-3.5 mb-4">
     <div class="flex items-center justify-between mb-2">
         <div class="flex items-center gap-2">
-            <span class="text-cyan-400 text-xs">📊</span>
-            <h2 class="text-xs font-bold text-gray-200">Energy Intensity Distribution Profile</h2>
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-blue-600 inline-block"></i>
+            <h2 class="text-xs font-bold text-slate-800">Energy Intensity Distribution Profile</h2>
         </div>
-        <span class="text-[10px] text-gray-400 font-mono">{{ total_sampled }} Live Database Sessions Analyzed</span>
+        <span class="text-[10px] text-slate-500 font-mono">{{ total_sampled }} Live Database Sessions Analyzed</span>
     </div>
 
     <!-- Segmented Multi-Bar -->
-    <div class="w-full h-3 rounded bg-gray-900 flex overflow-hidden mb-2">
+    <div class="w-full h-3 rounded bg-slate-100 border border-slate-200 flex overflow-hidden mb-2">
         {% for bucket in energy_distribution %}
             <div style="width: {{ bucket.pct }}%; background: {{ bucket.color }};"
                  title="{{ bucket.label }}: {{ bucket.pct }}% ({{ bucket.sessions }} sessions)"></div>
         {% endfor %}
         {% if total_sampled == 0 %}
-            <div style="width: 100%; background: #1e293b;" title="No sessions recorded yet"></div>
+            <div style="width: 100%; background: #cbd5e1;" title="No sessions recorded yet"></div>
         {% endif %}
     </div>
 
     <!-- Legend and breakdown details -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-[11px]">
         {% for bucket in energy_distribution %}
-        <div class="flex items-center justify-between bg-[#08101a] p-2 rounded border border-[#14243b]">
+        <div class="flex items-center justify-between bg-slate-50 p-2 rounded border border-slate-200">
             <div>
-                <div class="text-gray-300 font-medium">{{ bucket.label }}</div>
-                <div class="text-[10px] text-gray-400">{{ bucket.sessions }} sessions</div>
+                <div class="text-slate-700 font-medium">{{ bucket.label }}</div>
+                <div class="text-[10px] text-slate-500">{{ bucket.sessions }} sessions</div>
             </div>
             <span class="font-bold font-mono text-sm" style="color: {{ bucket.color }};">{{ bucket.pct }}%</span>
         </div>
         {% endfor %}
     </div>
 </div>
+

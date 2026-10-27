@@ -12,7 +12,7 @@
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeRevokeModal()"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
         <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
-            <h3 class="text-lg font-semibold text-red-400 mb-1">🚫 Revoke Certificate</h3>
+            <h3 class="text-lg font-semibold text-red-400 mb-1 flex items-center gap-2"><i data-lucide="ban" class="w-5 h-5"></i> Revoke Certificate</h3>
             <p class="text-sm text-gray-400 mb-4">This action cannot be undone.</p>
             <div id="revoke-cert-info" class="p-3 bg-gray-800 rounded-lg text-sm text-gray-300 mb-4 font-mono break-all"></div>
             <form hx-post="/action/pki/revoke" hx-target="#revoke-result" hx-swap="innerHTML">
@@ -67,7 +67,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="text-blue-400 font-bold text-sm">🏛 {{ root.cn }}</span>
+                            <span class="text-blue-400 font-bold text-sm flex items-center gap-1.5"><i data-lucide="landmark" class="w-4 h-4"></i> {{ root.cn }}</span>
                             <span class="text-xs {% if root.status == 'active' %}bg-green-900 text-green-300{% elif root.status == 'expiring' %}bg-yellow-900 text-yellow-300{% else %}bg-red-900 text-red-300{% endif %} px-2 py-0.5 rounded-full">{{ root.status }}</span>
                         </div>
                         <div class="text-xs text-gray-500 mt-0.5 font-mono">{{ root.fingerprint[:40] }}…</div>
@@ -155,7 +155,7 @@
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-sm font-semibold text-brand-green uppercase tracking-widest">Issue New Certificate</h2>
             <button onclick="document.getElementById('issue-panel').classList.add('hidden')"
-                class="text-gray-500 hover:text-gray-300">✕</button>
+                class="text-gray-500 hover:text-gray-300 p-1 rounded"><i data-lucide="x" class="w-4 h-4"></i></button>
         </div>
 
         <!-- Tabs -->
@@ -262,20 +262,20 @@
                     hx-get="/partials/pki/cert-rows"
                     hx-target="#cert-tbody"
                     hx-swap="innerHTML"
-                    class="text-xs text-gray-500 hover:text-gray-300 px-2 py-1 rounded hover:bg-gray-800">
-                    ↻ Refresh
+                    class="text-xs text-gray-500 hover:text-gray-300 px-2 py-1 rounded hover:bg-gray-800 inline-flex items-center gap-1">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Refresh
                 </button>
             </div>
             <div class="flex gap-2 flex-wrap" id="filter-bar">
                 <select id="filter-status" onchange="applyFilters()"
-                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none">
+                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 pr-8 py-1.5 text-sm text-gray-300 min-w-[130px] focus:outline-none">
                     <option value="">All statuses</option>
                     <option value="active">Active</option>
                     <option value="revoked">Revoked</option>
                     <option value="expired">Expired</option>
                 </select>
                 <select id="filter-type" onchange="applyFilters()"
-                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm text-gray-300 focus:outline-none">
+                    class="bg-gray-800 border border-gray-700 rounded-lg px-3 pr-8 py-1.5 text-sm text-gray-300 min-w-[130px] focus:outline-none">
                     <option value="">All types</option>
                     <option value="secc">SECC</option>
                     <option value="contract">Contract</option>
@@ -356,11 +356,19 @@ function showToast(message, type = 'info') {
         warning: 'bg-yellow-900 border-yellow-700 text-yellow-200',
         info:    'bg-gray-800 border-gray-700 text-gray-200',
     };
-    const icons = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
+    const icons = {
+        success: '<i data-lucide="check-circle" class="w-4 h-4"></i>',
+        error:   '<i data-lucide="alert-circle" class="w-4 h-4"></i>',
+        warning: '<i data-lucide="alert-triangle" class="w-4 h-4"></i>',
+        info:    '<i data-lucide="info" class="w-4 h-4"></i>'
+    };
     const toast = document.createElement('div');
     toast.className = `flex items-center gap-2 px-4 py-3 rounded-lg border text-sm shadow-xl pointer-events-auto max-w-xs ${colors[type] || colors.info}`;
     toast.innerHTML = `<span>${icons[type] || icons.info}</span><span>${message}</span>`;
     container.appendChild(toast);
+    if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons({ root: toast });
+    }
     setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; setTimeout(() => toast.remove(), 300); }, 4000);
 }
 

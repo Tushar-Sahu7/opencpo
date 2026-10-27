@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#00B0E4" />
+  <meta name="theme-color" content="#2563eb" />
   <link rel="manifest" href="/static/manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,21 +21,21 @@
     {% block content %}{% endblock %}
   </div>
 
-  <nav id="app-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-around;background:var(--bg2,#0d2137);border-top:1px solid var(--border,#1e3a5f);padding:8px 0 max(8px,env(safe-area-inset-bottom));">
-    <a href="/" id="nav-map" style="display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text3,#64748b);padding:4px 16px;">
+  <nav id="app-nav" style="position:fixed;bottom:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-around;background:var(--bg2,#f1f5f9);border-top:1px solid var(--border,#e2e8f0);padding:8px 0 max(8px,env(safe-area-inset-bottom));">
+    <a href="/" id="nav-map" style="display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text3,#94a3b8);padding:4px 16px;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
       <span style="font-size:11px;">{{ t.tab_map | default('Map') }}</span>
     </a>
-    <a href="/#scan" id="nav-scan" style="display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text3,#64748b);padding:4px 16px;">
+    <a href="/#scan" id="nav-scan" style="display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text3,#94a3b8);padding:4px 16px;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7"/></svg>
       <span style="font-size:11px;">{{ t.tab_scan | default('Scan') }}</span>
     </a>
-    <a href="{% if account is defined and account %}/account/profile{% elif flags is defined and flags.get('account_login') %}/account/login{% else %}/account/settings{% endif %}" id="nav-account" style="display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text3,#64748b);padding:4px 16px;">
+    <a href="{% if account is defined and account %}/account/profile{% elif flags is defined and flags.get('account_login') %}/account/login{% else %}/account/settings{% endif %}" id="nav-account" style="display:flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:var(--text3,#94a3b8);padding:4px 16px;">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0112 0v1"/></svg>
       <span style="font-size:11px;">{{ t.tab_account | default('Account') }}</span>
     </a>
   </nav>
-  <script>(function(){var p=location.pathname,a='nav-map';if(p.startsWith('/account'))a='nav-account';var e=document.getElementById(a);if(e)e.style.color='var(--accent,#00B0E4)';})()</script>
+  <script>(function(){var p=location.pathname,a='nav-map';if(p.startsWith('/account'))a='nav-account';var e=document.getElementById(a);if(e)e.style.color='var(--accent,#2563eb)';})()</script>
 
   <script>
     if ('serviceWorker' in navigator) {

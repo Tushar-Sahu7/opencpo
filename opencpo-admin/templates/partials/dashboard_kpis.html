@@ -1,14 +1,14 @@
 <!-- ═══ Row 1: 5 Top Metric Cards ═══════════════════════════════════════ -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
 
-    <!-- Card 1: Asset Inventory & Connectivity -->
+    <!-- Card 1: Charging Stations & Status -->
     <div class="dashboard-panel p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-2">
             <div class="panel-header-title">
                 <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
-                <span>Asset Inventory &amp; Connectivity</span>
+                <span>Charging Stations &amp; Status</span>
             </div>
-            <div class="flex items-center gap-1 text-[9px] font-bold text-cyan-400 bg-cyan-950/60 border border-cyan-800/40 px-1.5 py-0.5 rounded">
+            <div class="flex items-center gap-1 text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">
                 <span class="text-[8px] animate-pulse">●</span>
                 <span>LIVE</span>
             </div>
@@ -16,149 +16,171 @@
 
         <div class="flex items-center justify-between pt-1">
             <div>
-                <div class="text-[10px] text-gray-400">Chargers / Pedestals</div>
-                <div class="metric-value-huge text-cyan-400 font-mono">{{ charger_count }} <span class="text-xs font-normal text-cyan-300">Units</span></div>
-                <div class="text-[10px] {% if online_count == charger_count and charger_count > 0 %}text-emerald-400{% else %}text-gray-400{% endif %} mt-0.5">
+                <div class="metric-value-huge text-blue-600 font-mono">{{ charger_count }} <span class="text-xs font-normal text-blue-500">Units</span></div>
+                <div class="text-[10px] {% if online_count == charger_count and charger_count > 0 %}text-emerald-600{% else %}text-slate-500{% endif %} mt-0.5">
                     {{ online_count }} Online &bull; {{ charger_count - online_count }} Offline
                 </div>
             </div>
-            <div class="text-2xl text-cyan-500/30 px-2">⛽</div>
-            <div class="flex flex-col gap-1 text-[11px] border-l border-gray-800/60 pl-3">
-                <div class="flex items-center justify-between gap-3">
-                    <span class="text-gray-400">Areas</span>
-                    <span class="font-semibold text-gray-200">{{ region_count or 1 }} <span class="text-[9px] text-gray-500 font-normal">Regions</span></span>
-                </div>
-                <div class="flex items-center justify-between gap-3">
-                    <span class="text-gray-400">Sites</span>
-                    <span class="font-semibold text-gray-200">{{ site_count or 1 }} <span class="text-[9px] text-gray-500 font-normal">Hubs</span></span>
-                </div>
-                <div class="flex items-center justify-between gap-3">
-                    <span class="text-gray-400">Connectors</span>
-                    <span class="font-semibold text-cyan-400">{{ total_connectors }} <span class="text-[9px] text-gray-500 font-normal">Plugs</span></span>
-                </div>
+            <div class="text-blue-500 p-1.5 bg-blue-50 rounded-lg"><i data-lucide="fuel" class="w-6 h-6"></i></div>
+        </div>
+
+        <!-- Areas, Sites, Connectors Sub-metrics -->
+        <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-200 text-center text-[10px]">
+            <div>
+                <div class="font-bold text-slate-800 font-mono">{{ region_count or 1 }}</div>
+                <div class="text-[9px] text-slate-500">Areas</div>
+            </div>
+            <div>
+                <div class="font-bold text-slate-800 font-mono">{{ site_count or 1 }}</div>
+                <div class="text-[9px] text-slate-500">Sites</div>
+            </div>
+            <div>
+                <div class="font-bold text-blue-600 font-mono">{{ total_connectors }}</div>
+                <div class="text-[9px] text-slate-500">Connectors</div>
             </div>
         </div>
     </div>
 
-    <!-- Card 2: Connector Slots -->
+    <!-- Card 2: Charging Points -->
     <div class="dashboard-panel p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
             <div class="panel-header-title">
-                <span>CONNECTOR SLOTS ({{ total_connectors }} PLUGS)</span>
+                <span>Charging Points ({{ total_connectors }})</span>
             </div>
-            <span class="text-xs text-emerald-400">🔌</span>
+            <span class="text-xs text-emerald-500 inline-flex items-center"><i data-lucide="plug-zap" class="w-4 h-4"></i></span>
         </div>
 
         <div class="flex items-baseline justify-between pt-1">
             <div>
-                <div class="metric-value-huge text-white font-mono">{{ available_ratio }}%</div>
-                <div class="text-[10px] text-gray-400">Available Ratio</div>
+                <div class="metric-value-huge text-slate-800 font-mono">{{ available_ratio }}%</div>
+                <div class="text-[10px] text-slate-500">Available Ratio</div>
             </div>
             <div class="text-right">
-                <div class="text-sm font-bold text-cyan-400">{{ actively_charging }} Actively Charging</div>
-                <div class="text-[10px] text-gray-400">{{ ((actively_charging / total_connectors * 100)|round(1)) if total_connectors else 0 }}% utilization</div>
+                <div class="text-sm font-bold text-blue-600">{{ actively_charging }} Actively Charging</div>
+                <div class="text-[10px] text-slate-500">{{ ((actively_charging / total_connectors * 100)|round(1)) if total_connectors else 0 }}% utilization</div>
             </div>
         </div>
 
-        <!-- Status mini pills -->
-        <div class="grid grid-cols-5 gap-1 pt-2 border-t border-gray-800/60 text-center text-[10px]">
-            <div>
-                <div class="font-bold text-emerald-400 font-mono">{{ connector_statuses.Available }}</div>
-                <div class="text-[9px] text-gray-500">Available</div>
+        <!-- Status mini indicators with generous Suspended & Faulted spacing -->
+        <div class="pt-2 border-t border-slate-200 space-y-1.5">
+            <!-- Row 1: Active Operational States -->
+            <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
+                <div class="bg-slate-50 rounded py-1 px-1 border border-slate-100">
+                    <div class="font-bold text-emerald-600 font-mono text-xs tabular-nums">{{ connector_statuses.Available }}</div>
+                    <div class="text-[8.5px] text-slate-500 font-medium">Available</div>
+                </div>
+                <div class="bg-slate-50 rounded py-1 px-1 border border-slate-100">
+                    <div class="font-bold text-blue-600 font-mono text-xs tabular-nums">{{ connector_statuses.Charging }}</div>
+                    <div class="text-[8.5px] text-slate-500 font-medium">Charging</div>
+                </div>
+                <div class="bg-slate-50 rounded py-1 px-1 border border-slate-100">
+                    <div class="font-bold text-amber-600 font-mono text-xs tabular-nums">{{ connector_statuses.Preparing }}</div>
+                    <div class="text-[8.5px] text-slate-500 font-medium">Preparing</div>
+                </div>
             </div>
-            <div>
-                <div class="font-bold text-cyan-400 font-mono">{{ connector_statuses.Charging }}</div>
-                <div class="text-[9px] text-gray-500">Charging</div>
-            </div>
-            <div>
-                <div class="font-bold text-amber-400 font-mono">{{ connector_statuses.Preparing }}</div>
-                <div class="text-[9px] text-gray-500">Preparing</div>
-            </div>
-            <div>
-                <div class="font-bold text-indigo-400 font-mono">{{ connector_statuses.SuspendedEV }}</div>
-                <div class="text-[9px] text-gray-500">Suspended</div>
-            </div>
-            <div>
-                <div class="font-bold text-red-400 font-mono">{{ connector_statuses.Faulted }}</div>
-                <div class="text-[9px] text-gray-500">Faulted</div>
+
+            <!-- Row 2: Suspended & Faulted States with clear separation & badge padding -->
+            <div class="grid grid-cols-2 gap-2 text-center text-[10px]">
+                <div class="bg-indigo-50/70 rounded py-1 px-2 border border-indigo-100 flex items-center justify-between">
+                    <span class="text-[9px] font-semibold text-slate-600 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                        Suspended
+                    </span>
+                    <span class="font-bold text-indigo-600 font-mono text-xs tabular-nums">{{ connector_statuses.SuspendedEV }}</span>
+                </div>
+                <div class="bg-red-50/70 rounded py-1 px-2 border border-red-100 flex items-center justify-between">
+                    <span class="text-[9px] font-semibold text-slate-600 flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                        Faulted
+                    </span>
+                    <span class="font-bold text-red-600 font-mono text-xs tabular-nums">{{ connector_statuses.Faulted }}</span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Card 3: Aggregate Charging Load -->
+    <!-- Card 3: Total Charging Power -->
     <div class="dashboard-panel p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
             <div class="panel-header-title">
-                <span>AGGREGATE CHARGING LOAD</span>
+                <span>Total Charging Power</span>
             </div>
-            <span class="text-xs text-cyan-400">⚡</span>
+            <span class="text-xs text-blue-500 inline-flex items-center"><i data-lucide="zap" class="w-4 h-4"></i></span>
         </div>
 
         <div>
-            <div class="metric-value-huge text-cyan-400 font-mono">{{ current_load_kw }} <span class="text-xs font-normal text-cyan-300">kW</span></div>
-            <div class="text-[10px] text-gray-400 mt-0.5">Across {{ actively_charging }} ongoing session(s)</div>
+            <div class="metric-value-huge text-blue-600 font-mono">{{ current_load_kw }} <span class="text-xs font-normal text-blue-500">kW</span></div>
+            <div class="text-[10px] text-slate-500 mt-0.5">Across {{ actively_charging }} ongoing session(s)</div>
         </div>
 
-        <div class="pt-2 border-t border-gray-800/60">
-            <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+        <div class="pt-2 border-t border-slate-200">
+            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
                 <span>Grid Contract Capacity</span>
-                <span class="font-semibold text-gray-200">{{ grid_contract_pct }}% <span class="text-gray-500 font-normal">({{ grid_contract_kw }} kW)</span></span>
+                <span class="font-semibold text-slate-800">{{ grid_contract_pct }}% <span class="text-slate-400 font-normal">({{ grid_contract_kw }} kW)</span></span>
             </div>
-            <div class="w-full h-1.5 bg-gray-900 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full transition-all duration-500" style="width: {{ grid_contract_pct }}%;"></div>
+            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all duration-500" style="width: {{ grid_contract_pct }}%;"></div>
             </div>
         </div>
     </div>
 
-    <!-- Card 4: Completed Sessions -->
+    <!-- Card 4: Completed Charging Sessions -->
     <div class="dashboard-panel p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
             <div class="panel-header-title">
-                <span>COMPLETED SESSIONS</span>
+                <span>Completed Charging Sessions</span>
             </div>
-            <span class="text-[9px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-1.5 py-0.5 rounded">
+            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
                 LIVE DB
             </span>
         </div>
 
         <div>
-            <div class="metric-value-huge text-white font-mono">{{ "{:,}".format(completed_sessions) }} <span class="text-xs font-normal text-gray-400">sessions</span></div>
+            <div class="metric-value-huge text-slate-800 font-mono tabular-nums">{{ "{:,}".format(completed_sessions) }} <span class="text-xs font-normal text-slate-500">sessions</span></div>
         </div>
 
-        <div class="pt-2 border-t border-gray-800/60">
-            <div class="flex items-center justify-between text-[10px] text-gray-400 mb-0.5">
-                <span class="flex items-center gap-1"><span>⚡</span> TOTAL ENERGY DISPENSED</span>
+        <div class="pt-2 border-t border-slate-200 grid grid-cols-2 gap-2">
+            <div>
+                <div class="flex items-center gap-1 text-[10px] text-slate-500 mb-0.5">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-blue-500 inline-block"></i> ENERGY
+                </div>
+                <div class="text-xs font-bold text-slate-800 font-mono tabular-nums" data-animate-num="true">{{ "{:,.1f}".format(total_energy) }} <span class="text-[9px] font-normal text-slate-500">kWh</span></div>
             </div>
-            <div class="text-sm font-bold text-gray-100 font-mono">{{ "{:,.1f}".format(total_energy) }} <span class="text-[10px] font-normal text-gray-400">kWh</span></div>
+            <div>
+                <div class="flex items-center gap-1 text-[10px] text-slate-500 mb-0.5">
+                    <i data-lucide="coins" class="w-3.5 h-3.5 text-emerald-500 inline-block"></i> EST. VALUE
+                </div>
+                <div class="text-xs font-bold text-emerald-600 font-mono tabular-nums" data-animate-num="true">€{{ "{:,.2f}".format(total_energy * 0.45) }}</div>
+            </div>
         </div>
     </div>
 
-    <!-- Card 5: Session Benchmarks -->
+    <!-- Card 5: Charging Session Overview -->
     <div class="dashboard-panel p-3.5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-1">
             <div class="panel-header-title">
-                <span>SESSION BENCHMARKS</span>
+                <span>Charging Session Overview</span>
             </div>
-            <span class="text-xs text-purple-400">📈</span>
+            <span class="text-xs text-purple-500 inline-flex items-center"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
         </div>
 
         <div class="space-y-1.5 text-[11px] pt-1">
             <div class="flex items-center justify-between">
-                <span class="text-gray-400">Avg Energy</span>
-                <span class="font-bold text-gray-200 font-mono">{{ avg_energy }} <span class="text-[9px] text-gray-500 font-normal">kWh/sess</span></span>
+                <span class="text-slate-500">Avg Energy</span>
+                <span class="font-bold text-slate-800 font-mono">{{ avg_energy }} <span class="text-[9px] text-slate-400 font-normal">kWh/sess</span></span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-gray-400">Avg Duration</span>
-                <span class="font-bold text-gray-200 font-mono">{{ avg_duration }} <span class="text-[9px] text-gray-500 font-normal">min</span></span>
+                <span class="text-slate-500">Avg Duration</span>
+                <span class="font-bold text-slate-800 font-mono">{{ avg_duration }} <span class="text-[9px] text-slate-400 font-normal">min</span></span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-gray-400">Peak Demand</span>
-                <span class="font-bold text-cyan-400 font-mono">{{ max_power }} <span class="text-[9px] text-gray-500 font-normal">kW</span></span>
+                <span class="text-slate-500">Peak Demand</span>
+                <span class="font-bold text-blue-600 font-mono">{{ max_power }} <span class="text-[9px] text-slate-400 font-normal">kW</span></span>
             </div>
         </div>
 
-        <div class="pt-1.5 border-t border-gray-800/60 text-[9px] text-gray-500">
-            Active sessions: <span class="text-cyan-400 font-bold font-mono">{{ active_sessions }}</span>
+        <div class="pt-1.5 border-t border-slate-200 text-[9px] text-slate-500">
+            Active sessions: <span class="text-blue-600 font-bold font-mono">{{ active_sessions }}</span>
         </div>
     </div>
 

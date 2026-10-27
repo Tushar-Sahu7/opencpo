@@ -1,0 +1,334 @@
+<!-- ═══ OpenCPO Enterprise Dashboard Reusable Skeleton Shimmer Components ═══ -->
+<!-- Pixel-perfect geometry matching live components to guarantee zero Cumulative Layout Shift (CLS = 0) -->
+
+<!-- 1. KPI Cards Skeleton (5 Cards) -->
+{% macro kpis_skeleton() %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 w-full">
+    <!-- Card 1: Charging Stations & Status -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between bg-white">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full shimmer-animated"></span>
+                    <div class="h-2.5 w-32 shimmer-animated"></div>
+                </div>
+                <div class="h-4 w-12 shimmer-animated rounded"></div>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+                <div>
+                    <div class="h-7 w-24 shimmer-animated rounded mb-1.5"></div>
+                    <div class="h-2.5 w-32 shimmer-animated"></div>
+                </div>
+                <div class="w-9 h-9 shimmer-animated rounded-lg"></div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-1 pt-2 mt-3 border-t border-slate-100 text-center">
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-8 shimmer-animated"></div><div class="h-2 w-10 shimmer-animated"></div></div>
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-8 shimmer-animated"></div><div class="h-2 w-10 shimmer-animated"></div></div>
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-8 shimmer-animated"></div><div class="h-2 w-14 shimmer-animated"></div></div>
+        </div>
+    </div>
+
+    <!-- Card 2: Charging Points -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between bg-white">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="h-2.5 w-28 shimmer-animated"></div>
+                <div class="w-4 h-4 shimmer-animated"></div>
+            </div>
+            <div class="flex items-baseline justify-between pt-1">
+                <div>
+                    <div class="h-7 w-20 shimmer-animated rounded mb-1.5"></div>
+                    <div class="h-2.5 w-24 shimmer-animated"></div>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                    <div class="h-3.5 w-24 shimmer-animated"></div>
+                    <div class="h-2 w-16 shimmer-animated"></div>
+                </div>
+            </div>
+        </div>
+        <div class="pt-2 mt-3 border-t border-slate-100">
+            <div class="grid grid-cols-2 gap-2">
+                <div class="h-6 shimmer-animated rounded-md"></div>
+                <div class="h-6 shimmer-animated rounded-md"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 3: Energy Dispensed -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between bg-white">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full shimmer-animated"></span><div class="h-2.5 w-32 shimmer-animated"></div></div>
+                <div class="w-4 h-4 shimmer-animated"></div>
+            </div>
+            <div class="flex items-baseline justify-between pt-1">
+                <div>
+                    <div class="h-7 w-28 shimmer-animated rounded mb-1.5"></div>
+                    <div class="h-2.5 w-24 shimmer-animated"></div>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                    <div class="h-3.5 w-16 shimmer-animated"></div>
+                    <div class="h-2 w-20 shimmer-animated"></div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-2 mt-3 border-t border-slate-100 text-center">
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-14 shimmer-animated"></div><div class="h-2 w-16 shimmer-animated"></div></div>
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-14 shimmer-animated"></div><div class="h-2 w-16 shimmer-animated"></div></div>
+        </div>
+    </div>
+
+    <!-- Card 4: Total Revenue -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between bg-white">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full shimmer-animated"></span><div class="h-2.5 w-28 shimmer-animated"></div></div>
+                <div class="w-4 h-4 shimmer-animated"></div>
+            </div>
+            <div class="flex items-baseline justify-between pt-1">
+                <div>
+                    <div class="h-7 w-24 shimmer-animated rounded mb-1.5"></div>
+                    <div class="h-2.5 w-28 shimmer-animated"></div>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                    <div class="h-3.5 w-16 shimmer-animated"></div>
+                    <div class="h-2 w-14 shimmer-animated"></div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-2 mt-3 border-t border-slate-100 text-center">
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-12 shimmer-animated"></div><div class="h-2 w-16 shimmer-animated"></div></div>
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-12 shimmer-animated"></div><div class="h-2 w-16 shimmer-animated"></div></div>
+        </div>
+    </div>
+
+    <!-- Card 5: Grid Load -->
+    <div class="dashboard-panel p-3.5 flex flex-col justify-between bg-white">
+        <div>
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full shimmer-animated"></span><div class="h-2.5 w-32 shimmer-animated"></div></div>
+                <div class="w-4 h-4 shimmer-animated"></div>
+            </div>
+            <div class="flex items-baseline justify-between pt-1">
+                <div>
+                    <div class="h-7 w-20 shimmer-animated rounded mb-1.5"></div>
+                    <div class="h-2.5 w-24 shimmer-animated"></div>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                    <div class="h-3.5 w-16 shimmer-animated"></div>
+                    <div class="h-2 w-12 shimmer-animated"></div>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-2 mt-3 border-t border-slate-100 text-center">
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-14 shimmer-animated"></div><div class="h-2 w-16 shimmer-animated"></div></div>
+            <div class="flex flex-col items-center gap-1"><div class="h-3 w-14 shimmer-animated"></div><div class="h-2 w-16 shimmer-animated"></div></div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- 2. Dual-Axis Energy Chart Skeleton Overlay -->
+{% macro energy_chart_skeleton() %}
+<div class="w-full h-full flex flex-col justify-between p-4 bg-white/95 backdrop-blur-[1px] rounded-lg">
+    <div>
+        <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+                <div class="h-3.5 w-56 shimmer-animated rounded"></div>
+                <div class="h-4 w-16 shimmer-animated rounded"></div>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="h-2.5 w-28 shimmer-animated"></div>
+                <div class="h-2.5 w-20 shimmer-animated"></div>
+            </div>
+        </div>
+        <div class="h-2.5 w-72 shimmer-animated mb-4"></div>
+        <!-- Vertical simulated bars -->
+        <div class="w-full flex items-end justify-between gap-3 pt-6 pb-2 px-4" style="height: 190px;">
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-20 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-32 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-40 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-24 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-44 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-36 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+            <div class="flex-1 flex flex-col items-center gap-2"><div class="w-full h-28 shimmer-animated rounded-t"></div><div class="h-2 w-8 shimmer-animated"></div></div>
+        </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 mt-2 border-t border-slate-100 text-center">
+        <div class="flex flex-col items-center gap-1"><div class="h-2 w-16 shimmer-animated"></div><div class="h-3 w-28 shimmer-animated"></div></div>
+        <div class="flex flex-col items-center gap-1"><div class="h-2 w-16 shimmer-animated"></div><div class="h-3 w-28 shimmer-animated"></div></div>
+        <div class="flex flex-col items-center gap-1"><div class="h-2 w-20 shimmer-animated"></div><div class="h-3 w-20 shimmer-animated"></div></div>
+        <div class="flex flex-col items-center gap-1"><div class="h-2 w-20 shimmer-animated"></div><div class="h-3 w-24 shimmer-animated"></div></div>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- 3. Connector Donut Chart Skeleton Overlay -->
+{% macro donut_chart_skeleton() %}
+<div class="w-full h-full flex flex-col justify-between p-4 bg-white/95 backdrop-blur-[1px] rounded-lg">
+    <div>
+        <div class="flex items-center justify-between mb-2">
+            <div class="h-3.5 w-36 shimmer-animated rounded"></div>
+            <div class="h-4 w-20 shimmer-animated rounded"></div>
+        </div>
+        <div class="h-2.5 w-48 shimmer-animated mb-3"></div>
+        <!-- Donut ring -->
+        <div class="relative flex items-center justify-center my-2" style="height: 140px;">
+            <div class="w-28 h-28 rounded-full shimmer-animated flex items-center justify-center">
+                <div class="w-16 h-16 rounded-full bg-white flex flex-col items-center justify-center gap-0.5">
+                    <div class="h-4 w-7 shimmer-animated rounded"></div>
+                    <div class="h-2 w-10 shimmer-animated"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 5 Legend Rows -->
+    <div class="space-y-1.5 pt-2 border-t border-slate-100">
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full shimmer-animated"></span><div class="h-2.5 w-16 shimmer-animated"></div></div><div class="h-2.5 w-5 shimmer-animated"></div></div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full shimmer-animated"></span><div class="h-2.5 w-16 shimmer-animated"></div></div><div class="h-2.5 w-5 shimmer-animated"></div></div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full shimmer-animated"></span><div class="h-2.5 w-24 shimmer-animated"></div></div><div class="h-2.5 w-5 shimmer-animated"></div></div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full shimmer-animated"></span><div class="h-2.5 w-20 shimmer-animated"></div></div><div class="h-2.5 w-5 shimmer-animated"></div></div>
+        <div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full shimmer-animated"></span><div class="h-2.5 w-24 shimmer-animated"></div></div><div class="h-2.5 w-5 shimmer-animated"></div></div>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- 4. Energy Profile Skeleton -->
+{% macro energy_profile_skeleton() %}
+<div class="dashboard-panel p-3.5 bg-white">
+    <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+            <div class="w-4 h-4 shimmer-animated rounded"></div>
+            <div class="h-3 w-48 shimmer-animated"></div>
+        </div>
+        <div class="h-2.5 w-40 shimmer-animated"></div>
+    </div>
+    <div class="w-full h-3 rounded shimmer-animated mb-3"></div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="p-2.5 rounded border border-slate-100 flex items-center justify-between"><div class="space-y-1.5"><div class="h-2.5 w-16 shimmer-animated"></div><div class="h-2 w-12 shimmer-animated"></div></div><div class="h-4 w-8 shimmer-animated"></div></div>
+        <div class="p-2.5 rounded border border-slate-100 flex items-center justify-between"><div class="space-y-1.5"><div class="h-2.5 w-16 shimmer-animated"></div><div class="h-2 w-12 shimmer-animated"></div></div><div class="h-4 w-8 shimmer-animated"></div></div>
+        <div class="p-2.5 rounded border border-slate-100 flex items-center justify-between"><div class="space-y-1.5"><div class="h-2.5 w-16 shimmer-animated"></div><div class="h-2 w-12 shimmer-animated"></div></div><div class="h-4 w-8 shimmer-animated"></div></div>
+        <div class="p-2.5 rounded border border-slate-100 flex items-center justify-between"><div class="space-y-1.5"><div class="h-2.5 w-16 shimmer-animated"></div><div class="h-2 w-12 shimmer-animated"></div></div><div class="h-4 w-8 shimmer-animated"></div></div>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- 5. Fleet Table Skeleton -->
+{% macro fleet_table_skeleton() %}
+<div class="dashboard-panel p-4 bg-white">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div class="flex items-center gap-2">
+            <div class="w-4 h-4 shimmer-animated rounded"></div>
+            <div class="h-3.5 w-52 shimmer-animated"></div>
+            <div class="h-4 w-24 shimmer-animated rounded-full"></div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="h-8 w-28 shimmer-animated rounded-md"></div>
+            <div class="h-8 w-44 shimmer-animated rounded-md"></div>
+        </div>
+    </div>
+    <div class="overflow-x-auto rounded border border-slate-100">
+        <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-100">
+                <tr>
+                    <th class="py-2.5 px-3"><div class="h-2.5 w-20 shimmer-animated"></div></th>
+                    <th class="py-2.5 px-3"><div class="h-2.5 w-16 shimmer-animated"></div></th>
+                    <th class="py-2.5 px-3"><div class="h-2.5 w-14 shimmer-animated"></div></th>
+                    <th class="py-2.5 px-3"><div class="h-2.5 w-28 shimmer-animated"></div></th>
+                    <th class="py-2.5 px-3"><div class="h-2.5 w-24 shimmer-animated"></div></th>
+                    <th class="py-2.5 px-3"><div class="h-2.5 w-24 shimmer-animated"></div></th>
+                    <th class="py-2.5 px-3 text-right"><div class="h-2.5 w-28 shimmer-animated ml-auto"></div></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for _ in range(5) %}
+                <tr class="py-3">
+                    <td class="py-3 px-3"><div class="h-4 w-24 shimmer-animated rounded"></div></td>
+                    <td class="py-3 px-3"><div class="h-3 w-10 shimmer-animated"></div></td>
+                    <td class="py-3 px-3"><div class="h-4 w-16 shimmer-animated rounded-full"></div></td>
+                    <td class="py-3 px-3"><div class="h-3.5 w-32 shimmer-animated"></div></td>
+                    <td class="py-3 px-3"><div class="h-4 w-28 shimmer-animated"></div></td>
+                    <td class="py-3 px-3"><div class="h-3 w-20 shimmer-animated"></div></td>
+                    <td class="py-3 px-3 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
+                            <div class="h-6 w-12 shimmer-animated rounded"></div>
+                            <div class="h-6 w-14 shimmer-animated rounded"></div>
+                            <div class="h-6 w-14 shimmer-animated rounded"></div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- 6. Exceptions Queue Skeleton -->
+{% macro exceptions_skeleton() %}
+<div class="dashboard-panel p-4 bg-white">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 shimmer-animated rounded"></div>
+                <div class="h-3.5 w-44 shimmer-animated"></div>
+                <div class="h-4 w-24 shimmer-animated rounded-full"></div>
+            </div>
+            <div class="h-2.5 w-72 shimmer-animated"></div>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="h-8 w-36 shimmer-animated rounded-md"></div>
+            <div class="h-8 w-28 shimmer-animated rounded-md"></div>
+            <div class="h-8 w-40 shimmer-animated rounded-md"></div>
+        </div>
+    </div>
+    <div class="space-y-2 mt-3">
+        <div class="p-3 rounded-lg border border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded shimmer-animated"></div>
+                <div class="space-y-1.5">
+                    <div class="h-3 w-64 shimmer-animated"></div>
+                    <div class="h-2.5 w-40 shimmer-animated"></div>
+                </div>
+            </div>
+            <div class="h-6 w-20 shimmer-animated rounded"></div>
+        </div>
+        <div class="p-3 rounded-lg border border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-7 h-7 rounded shimmer-animated"></div>
+                <div class="space-y-1.5">
+                    <div class="h-3 w-52 shimmer-animated"></div>
+                    <div class="h-2.5 w-36 shimmer-animated"></div>
+                </div>
+            </div>
+            <div class="h-6 w-20 shimmer-animated rounded"></div>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- Reusable Client-side Template Elements (Preserves tpl-* IDs for client-side queries) -->
+<template id="tpl-kpis-skeleton">
+    {{ kpis_skeleton() }}
+</template>
+
+<template id="tpl-energy-chart-skeleton">
+    {{ energy_chart_skeleton() }}
+</template>
+
+<template id="tpl-donut-chart-skeleton">
+    {{ donut_chart_skeleton() }}
+</template>
+
+<template id="tpl-energy-profile-skeleton">
+    {{ energy_profile_skeleton() }}
+</template>
+
+<template id="tpl-fleet-table-skeleton">
+    {{ fleet_table_skeleton() }}
+</template>
+
+<template id="tpl-exceptions-skeleton">
+    {{ exceptions_skeleton() }}
+</template>

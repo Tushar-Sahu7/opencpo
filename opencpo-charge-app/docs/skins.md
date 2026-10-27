@@ -157,10 +157,10 @@ In templates, reference skin and base assets:
 <script src="/static/home.js"></script>
 
 <!-- Skin-specific assets -->
-<img src="/skin/logo.svg" alt="Logo">
+<img src="/skin/logo.png" alt="Logo">
 
 <!-- Base assets (fallback) -->
-<img src="/static/logo.svg" alt="Logo">
+<img src="/static/logo.png" alt="Logo">
 ```
 
 ## Default Skin

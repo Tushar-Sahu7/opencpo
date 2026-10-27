@@ -11,7 +11,7 @@
             theme: {
                 extend: {
                     colors: {
-                        brand: { dark: '#0C2340', green: '#84BD00', blue: '#00B0E4' }
+                        brand: { dark: '#0f172a', green: '#22c55e', blue: '#2563eb' }
                     },
                     fontSize: {
                         'xs': ['13px', '18px'],
@@ -24,34 +24,35 @@
         }
     </script>
     <style>
-        body { background: #050b14; }
+        body { background: #f8fafc; color: #0f172a; }
 
         .login-card {
-            background: #0a1221;
-            border: 1px solid #15283f;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 12px;
-            box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
         .input-field {
-            background: #060d19;
-            border: 1px solid #1e3452;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
             border-radius: 7px;
-            color: #e8edf2;
+            color: #0f172a;
             font-size: 15px;
             padding: 11px 14px;
             width: 100%;
             outline: none;
             transition: border-color 0.15s, box-shadow 0.15s;
         }
-        .input-field::placeholder { color: #3d5870; }
+        .input-field::placeholder { color: #94a3b8; }
         .input-field:focus {
-            border-color: #00B0E4;
-            box-shadow: 0 0 0 3px rgba(0,176,228,0.12);
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
         }
 
         .btn-login {
-            background: #00B0E4;
+            background: #2563eb;
             color: #fff;
             border: none;
             border-radius: 7px;
@@ -64,12 +65,12 @@
             transition: background 0.15s, box-shadow 0.15s;
         }
         .btn-login:hover {
-            background: #00c4ff;
-            box-shadow: 0 4px 16px rgba(0,176,228,0.3);
+            background: #1d4ed8;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.3);
         }
-        .btn-login:active { background: #0099cc; }
+        .btn-login:active { background: #1e40af; }
 
-        label { font-size: 13px; color: #6b8299; letter-spacing: 0.3px; }
+        label { font-size: 13px; color: #475569; letter-spacing: 0.3px; }
     </style>
 </head>
 <body class="h-full flex flex-col items-center justify-center" style="min-height:100vh;">
@@ -77,9 +78,9 @@
     <!-- Logo bar at top -->
     <div style="margin-bottom:36px;text-align:center;">
         <div style="font-size:32px;font-weight:700;letter-spacing:-0.5px;line-height:1;">
-            <span style="color:#e8edf2;">Open</span><span style="color:#4a6580;">CPO</span>
+            <span style="color:#0f172a;">Open</span><span style="color:#2563eb;">CPO</span>
         </div>
-        <div style="font-size:10px;color:#3d5870;letter-spacing:2.5px;text-transform:uppercase;margin-top:8px;">
+        <div style="font-size:10px;color:#64748b;letter-spacing:2.5px;text-transform:uppercase;margin-top:8px;">
             Admin Panel
         </div>
     </div>
@@ -87,7 +88,7 @@
     <!-- Login card -->
     <div class="login-card" style="width:100%;max-width:380px;padding:36px 32px;">
 
-        <h1 style="font-size:17px;font-weight:600;color:#e8edf2;margin-bottom:24px;">Sign in</h1>
+        <h1 style="font-size:17px;font-weight:600;color:#0f172a;margin-bottom:24px;">Sign in</h1>
 
         <!-- Error message -->
         {% if error %}

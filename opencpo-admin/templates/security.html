@@ -9,7 +9,7 @@
     <!-- Security Events -->
     <div class="bg-gray-900 rounded-lg border border-gray-800">
         <div class="p-4 border-b border-gray-800">
-            <h2 class="text-lg font-semibold">🛡️ Recent Security Events</h2>
+            <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-blue-500"></i> Recent Security Events</h2>
         </div>
         <div id="security-events" class="p-4 space-y-2 max-h-[400px] overflow-y-auto">
             <div class="text-gray-500 text-sm">Loading security events from event bus...</div>
@@ -19,24 +19,24 @@
     <!-- PKI Health -->
     <div class="bg-gray-900 rounded-lg border border-gray-800">
         <div class="p-4 border-b border-gray-800">
-            <h2 class="text-lg font-semibold">🔐 PKI Health</h2>
+            <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5 text-blue-500"></i> PKI Health</h2>
         </div>
         <div class="p-4 space-y-3" hx-get="/partials/stats" hx-trigger="load" hx-swap="innerHTML">
             <div class="flex justify-between text-sm">
                 <span class="text-gray-400">Root CA</span>
-                <span class="text-green-400">✓ Valid</span>
+                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
             </div>
             <div class="flex justify-between text-sm">
                 <span class="text-gray-400">CPO Sub-CA</span>
-                <span class="text-green-400">✓ Valid</span>
+                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
             </div>
             <div class="flex justify-between text-sm">
                 <span class="text-gray-400">MO Sub-CA</span>
-                <span class="text-green-400">✓ Valid</span>
+                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
             </div>
             <div class="flex justify-between text-sm">
                 <span class="text-gray-400">OCSP Responder</span>
-                <span class="text-green-400">✓ Running</span>
+                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Running</span>
             </div>
         </div>
     </div>
@@ -45,7 +45,7 @@
 <!-- Access Log -->
 <div class="mt-6 bg-gray-900 rounded-lg border border-gray-800">
     <div class="p-4 border-b border-gray-800">
-        <h2 class="text-lg font-semibold">📋 OCPI Partner Status</h2>
+        <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-blue-500"></i> OCPI Partner Status</h2>
     </div>
     <div class="p-4 text-sm text-gray-400">
         Partner status loaded from OCPI credentials module.

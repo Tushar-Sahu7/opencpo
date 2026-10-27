@@ -21,7 +21,7 @@
     <div>
       <label class="block text-xs text-gray-500 mb-1">Group</label>
       <select name="group_id" onchange="this.form.submit()"
-        class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:border-brand-blue focus:outline-none">
+        class="bg-gray-800 border border-gray-700 rounded px-3 pr-8 py-2 text-sm text-gray-200 min-w-[140px] focus:border-brand-blue focus:outline-none">
         <option value="">All Groups</option>
         {% for g in groups %}
         <option value="{{ g.id }}" {% if request.query_params.get('group_id') == g.id %}selected{% endif %}>
@@ -33,7 +33,7 @@
     <div>
       <label class="block text-xs text-gray-500 mb-1">Status</label>
       <select name="status" onchange="this.form.submit()"
-        class="bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:border-brand-blue focus:outline-none">
+        class="bg-gray-800 border border-gray-700 rounded px-3 pr-8 py-2 text-sm text-gray-200 min-w-[140px] focus:border-brand-blue focus:outline-none">
         <option value="">All Statuses</option>
         {% for s in ['draft','sent','collecting','paid','failed','overdue'] %}
         <option value="{{ s }}" {% if request.query_params.get('status') == s %}selected{% endif %}>
@@ -43,8 +43,8 @@
       </select>
     </div>
     {% if request.query_params.get('group_id') or request.query_params.get('status') %}
-    <a href="/invoices" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-400 border border-gray-700">
-      ✕ Clear filters
+    <a href="/invoices" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-400 border border-gray-700 inline-flex items-center gap-1">
+      <i data-lucide="x" class="w-3.5 h-3.5"></i> Clear filters
     </a>
     {% endif %}
   </form>
@@ -114,15 +114,15 @@
           <a href="{{ CORE_API | default('http://127.0.0.1:8000') }}/api/v1/invoices/{{ inv.id }}/pdf"
              target="_blank"
              title="Download PDF"
-             class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300 transition-colors">
-            📄
+             class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300 transition-colors inline-flex items-center">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
           </a>
           {% if status in ('draft', 'sent') %}
           <!-- Send -->
           <form method="post" action="/invoices/{{ inv.id }}/send" style="display:inline">
             <button type="submit" title="Send Invoice"
-              class="px-2 py-1 bg-blue-900/50 hover:bg-blue-800 rounded text-xs text-blue-300 transition-colors">
-              ✉️
+              class="px-2 py-1 bg-blue-900/50 hover:bg-blue-800 rounded text-xs text-blue-300 transition-colors inline-flex items-center">
+              <i data-lucide="mail" class="w-3.5 h-3.5"></i>
             </button>
           </form>
           {% endif %}
@@ -131,16 +131,16 @@
           <form method="post" action="/invoices/{{ inv.id }}/collect" style="display:inline"
                 onsubmit="return confirm('Trigger SEPA collection for invoice {{ inv.invoice_number or inv.id[:8] }}?')">
             <button type="submit" title="Collect (SEPA)"
-              class="px-2 py-1 bg-yellow-900/50 hover:bg-yellow-800 rounded text-xs text-yellow-300 transition-colors">
-              💳
+              class="px-2 py-1 bg-yellow-900/50 hover:bg-yellow-800 rounded text-xs text-yellow-300 transition-colors inline-flex items-center">
+              <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
             </button>
           </form>
           <!-- Mark Paid -->
           <form method="post" action="/invoices/{{ inv.id }}/mark-paid" style="display:inline"
                 onsubmit="return confirm('Mark invoice {{ inv.invoice_number or inv.id[:8] }} as paid?')">
             <button type="submit" title="Mark as Paid"
-              class="px-2 py-1 bg-green-900/50 hover:bg-green-800 rounded text-xs text-green-300 transition-colors">
-              ✅
+              class="px-2 py-1 bg-green-900/50 hover:bg-green-800 rounded text-xs text-green-300 transition-colors inline-flex items-center">
+              <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
             </button>
           </form>
           {% endif %}
@@ -164,7 +164,7 @@
   <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
     <div class="flex justify-between items-center mb-5">
       <h3 class="font-semibold text-gray-100">Generate Invoice</h3>
-      <button onclick="closeModal('modal-generate')" class="text-gray-500 hover:text-gray-300 text-xl">✕</button>
+      <button onclick="closeModal('modal-generate')" class="text-gray-500 hover:text-gray-300 p-1 rounded"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <form action="/invoices/generate" method="post" class="space-y-4">
       <div>
@@ -189,9 +189,9 @@
             class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:border-brand-blue focus:outline-none">
         </div>
       </div>
-      <div class="p-3 rounded-lg bg-gray-800/60 border border-gray-700 text-xs text-gray-400">
-        ℹ️ Invoice will be generated from all unbilled CDRs in the selected period for this group.
-        Includes BTW 21%. Invoice is created as Draft — review before sending.
+      <div class="p-3 rounded-lg bg-gray-800/60 border border-gray-700 text-xs text-gray-400 flex items-start gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-brand-blue flex-shrink-0 mt-0.5"></i>
+        <span>Invoice will be generated from all unbilled CDRs in the selected period for this group. Includes BTW 21%. Invoice is created as Draft — review before sending.</span>
       </div>
       <div class="flex gap-3 pt-1">
         <button type="button" onclick="closeModal('modal-generate')"

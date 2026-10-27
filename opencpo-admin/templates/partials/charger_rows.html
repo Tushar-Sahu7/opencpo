@@ -19,11 +19,17 @@
     <td class="p-3 text-gray-400 text-xs">{{ cp.last_boot or '—' }}</td>
     <td class="p-3 text-right space-x-1">
         <button hx-post="/action/reset/{{ cp.id }}" hx-swap="outerHTML" title="Reset — reboot the charger"
-                class="px-2 py-1 bg-blue-700 rounded text-xs hover:bg-blue-600">↻</button>
-        <button onclick="openEditModal('{{ cp.id }}','{{ cp.vendor }}','{{ cp.model }}','{{ cp.serial_number or '' }}','{{ cp.ocpp_version }}','{{ cp.site or '' }}')"
-                class="px-2 py-1 bg-gray-700 rounded text-xs hover:bg-gray-600" title="Edit charger details">✏️</button>
+                class="px-2 py-1 bg-blue-700 rounded text-xs hover:bg-blue-600 inline-flex items-center justify-center"><i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i></button>
+        <button onclick="editCharger(this)"
+                data-id="{{ cp.id }}"
+                data-vendor="{{ cp.vendor }}"
+                data-model="{{ cp.model }}"
+                data-serial="{{ cp.serial_number or '' }}"
+                data-ocpp="{{ cp.ocpp_version }}"
+                data-site="{{ cp.site or '' }}"
+                class="px-2 py-1 bg-gray-700 rounded text-xs hover:bg-gray-600 inline-flex items-center justify-center btn-press" title="Edit charger details"><i data-lucide="pencil" class="w-3.5 h-3.5"></i></button>
         <button onclick="confirmDelete('{{ cp.id }}')"
-                class="px-2 py-1 bg-red-800 rounded text-xs hover:bg-red-700" title="Delete this charger">🗑</button>
+                class="px-2 py-1 bg-red-800 rounded text-xs hover:bg-red-700 inline-flex items-center justify-center btn-press" title="Delete this charger"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
     </td>
 </tr>
 {% endfor %}
