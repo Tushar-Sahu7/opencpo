@@ -113,7 +113,7 @@ async def handle_stop_transaction(
 ) -> dict:
     """Charging session stopped."""
     transaction_id = payload.get("transactionId")
-    meter_stop = payload.get("meterStop", 0)
+    meter_stop = payload.get("meterStop")
     timestamp = parse_timestamp(payload.get("timestamp"))
     reason = payload.get("reason", "Local")
     id_tag = payload.get("idTag", "")
@@ -128,12 +128,45 @@ async def handle_stop_transaction(
     session = None
     async with db.transaction() as conn:
         row = await conn.fetchrow(
-            "SELECT id::text as session_id, COALESCE(meter_start, 0) as meter_start "
+            "SELECT id::text as session_id, COALESCE(meter_start, 0) as meter_start, "
+            "COALESCE(energy_kwh, 0) as energy_kwh "
             "FROM ocpp.sessions WHERE charge_point = $1 AND transaction_id = $2 AND status = 'active'",
             cp_id, transaction_id,
         )
         if row:
-            final_energy = session_energy(float(meter_stop) / 1000.0, float(row["meter_start"]))
+            accumulated_energy = float(row["energy_kwh"])
+            meter_start_wh = float(row["meter_start"])
+
+            # Calculate energy from meterStop if provided
+            calculated_energy = 0.0
+            meter_stop_val = None
+            if meter_stop is not None:
+                try:
+                    meter_stop_val = float(meter_stop)
+                    calculated_energy = session_energy(meter_stop_val / 1000.0, meter_start_wh)
+                except (ValueError, TypeError):
+                    calculated_energy = 0.0
+
+            # Reconcile final energy:
+            # - If calculated_energy > 0: use max(calculated_energy, accumulated_energy)
+            # - If calculated_energy is 0:
+            #     If accumulated_energy > 0 (e.g. meterStop was missing, 0, or glitched):
+            #         preserve accumulated_energy from MeterValues!
+            #     Else:
+            #         legitimate 0 kWh session (e.g. meterStop == meterStart or both 0)
+            if calculated_energy > 0:
+                final_energy = max(calculated_energy, accumulated_energy)
+            elif accumulated_energy > 0:
+                logger.warning(
+                    f"[{cp_id}] StopTransaction meter_stop={meter_stop} produced 0 energy, "
+                    f"preserving accumulated energy {accumulated_energy:.4f} kWh from MeterValues"
+                )
+                final_energy = accumulated_energy
+            else:
+                final_energy = 0.0
+
+            final_energy = round(final_energy, 4)
+
             session = await conn.fetchrow("""
                 UPDATE ocpp.sessions SET
                     status = 'completed',
@@ -143,7 +176,7 @@ async def handle_stop_transaction(
                     energy_kwh = $4
                 WHERE charge_point = $5 AND transaction_id = $6 AND status = 'active'
                 RETURNING id::text as session_id, energy_kwh, start_time, meter_start
-            """, timestamp, reason, float(meter_stop), final_energy, cp_id, transaction_id)
+            """, timestamp, reason, meter_stop_val, final_energy, cp_id, transaction_id)
 
     if session:
         session_id = session["session_id"]
@@ -297,7 +330,14 @@ async def _send_receipt_email(
 
 def _calculate_cdr_cost(energy_kwh: float, tariff_rate: Decimal = Decimal("0.35")) -> dict:
     """Calculate CDR cost using Decimal arithmetic. Returns cost JSONB dict."""
-    energy = Decimal(str(energy_kwh))
+    import math
+    try:
+        val = max(0.0, float(energy_kwh))
+        if math.isnan(val) or math.isinf(val):
+            val = 0.0
+    except (ValueError, TypeError):
+        val = 0.0
+    energy = Decimal(str(round(val, 4)))
     energy_cost = (energy * tariff_rate).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     vat_rate = Decimal("0.21")
     vat_amount = (energy_cost * vat_rate).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)

@@ -21,3 +21,16 @@ async def sessions_page(request: Request):
         "sessions": sessions,
         "total": total,
     })
+
+
+@router.get("/partials/session-rows", response_class=HTMLResponse)
+async def session_rows_partial(request: Request):
+    """HTMX partial: session table rows (polled or refreshed)."""
+    try:
+        data = await api("/sessions?limit=100")
+        sessions = data.get("sessions", [])
+    except Exception:
+        sessions = []
+    return templates.TemplateResponse(request, "partials/session_rows.html", context={
+        "sessions": sessions,
+    })

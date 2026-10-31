@@ -1,17 +1,17 @@
 <!-- ═══ Interactive Operations & Command Center Toolbar ═══════════════ -->
-<div class="mb-4 p-3 rounded-lg bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+<div class="card mb-4 p-3 flex flex-wrap items-center justify-between gap-3 shadow-sm">
     <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
         <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Live Control Center</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-success-500 animate-pulse"></span>
+            <span class="text-caption-bold text-default-font uppercase tracking-wider">Live Control Center</span>
         </div>
-        <span class="text-slate-300 hidden sm:inline">|</span>
-        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-            <span>Connected: <strong id="tb-chargers" class="text-blue-600 font-mono font-bold">{{ online_count }}/{{ charger_count }}</strong> Chargers</span>
-            <span class="text-slate-300">&bull;</span>
-            <span>Load: <strong id="tb-load" class="text-blue-600 font-mono font-bold tabular-nums">{{ current_load_kw }} kW</strong></span>
-            <span class="text-slate-300">&bull;</span>
-            <span>Plugs: <strong id="tb-charging" class="text-emerald-600 font-mono font-bold tabular-nums">{{ connector_statuses.Charging }}</strong> Charging / <strong id="tb-ready" class="text-slate-700 font-mono font-bold tabular-nums">{{ connector_statuses.Available }}</strong> Ready</span>
+        <span class="text-neutral-border hidden sm:inline">|</span>
+        <div class="flex flex-wrap items-center gap-2 text-caption text-subtext-color">
+            <span>Connected: <strong id="tb-chargers" class="text-brand-600 font-mono font-bold">{{ online_count }}/{{ charger_count }}</strong> Chargers</span>
+            <span class="text-neutral-border">&bull;</span>
+            <span>Load: <strong id="tb-load" class="text-brand-600 font-mono font-bold tabular-nums">{{ current_load_kw }} kW</strong></span>
+            <span class="text-neutral-border">&bull;</span>
+            <span>Plugs: <strong id="tb-charging" class="text-success-600 dark:text-success-400 font-mono font-bold tabular-nums">{{ connector_statuses.Charging }}</strong> Charging / <strong id="tb-ready" class="text-default-font font-mono font-bold tabular-nums">{{ connector_statuses.Available }}</strong> Ready</span>
         </div>
     </div>
 
@@ -21,7 +21,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Connect 3 simulated OCPP 1.6 chargers via Charger Farm"
-                class="h-8 px-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm">
+                class="btn-primary text-caption py-1.5 px-3 inline-flex items-center gap-1.5">
             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
             <span>+3 Chargers</span>
         </button>
@@ -30,7 +30,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Plug in EV and stream live active meter values (kW load)"
-                class="h-8 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm btn-press">
+                class="btn-outline text-success-600 dark:text-success-400 text-caption py-1.5 px-3 inline-flex items-center gap-1.5 btn-press">
             <i data-lucide="play" class="w-3.5 h-3.5 fill-current btn-icon-default"></i>
             <span class="btn-spinner"></span>
             <span>Plug &amp; Charge</span>
@@ -40,7 +40,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Finish transaction and write CDR to database"
-                class="h-8 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm btn-press">
+                class="btn-outline text-warning-600 dark:text-warning-400 text-caption py-1.5 px-3 inline-flex items-center gap-1.5 btn-press">
             <i data-lucide="square" class="w-3.5 h-3.5 fill-current btn-icon-default"></i>
             <span class="btn-spinner"></span>
             <span>Stop Charge</span>
@@ -50,7 +50,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Inject hardware ground fault to trigger Exception Queue alert"
-                class="h-8 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm">
+                class="btn-outline text-error-600 dark:text-error-400 text-caption py-1.5 px-3 inline-flex items-center gap-1.5">
             <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
             <span>Inject Fault</span>
         </button>
@@ -59,7 +59,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Clear hardware fault and restore connector to Available"
-                class="h-8 px-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm">
+                class="btn-outline text-caption py-1.5 px-3 inline-flex items-center gap-1.5">
             <i data-lucide="check" class="w-3.5 h-3.5"></i>
             <span>Clear Faults</span>
         </button>
@@ -68,7 +68,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Disconnect all farm chargers"
-                class="h-8 px-3 bg-slate-50 hover:bg-red-50 border border-slate-300 hover:border-red-300 text-slate-500 hover:text-red-600 text-xs font-semibold rounded-md transition inline-flex items-center gap-1.5 shadow-sm">
+                class="btn-outline text-caption py-1.5 px-3 inline-flex items-center gap-1.5 hover:text-error-600 hover:border-error-500">
             <i data-lucide="power-off" class="w-3.5 h-3.5"></i>
             <span>Disconnect Farm</span>
         </button>

@@ -1,52 +1,52 @@
 {% extends "base.html" %}
-{% block title %}Receipts{% endblock %}
+{% block title %}Receipts — CPO Admin{% endblock %}
 {% block content %}
-<div class="flex items-center justify-between mb-6">
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
     <div>
-        <h1 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="receipt" class="w-6 h-6 text-blue-500"></i> Receipts</h1>
-        <p class="text-sm text-gray-500 mt-1 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 text-blue-400"></i> All completed sessions. Download receipt PDFs for each session.</p>
+        <h1 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="receipt" class="w-6 h-6 text-brand-500"></i> Receipts</h1>
+        <p class="text-xs text-subtext-color mt-1 mb-0 flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5 text-brand-400"></i> All completed sessions. Download receipt PDFs for each session.</p>
     </div>
-    <span class="text-gray-400 text-sm">{{ sessions|length }} of {{ total }} sessions</span>
+    <span class="text-subtext-color text-xs">{{ sessions|length }} of {{ total }} sessions</span>
 </div>
 
-<div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+<div class="card overflow-hidden">
 <table class="w-full text-sm">
-    <thead class="bg-gray-800/50">
-        <tr>
-            <th class="text-left p-3 text-gray-400 font-medium">Date</th>
-            <th class="text-left p-3 text-gray-400 font-medium">Charger</th>
-            <th class="text-left p-3 text-gray-400 font-medium">Driver</th>
-            <th class="text-right p-3 text-gray-400 font-medium">kWh</th>
-            <th class="text-right p-3 text-gray-400 font-medium">Rate</th>
-            <th class="text-right p-3 text-gray-400 font-medium">Amount</th>
-            <th class="text-center p-3 text-gray-400 font-medium">Actions</th>
+    <thead>
+        <tr class="border-b border-neutral-border text-[10px] tracking-widest text-subtext-color uppercase">
+            <th class="text-left p-3 font-semibold">Date</th>
+            <th class="text-left p-3 font-semibold">Charger</th>
+            <th class="text-left p-3 font-semibold">Driver</th>
+            <th class="text-right p-3 font-semibold">kWh</th>
+            <th class="text-right p-3 font-semibold">Rate</th>
+            <th class="text-right p-3 font-semibold">Amount</th>
+            <th class="text-center p-3 font-semibold">Actions</th>
         </tr>
     </thead>
-    <tbody class="divide-y divide-gray-800">
+    <tbody>
         {% for s in sessions %}
-        <tr class="hover:bg-gray-800/30">
+        <tr class="border-b border-neutral-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
             <td class="p-3">
-                <div class="text-white">{{ s.stopped_at[:10] if s.stopped_at else '—' }}</div>
-                <div class="text-gray-500 text-xs">{{ s.stopped_at[11:16] if s.stopped_at else '' }}</div>
+                <div class="text-default-font font-mono text-xs">{{ s.stopped_at|format_date }}</div>
+                <div class="text-subtext-color text-xs font-mono">{{ s.stopped_at|format_time }}</div>
             </td>
             <td class="p-3">
-                <div class="text-white">{{ s.charger_name or s.charge_point_id or '—' }}</div>
-                {% if s.city %}<div class="text-gray-500 text-xs">{{ s.city }}</div>{% endif %}
+                <div class="text-brand-600 dark:text-brand-400 font-medium">{{ s.charger_name or s.charge_point_id or '—' }}</div>
+                {% if s.city %}<div class="text-subtext-color text-xs">{{ s.city }}</div>{% endif %}
             </td>
             <td class="p-3">
-                <div class="text-white">{{ s.driver_email or '—' }}</div>
-                {% if s.driver_phone %}<div class="text-gray-400 text-xs font-mono">{{ s.driver_phone }}</div>{% endif %}
+                <div class="text-default-font text-xs">{{ s.driver_email or '—' }}</div>
+                {% if s.driver_phone %}<div class="text-subtext-color text-xs font-mono">{{ s.driver_phone }}</div>{% endif %}
             </td>
-            <td class="p-3 text-right text-white font-mono">{{ "%.2f"|format(s.kwh or s.energy_kwh or 0) }}</td>
-            <td class="p-3 text-right text-gray-400 font-mono text-xs">€{{ "%.4f"|format(s.rate_kwh or 0) }}</td>
-            <td class="p-3 text-right text-brand-green font-semibold font-mono">€{{ "%.2f"|format(s.cost_incl or 0) }}</td>
+            <td class="p-3 text-right text-default-font font-mono">{{ "%.2f"|format(s.kwh or s.energy_kwh or 0) }}</td>
+            <td class="p-3 text-right text-subtext-color font-mono text-xs">€ {{ "%.4f"|format(s.rate_kwh or 0) }}</td>
+            <td class="p-3 text-right text-brand-600 dark:text-brand-400 font-semibold font-mono">€ {{ "%.2f"|format(s.cost_incl or 0) }}</td>
             <td class="p-3 text-center">
-                <a href="/receipts/{{ s.id }}/download" class="text-brand-blue hover:underline text-xs inline-flex items-center gap-1" title="Download PDF"><i data-lucide="download" class="w-3.5 h-3.5"></i> <span>PDF</span></a>
+                <a href="/receipts/{{ s.id }}/download" class="btn btn-outline text-xs py-1 px-2.5 inline-flex items-center gap-1" title="Download PDF"><i data-lucide="download" class="w-3.5 h-3.5"></i> <span>PDF</span></a>
             </td>
         </tr>
         {% endfor %}
         {% if not sessions %}
-        <tr><td colspan="7" class="p-8 text-center text-gray-500">No completed sessions yet</td></tr>
+        <tr><td colspan="7" class="p-8 text-center text-subtext-color">No completed sessions yet</td></tr>
         {% endif %}
     </tbody>
 </table>

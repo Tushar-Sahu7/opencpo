@@ -1,57 +1,57 @@
 {% for p in partners %}
-<tr class="partner-row" style="border-bottom:1px solid #0d1b2e;"
+<tr class="partner-row border-b border-neutral-border hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors"
   data-name="{{ p.name|lower }}"
   data-party="{{ p.party_id|lower }}"
   data-country="{{ p.country_code|lower }}"
   data-role="{{ p.role|lower }}"
   data-status="{{ p.status|lower }}">
-  <td style="padding:10px 14px;">
-    <div style="color:#e8edf2;font-weight:500;">{{ p.name }}</div>
-    <div style="font-size:11px;color:#3d5870;margin-top:1px;">{{ p.country_code }}</div>
+  <td class="py-2.5 px-3">
+    <div class="text-default-font font-medium text-caption">{{ p.name }}</div>
+    <div class="text-[11px] text-subtext-color">{{ p.country_code }}</div>
   </td>
-  <td style="padding:10px 14px;font-family:monospace;color:#c0cdd8;">
+  <td class="py-2.5 px-3 font-mono text-caption text-default-font">
     {{ p.country_code }}*{{ p.party_id }}
   </td>
-  <td style="padding:10px 14px;">
-    <span style="font-size:11px;font-weight:600;color:{% if p.role == 'CPO' %}#00B0E4{% elif p.role == 'EMSP' %}#a78bfa{% else %}#6b8299{% endif %};">
+  <td class="py-2.5 px-3">
+    <span class="text-[11px] font-semibold text-default-font">
       {{ p.role }}
     </span>
   </td>
-  <td style="padding:10px 14px;">
+  <td class="py-2.5 px-3">
     {% if p.status == 'active' %}
-      <span style="color:#84BD00;font-size:12px;">● Active</span>
+      <span class="badge badge-success text-[11px]">● Active</span>
     {% elif p.status == 'pending' %}
-      <span style="color:#fbbf24;font-size:12px;">● Pending</span>
+      <span class="badge badge-warning text-[11px]">● Pending</span>
     {% elif p.status == 'suspended' %}
-      <span style="color:#f97316;font-size:12px;">● Suspended</span>
+      <span class="badge badge-error text-[11px]">● Suspended</span>
     {% else %}
-      <span style="color:#6b8299;font-size:12px;">● {{ p.status|capitalize }}</span>
+      <span class="badge badge-neutral text-[11px]">● {{ p.status|capitalize }}</span>
     {% endif %}
   </td>
-  <td style="padding:10px 14px;font-family:monospace;font-size:11px;color:#4a6580;">
+  <td class="py-2.5 px-3 font-mono text-[11px] text-subtext-color">
     {{ p.token_b_masked or "—" }}
   </td>
-  <td style="padding:10px 14px;font-size:11px;">
+  <td class="py-2.5 px-3 text-caption">
     {% if p.base_tariff_id %}
-      <span style="color:#c0cdd8;font-family:monospace;">{{ p.base_tariff_id }}</span>
+      <span class="text-default-font font-mono text-[11px]">{{ p.base_tariff_id }}</span>
       {% if p.roaming_fee_kwh %}
-        <span style="color:#4a6580;margin-left:4px;">+{{ "%.4f"|format(p.roaming_fee_kwh) }}/kWh</span>
+        <span class="text-subtext-color text-[11px] ml-1">+{{ "%.4f"|format(p.roaming_fee_kwh) }}/kWh</span>
       {% endif %}
     {% else %}
-      <span style="color:#3d5870;">All</span>
+      <span class="text-subtext-color text-[11px]">All</span>
     {% endif %}
   </td>
-  <td style="padding:10px 14px;font-size:11px;color:#4a6580;">
-    {{ (p.last_sync or "")[:19].replace("T"," ") or "Never" }}
+  <td class="py-2.5 px-3 text-[11px] text-subtext-color font-mono">
+    {{ p.last_sync|format_datetime(default="Never") }}
   </td>
-  <td style="padding:10px 14px;text-align:right;">
-    <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
-      <span id="test-result-{{ p.id }}" style="font-size:11px;color:#4a6580;min-width:60px;text-align:right;"></span>
+  <td class="py-2.5 px-3 text-right">
+    <div class="flex gap-1.5 justify-end items-center">
+      <span id="test-result-{{ p.id }}" class="text-[11px] text-subtext-color min-w-[60px] text-right font-medium"></span>
       <button
         hx-post="/partials/ocpi/test/{{ p.id }}"
         hx-target="#test-result-{{ p.id }}"
         hx-swap="innerHTML"
-        style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#00B0E4;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;"
+        class="btn-outline text-[11px] py-1 px-2.5 whitespace-nowrap"
         title="Test connection to this partner's OCPI endpoint">
         Test
       </button>
@@ -60,14 +60,23 @@
         hx-post="/partials/ocpi/sync/{{ p.id }}"
         hx-target="#test-result-{{ p.id }}"
         hx-swap="innerHTML"
-        style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#84BD00;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;"
+        class="btn-primary text-[11px] py-1 px-2.5 whitespace-nowrap"
         title="Pull latest data from this partner">
         Sync
       </button>
       {% endif %}
       <button
-        onclick="openEditModal({{ p.id }}, '{{ p.name|replace("'","\\'")|e }}', '{{ p.url|e }}', '{{ p.status }}', '{{ p.base_tariff_id or "" }}', {{ p.roaming_fee_kwh or 0 }}, {{ p.roaming_fee_flat or 0 }}, {{ p.roaming_fee_time or 0 }})"
-        style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#6b8299;border-radius:5px;font-size:11px;cursor:pointer;"
+        type="button"
+        onclick="openEditModal(this)"
+        data-id="{{ p.id }}"
+        data-name="{{ p.name|e }}"
+        data-url="{{ p.url|e }}"
+        data-status="{{ p.status }}"
+        data-tariff="{{ p.base_tariff_id or '' }}"
+        data-fee-kwh="{{ p.roaming_fee_kwh or 0 }}"
+        data-fee-flat="{{ p.roaming_fee_flat or 0 }}"
+        data-fee-time="{{ p.roaming_fee_time or 0 }}"
+        class="btn-outline text-[11px] py-1 px-2.5"
         title="Edit partner details">
         Edit
       </button>
@@ -76,7 +85,7 @@
 </tr>
 {% else %}
 <tr>
-  <td colspan="8" style="padding:40px;text-align:center;color:#3d5870;font-size:13px;">
+  <td colspan="8" class="py-10 text-center text-subtext-color text-caption">
     No roaming partners yet.
   </td>
 </tr>

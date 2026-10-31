@@ -2,31 +2,31 @@
 <div class="space-y-4">
 
     <!-- Version Comparison Card -->
-    <div class="bg-gray-900/50 border border-gray-800 rounded-lg p-4">
+    <div class="card p-4">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-6">
                 <!-- Current version -->
                 <div class="text-center">
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Current</div>
-                    <div class="text-lg font-mono font-bold {% if needs_update %}text-gray-400{% else %}text-green-400{% endif %}">
+                    <div class="text-xs text-subtext-color uppercase tracking-wider mb-1">Current</div>
+                    <div class="text-lg font-mono font-bold {% if needs_update %}text-subtext-color{% else %}text-success-600 dark:text-success-400{% endif %}">
                         {{ current }}
                     </div>
                 </div>
                 <!-- Arrow / status -->
                 <div class="flex flex-col items-center">
                     {% if needs_update %}
-                    <span class="text-yellow-400 text-xl">→</span>
-                    <span class="text-xs text-yellow-500 mt-1">Update available</span>
+                    <span class="text-warning-500 text-xl">→</span>
+                    <span class="text-xs text-warning-600 dark:text-warning-400 mt-1 font-medium">Update available</span>
                     {% else %}
-                    <span class="text-green-500 inline-flex items-center"><i data-lucide="check" class="w-6 h-6"></i></span>
-                    <span class="text-xs text-green-500 mt-1">Up to date</span>
+                    <span class="text-success-500 inline-flex items-center"><i data-lucide="check" class="w-6 h-6"></i></span>
+                    <span class="text-xs text-success-600 dark:text-success-400 mt-1 font-medium">Up to date</span>
                     {% endif %}
                 </div>
                 <!-- Latest version -->
                 {% if latest and latest != current %}
                 <div class="text-center">
-                    <div class="text-xs text-gray-500 uppercase tracking-wider mb-1">Latest</div>
-                    <div class="text-lg font-mono font-bold text-yellow-300">{{ latest }}</div>
+                    <div class="text-xs text-subtext-color uppercase tracking-wider mb-1">Latest</div>
+                    <div class="text-lg font-mono font-bold text-warning-500 dark:text-warning-400">{{ latest }}</div>
                 </div>
                 {% endif %}
             </div>
@@ -41,20 +41,20 @@
                 hx-swap="innerHTML"
                 hx-confirm="Update to {{ latest }}? The platform will restart. Continue?"
                 hx-indicator="#update-run-spinner"
-                class="px-5 py-2 bg-yellow-700 hover:bg-yellow-600 text-white font-bold rounded-lg text-sm transition-colors inline-flex items-center gap-1.5">
+                class="btn btn-primary bg-warning-600 hover:bg-warning-700 text-white font-bold text-sm inline-flex items-center gap-1.5 py-2 px-5">
             <i data-lucide="arrow-up-circle" class="w-4 h-4"></i>
             <span>Update Now</span>
         </button>
 
         <select onchange="postponeUpdatePanel(this)"
-                class="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-xs text-gray-300">
+                class="select text-xs py-2 px-3">
             <option value="">Remind Later...</option>
             <option value="1">In 1 hour</option>
             <option value="24" selected>In 24 hours</option>
             <option value="168">In 7 days</option>
         </select>
 
-        <span id="update-run-spinner" class="htmx-indicator text-sm text-yellow-400">
+        <span id="update-run-spinner" class="htmx-indicator text-sm text-warning-500">
             <span class="inline-block animate-pulse">⟳</span> Updating...
         </span>
     </div>
@@ -64,7 +64,7 @@
         <button hx-post="/action/update/check"
                 hx-target="#update-result-panel"
                 hx-swap="innerHTML"
-                class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-xs text-gray-200 transition-colors inline-flex items-center gap-1.5">
+                class="btn btn-outline text-xs py-2 px-4 inline-flex items-center gap-1.5">
             <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
             <span>Check for updates</span>
         </button>
@@ -74,24 +74,24 @@
 
     <!-- Changelog (expandable) -->
     {% if changelog %}
-    <details class="bg-gray-900/30 border border-gray-800 rounded-lg">
-        <summary class="px-4 py-3 text-sm text-gray-300 cursor-pointer hover:text-gray-200 font-medium select-none flex items-center gap-1.5">
+    <details class="card">
+        <summary class="px-4 py-3 text-sm text-default-font cursor-pointer hover:text-brand-600 dark:hover:text-brand-400 font-medium select-none flex items-center gap-1.5">
             <i data-lucide="clipboard-list" class="w-4 h-4 inline-block"></i>
             <span>Changelog — {{ latest }}</span>
         </summary>
-        <div class="px-4 pb-4 text-xs text-gray-400 leading-relaxed whitespace-pre-wrap font-mono">
+        <div class="px-4 pb-4 text-xs text-subtext-color leading-relaxed whitespace-pre-wrap font-mono border-t border-neutral-border pt-3">
             {{ changelog }}
         </div>
     </details>
     {% endif %}
 
     <!-- Update History Table -->
-    <div class="border-t border-gray-800 pt-4 mt-2">
-        <h3 class="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-1.5"><i data-lucide="history" class="w-4 h-4 inline-block"></i> Activity History</h3>
+    <div class="border-t border-neutral-border pt-4 mt-2">
+        <h3 class="text-sm font-semibold text-default-font mb-3 flex items-center gap-1.5"><i data-lucide="history" class="w-4 h-4 inline-block"></i> Activity History</h3>
         <div hx-get="/partials/update-history"
              hx-trigger="load"
              hx-swap="innerHTML">
-            <div class="text-xs text-gray-500 py-2">Loading history...</div>
+            <div class="text-xs text-subtext-color py-2">Loading history...</div>
         </div>
     </div>
 </div>

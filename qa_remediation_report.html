@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OpenCPO QA Remediation & Architecture Resolution Report</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    @page {
+        size: A4;
+        margin: 18mm 16mm 18mm 16mm;
+        @bottom-right {
+            content: "Page " counter(page);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 8pt;
+            color: #64748b;
+        }
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: #1e293b;
+        background: #ffffff;
+        font-size: 9.5pt;
+        line-height: 1.55;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Print Break Utilities */
+    .page-break {
+        page-break-before: always;
+        break-before: page;
+    }
+    .avoid-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+
+    /* Header & Cover */
+    .header-bar {
+        border-bottom: 2px solid #2563eb;
+        padding-bottom: 12px;
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+    .header-logo {
+        font-size: 16pt;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: -0.5px;
+    }
+    .header-logo span {
+        color: #2563eb;
+    }
+    .header-meta {
+        font-size: 8pt;
+        color: #64748b;
+        text-align: right;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .doc-title {
+        font-size: 22pt;
+        font-weight: 800;
+        color: #0f172a;
+        line-height: 1.2;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.6px;
+    }
+    .doc-subtitle {
+        font-size: 11pt;
+        color: #475569;
+        margin: 0 0 20px 0;
+        font-weight: 500;
+    }
+
+    .meta-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 24px;
+    }
+    .meta-item {
+        font-size: 8pt;
+    }
+    .meta-label {
+        color: #64748b;
+        text-transform: uppercase;
+        font-weight: 700;
+        font-size: 7pt;
+        letter-spacing: 0.5px;
+    }
+    .meta-value {
+        color: #0f172a;
+        font-weight: 600;
+        font-size: 8.5pt;
+        margin-top: 2px;
+    }
+
+    /* Section Headings */
+    h2 {
+        font-size: 13pt;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 24px 0 10px 0;
+        padding-bottom: 5px;
+        border-bottom: 1.5px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    h3 {
+        font-size: 10.5pt;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 16px 0 6px 0;
+    }
+    h4 {
+        font-size: 9.5pt;
+        font-weight: 700;
+        color: #334155;
+        margin: 12px 0 4px 0;
+    }
+
+    /* Severity Badges */
+    .badge {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 7.5pt;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-p1 {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+    }
+    .badge-p2 {
+        background: #fffbeb;
+        color: #b45309;
+        border: 1px solid #fde68a;
+    }
+    .badge-p3 {
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
+    }
+    .badge-blue {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    /* Callout Boxes */
+    .callout {
+        padding: 10px 14px;
+        border-radius: 6px;
+        margin: 12px 0;
+        font-size: 9pt;
+        border-left: 4px solid;
+    }
+    .callout-danger {
+        background: #fff5f5;
+        border-color: #ef4444;
+        color: #7f1d1d;
+    }
+    .callout-success {
+        background: #f0fdf4;
+        border-color: #22c55e;
+        color: #14532d;
+    }
+    .callout-info {
+        background: #f0f9ff;
+        border-color: #0284c7;
+        color: #0c4a6e;
+    }
+
+    /* Tables */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 8.5pt;
+        margin: 12px 0 16px 0;
+    }
+    th {
+        background: #f1f5f9;
+        color: #475569;
+        font-weight: 700;
+        text-align: left;
+        padding: 7px 10px;
+        border: 1px solid #cbd5e1;
+        font-size: 8pt;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+    td {
+        padding: 7px 10px;
+        border: 1px solid #e2e8f0;
+        vertical-align: top;
+    }
+    tr:nth-child(even) td {
+        background: #f8fafc;
+    }
+
+    /* Code Blocks */
+    pre, code {
+        font-family: 'JetBrains Mono', Consolas, Monaco, monospace;
+    }
+    code {
+        background: #f1f5f9;
+        color: #0f172a;
+        padding: 1px 4px;
+        border-radius: 3px;
+        font-size: 8pt;
+    }
+    pre {
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 10px 14px;
+        border-radius: 6px;
+        font-size: 7.8pt;
+        line-height: 1.45;
+        overflow-x: auto;
+        margin: 8px 0 12px 0;
+        border: 1px solid #1e293b;
+    }
+    .diff-del {
+        color: #f87171;
+        background: rgba(239, 68, 68, 0.15);
+        display: block;
+    }
+    .diff-add {
+        color: #4ade80;
+        background: rgba(34, 197, 94, 0.15);
+        display: block;
+    }
+
+    /* Lists */
+    ul, ol {
+        margin: 6px 0 12px 0;
+        padding-left: 20px;
+    }
+    li {
+        margin-bottom: 4px;
+    }
+
+    /* Metric Cards */
+    .stat-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px;
+        text-align: center;
+    }
+    .stat-val {
+        font-size: 16pt;
+        font-weight: 800;
+        color: #2563eb;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .stat-lbl {
+        font-size: 7pt;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+</style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header-bar">
+        <div class="header-logo">Open<span>CPO</span> Enterprise</div>
+        <div class="header-meta">
+            DOC REF: QA-ENG-2026-004<br>
+            SECURITY &amp; CONCURRENCY REMEDIATION SPEC
+        </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="doc-title">OpenCPO Architecture Remediation &amp; QA Resolution Guide</h1>
+    <p class="doc-subtitle">Comprehensive Technical Specification for Resolving Session Isolation, Client-Side Injection, TCP Socket Exhaustion, and Real-Time Dashboard Fleet Stability.</p>
+
+    <!-- Metadata Grid -->
+    <div class="meta-grid">
+        <div class="meta-item">
+            <div class="meta-label">Author / Role</div>
+            <div class="meta-value">Staff QA &amp; Reliability Eng</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Classification</div>
+            <div class="meta-value">Engineering Resolution (ADR)</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Target Version</div>
+            <div class="meta-value">OpenCPO Admin v1.4.2</div>
+        </div>
+        <div class="meta-item">
+            <div class="meta-label">Verification Status</div>
+            <div class="meta-value" style="color: #16a34a;">Verified &amp; Actionable</div>
+        </div>
+    </div>
+
+    <!-- 1. Executive Summary -->
+    <h2>1. Executive Summary</h2>
+    <p>
+        The OpenCPO real-time operations dashboard delivers mission-critical supervision across EV charging networks. An earlier implementation exhibited <strong>continuous buffering, UI reloading traps, and frozen loading skeletons</strong> caused by uncoordinated multi-component polling, un-deduplicated backend API queries (25 calls every 3 seconds), and destructive full-DOM replacements.
+    </p>
+    <p>
+        While initial stabilization decoupled the polling cadence and introduced in-place reconciliation, a comprehensive QA penetration and concurrency audit uncovered four critical failure modes requiring immediate architectural remediation before production deployment:
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0 18px 0;">
+        <div class="stat-card">
+            <div class="stat-val" style="color: #b91c1c;">SEC-01</div>
+            <div class="stat-lbl">Session Identity Bleed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" style="color: #b91c1c;">SEC-02</div>
+            <div class="stat-lbl">Client-Side DOM XSS</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" style="color: #b45309;">NET-01</div>
+            <div class="stat-lbl">SSE Socket Starvation</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" style="color: #2563eb;">CON-01</div>
+            <div class="stat-lbl">Sync Backoff Lockout</div>
+        </div>
+    </div>
+
+    <!-- 2. Priority Risk Summary -->
+    <h2>2. Risk Summary Table</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 10%;">ID</th>
+                <th style="width: 25%;">Vulnerability / Bug</th>
+                <th style="width: 12%;">Severity</th>
+                <th style="width: 25%;">Root Cause</th>
+                <th style="width: 28%;">Resolution Approach</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>SEC-01</strong></td>
+                <td>Cross-Session Identity Bleed</td>
+                <td><span class="badge badge-p1">High / P1</span></td>
+                <td>Global 2.5s TTL cache stores request-bound <code>user</code> object.</td>
+                <td>Re-bind <code>request.state.user</code> per-request from cloned context.</td>
+            </tr>
+            <tr>
+                <td><strong>SEC-02</strong></td>
+                <td>DOM XSS via Charger Metadata</td>
+                <td><span class="badge badge-p1">High / P1</span></td>
+                <td>Dynamic row creation embeds unescaped string literals into <code>innerHTML</code>.</td>
+                <td>Implement RFC-compliant HTML entity sanitization on all client strings.</td>
+            </tr>
+            <tr>
+                <td><strong>NET-01</strong></td>
+                <td>HTTP/1.1 Socket Starvation</td>
+                <td><span class="badge badge-p2">Medium / P2</span></td>
+                <td>Multi-tab persistent SSE streams consume browser's 6-connection pool.</td>
+                <td>Enforce HTTP/2 multiplexing on ingress; add Page Visibility pause/resume.</td>
+            </tr>
+            <tr>
+                <td><strong>CON-01</strong></td>
+                <td>Manual Sync Backoff Lockout</td>
+                <td><span class="badge badge-p2">Medium / P2</span></td>
+                <td><code>refreshNow()</code> fails to reset <code>consecutiveErrors</code> counter.</td>
+                <td>Reset error counter and in-flight flags on explicit operator refresh.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- 3. Technical Deep-Dive & Remediation -->
+    <h2>3. Deep-Dive Remediation Blueprint</h2>
+
+    <!-- SEC-01 -->
+    <div class="avoid-break">
+        <h3>SEC-01: Cross-Session Identity Bleed via Shared Cache</h3>
+        <span class="badge badge-p1">CVSS: 6.8 (Medium)</span> &nbsp;
+        <span class="badge badge-blue">Affected File: opencpo-admin/routes/dashboard.py</span>
+
+        <p><strong>Detailed Problem Analysis:</strong><br>
+        To eliminate database thrashing, <code>_get_dashboard_context()</code> was equipped with a 2.5-second in-memory cache keyed by <code>(days, is_simulated, region_filter, selected_tz)</code>. However, the cached dictionary included the caller's <code>request.state.user</code> payload. When User A (Admin) queries the dashboard, User A's identity is cached. If User B (Operator) queries within the 2.5-second window with matching parameters, User B receives User A's identity object in the template context.</p>
+
+        <div class="callout callout-danger">
+            <strong>Security Impact:</strong> Identity spoofing in the top navigation, cross-tenant metadata exposure, and transient elevation of UI capability badges.
+        </div>
+
+        <p><strong>The Best Approach:</strong><br>
+        Keep cached data strictly to shared telemetry (chargers, grid capacity, energy metrics), and dynamically stamp the active <code>request.state.user</code> onto a shallow copy of the context dictionary at dispatch time.</p>
+
+        <p><strong>Exact Code Implementation:</strong></p>
+<pre><code># File: opencpo-admin/routes/dashboard.py
+
+async def _get_dashboard_context(request: Request) -> dict:
+    """Fetch complete live data with safe per-request user re-binding."""
+    days = int(request.query_params.get("days", 7))
+    sim_param = request.query_params.get("simulated")
+    is_simulated = (sim_param == "1" or sim_param.lower() == "true") if sim_param is not None else None
+    region_filter = request.query_params.get("region", "all")
+    selected_tz = request.query_params.get("tz", "IST")
+
+    cache_key = (days, is_simulated, region_filter, selected_tz)
+    now = time.time()
+
+    # 1. Check cache hit
+    cached = _dashboard_cache.get(cache_key)
+    if cached and (now - cached["ts"]) < _DASHBOARD_CACHE_TTL:
+        # CRITICAL FIX: Clone context and attach current request's user
+        ctx = dict(cached["ctx"])
+        ctx["user"] = getattr(request.state, "user", {}) or {}
+        return ctx
+
+    # 2. In-flight request deduplication
+    if cache_key in _dashboard_inflight:
+        shared_ctx = await _dashboard_inflight[cache_key]
+        ctx = dict(shared_ctx)
+        ctx["user"] = getattr(request.state, "user", {}) or {}
+        return ctx
+
+    loop = asyncio.get_event_loop()
+    future = loop.create_future()
+    _dashboard_inflight[cache_key] = future
+
+    try:
+        shared_ctx = await _build_dashboard_context(request, days, is_simulated, region_filter, selected_tz)
+        _dashboard_cache[cache_key] = {"ctx": shared_ctx, "ts": time.time()}
+        if not future.done():
+            future.set_result(shared_ctx)
+        
+        ctx = dict(shared_ctx)
+        ctx["user"] = getattr(request.state, "user", {}) or {}
+        return ctx
+    except Exception as exc:
+        if not future.done():
+            future.set_exception(exc)
+        raise
+    finally:
+        _dashboard_inflight.pop(cache_key, None)
+</code></pre>
+    </div>
+
+    <!-- SEC-02 -->
+    <div class="avoid-break" style="margin-top: 18px;">
+        <h3>SEC-02: Client-Side DOM XSS in `createFleetRowElement`</h3>
+        <span class="badge badge-p1">CVSS: 7.2 (High)</span> &nbsp;
+        <span class="badge badge-blue">Affected File: opencpo-admin/templates/dashboard.html</span>
+
+        <p><strong>Detailed Problem Analysis:</strong><br>
+        When newly connected chargers appear on the network, <code>FleetLiveManager</code> creates a new row via <code>createFleetRowElement(cp)</code>. The method interpolated raw properties (<code>${cp.site}</code>, <code>${cp.vendor}</code>, <code>${cp.model}</code>) directly into an HTML string literal. An attacker registering a virtual or physical charge point with payload characters (e.g., <code>&lt;img src=x onerror=...&gt;</code>) achieves stored script execution on administrator browsers.</p>
+
+        <p><strong>The Best Approach:</strong><br>
+        Introduce a lightweight, zero-dependency HTML entity encoder in the frontend and sanitize all string properties before string template interpolation.</p>
+
+        <p><strong>Exact Code Implementation:</strong></p>
+<pre><code>// File: opencpo-admin/templates/dashboard.html
+
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function createFleetRowElement(cp) {
+    const tr = document.createElement('tr');
+    tr.className = 'fleet-row';
+    tr.id = `fleet-row-${escapeHtml(cp.id)}`;
+    tr.dataset.status = escapeHtml(cp.status);
+    tr.dataset.id = escapeHtml(cp.id);
+    tr.dataset.model = `${escapeHtml(cp.vendor || 'ABB')} ${escapeHtml(cp.model || 'Terra 54')}`;
+    tr.dataset.site = escapeHtml(cp.site || 'Central Depot');
+
+    const isOnline = cp.status === 'online';
+    const safeId = escapeHtml(cp.id);
+    const safeSite = escapeHtml(cp.site || 'Central Depot');
+    const safeVendor = escapeHtml(cp.vendor || 'ABB');
+    const safeModel = escapeHtml(cp.model || 'Terra 54');
+    const safeVersion = escapeHtml(cp.ocpp_version || '1.6');
+    const safeHeartbeat = escapeHtml(cp.last_heartbeat || 'Just now');
+
+    // Connector Pills with strict sanitization
+    let connHtml = '&lt;div class="flex items-center gap-1.5 flex-wrap"&gt;';
+    let hasLive = false;
+    if (cp.live) {
+        for (const [k, v] of Object.entries(cp.live)) {
+            if (k.startsWith('connector_') && k.endsWith('_status')) {
+                hasLive = true;
+                const cid = escapeHtml(k.replace('connector_', '').replace('_status', ''));
+                const statusStr = escapeHtml(v);
+                let badgeClass = 'bg-slate-100 text-slate-600';
+                if (v === 'Charging') badgeClass = 'bg-blue-50 text-blue-700 border border-blue-200 animate-pulse';
+                else if (v === 'Available') badgeClass = 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+                else if (v === 'Faulted') badgeClass = 'bg-red-50 text-red-700 border border-red-200';
+
+                connHtml += `&lt;span class="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold ${badgeClass}"&gt;#${cid}: ${statusStr}&lt;/span&gt;`;
+            }
+        }
+    }
+    if (!hasLive) {
+        connHtml += '&lt;span class="px-1.5 py-0.5 rounded text-[9px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200"&gt;#1: Ready&lt;/span&gt;';
+    }
+    connHtml += '&lt;/div&gt;';
+
+    tr.innerHTML = `
+        &lt;td class="font-mono font-bold text-blue-600 text-xs"&gt;
+            &lt;a href="/remote/${safeId}" class="hover:underline flex items-center gap-1 text-blue-600 no-underline"&gt;
+                &lt;i data-lucide="zap" class="w-3.5 h-3.5 inline-block"&gt;&lt;/i&gt;
+                &lt;span&gt;${safeId}&lt;/span&gt;
+            &lt;/a&gt;
+        &lt;/td&gt;
+        &lt;td class="font-mono text-[11px] text-slate-500"&gt;${safeVersion}&lt;/td&gt;
+        &lt;td class="fleet-status-cell"&gt;
+            &lt;span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${isOnline ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'}"&gt;
+                &lt;span class="w-1.5 h-1.5 rounded-full ${isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-red-400'}"&gt;&lt;/span&gt;
+                ${escapeHtml(cp.status.toUpperCase())}
+            &lt;/span&gt;
+        &lt;/td&gt;
+        &lt;td&gt;
+            &lt;div class="text-slate-800 font-medium text-xs"&gt;${safeSite}&lt;/div&gt;
+            &lt;div class="text-[10px] text-slate-500"&gt;${safeVendor} ${safeModel}&lt;/div&gt;
+        &lt;/td&gt;
+        &lt;td class="fleet-connectors-cell"&gt;${connHtml}&lt;/td&gt;
+        &lt;td class="font-mono text-[10px] text-slate-500 fleet-heartbeat-cell"&gt;${safeHeartbeat}&lt;/td&gt;
+        &lt;td class="text-right fleet-actions-cell"&gt;
+            &lt;div class="inline-flex items-center gap-1 justify-end"&gt;
+                &lt;button hx-post="/action/start/${safeId}?connector=1" hx-target="#toast-container" hx-swap="beforeend" title="RemoteStartTransaction" class="action-btn action-btn-accent btn-press"&gt;
+                    &lt;i data-lucide="play" class="w-3 h-3 fill-current inline-block btn-icon-default"&gt;&lt;/i&gt;
+                    &lt;span class="btn-spinner"&gt;&lt;/span&gt;
+                    &lt;span&gt;Start&lt;/span&gt;
+                &lt;/button&gt;
+                &lt;button hx-post="/action/stop/${safeId}?connector=1" hx-target="#toast-container" hx-swap="beforeend" title="RemoteStopTransaction" class="action-btn btn-press"&gt;
+                    &lt;i data-lucide="square" class="w-3 h-3 fill-current inline-block btn-icon-default"&gt;&lt;/i&gt;
+                    &lt;span class="btn-spinner"&gt;&lt;/span&gt;
+                    &lt;span&gt;Stop&lt;/span&gt;
+                &lt;/button&gt;
+                &lt;button hx-post="/action/reset/${safeId}?type=Soft" hx-target="#toast-container" hx-swap="beforeend" title="Soft Reset" class="action-btn"&gt;
+                    &lt;i data-lucide="rotate-ccw" class="w-3 h-3 inline-block"&gt;&lt;/i&gt;
+                    &lt;span&gt;Reset&lt;/span&gt;
+                &lt;/button&gt;
+                &lt;button hx-post="/action/unlock/${safeId}?connector=1" hx-target="#toast-container" hx-swap="beforeend" title="Unlock Stuck Connector" class="action-btn"&gt;
+                    &lt;i data-lucide="unlock" class="w-3 h-3 inline-block"&gt;&lt;/i&gt;
+                    &lt;span&gt;Unlock&lt;/span&gt;
+                &lt;/button&gt;
+            &lt;/div&gt;
+        &lt;/td&gt;
+    `;
+    return tr;
+}
+</code></pre>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- NET-01 & CON-01 -->
+    <div class="avoid-break">
+        <h3>NET-01: HTTP/1.1 Socket Starvation from Multi-Tab SSE</h3>
+        <span class="badge badge-p2">CVSS: 5.3 (Medium)</span> &nbsp;
+        <span class="badge badge-blue">Affected Area: opencpo-admin/templates/base.html &amp; Ingress Proxy</span>
+
+        <p><strong>Detailed Problem Analysis:</strong><br>
+        Standard browser connection pools enforce a ceiling of 6 TCP sockets per host under HTTP/1.1. In operations centers where staff maintain 3–4 dashboard tabs across monitoring displays, each tab holds a permanent socket for <code>EventSource('/api/events/stream')</code>. When background pollers (HTMX and <code>FleetLiveManager</code>) issue requests, they enter a stalled state awaiting socket liberation, mimicking an application buffer freeze.</p>
+
+        <p><strong>The Best Approach:</strong>
+        <ol>
+            <li><strong>Ingress Protocol Enforcement:</strong> Terminate SSL at the reverse proxy (Traefik / Nginx / Caddy) with HTTP/2 (<code>h2</code>) enabled. HTTP/2 multiplexes hundreds of SSE streams and concurrent fetch requests across a single TCP connection.</li>
+            <li><strong>Page Visibility Lifecycle Management:</strong> In <code>base.html</code>, pause SSE streaming and polling timers when a browser tab is placed in the background (hidden), reconnecting instantly upon tab focus.</li>
+        </ol>
+        </p>
+
+        <p><strong>Visibility Hook Implementation (base.html):</strong></p>
+<pre><code>// File: opencpo-admin/templates/base.html
+
+document.addEventListener('visibilitychange', function() {
+    if (document.hidden) {
+        // Tab inactive: close SSE stream to conserve client socket pool
+        if (window._sseInstance) {
+            window._sseInstance.close();
+            window._sseInstance = null;
+        }
+    } else {
+        // Tab visible: reconnect instantly
+        if (typeof window.initGlobalLiveStream === 'function') {
+            window.initGlobalLiveStream();
+        }
+        if (window.FleetLiveManager) {
+            window.FleetLiveManager.refreshNow();
+        }
+    }
+});
+</code></pre>
+    </div>
+
+    <div class="avoid-break" style="margin-top: 18px;">
+        <h3>CON-01: Manual Sync Backoff Lockout</h3>
+        <span class="badge badge-p2">CVSS: 4.0 (Medium)</span> &nbsp;
+        <span class="badge badge-blue">Affected File: opencpo-admin/templates/dashboard.html</span>
+
+        <p><strong>Detailed Problem Analysis:</strong><br>
+        When network lag occurs, <code>FleetLiveManager</code> scales its polling interval from 5s to 30s using exponential backoff. If an operator clicks the manual <strong>Sync</strong> button, <code>refreshNow()</code> executes an immediate fetch but previously failed to reset <code>consecutiveErrors = 0</code>. If that single refresh experienced transient latency, subsequent polls remained throttled at 30 seconds.</p>
+
+        <p><strong>The Best Approach:</strong><br>
+        Explicit user action must reset the backoff penalty immediately and cancel any pending stale timers.</p>
+
+        <p><strong>Exact Code Implementation:</strong></p>
+<pre><code>// File: opencpo-admin/templates/dashboard.html
+
+return {
+    start: function() {
+        scheduleNext();
+    },
+    refreshNow: function(qs) {
+        if (qs) activeQs = qs;
+        consecutiveErrors = 0; // Immediate backoff reset on user action
+        clearTimeout(pollTimer);
+        fetchLiveFleet();
+    },
+    destroy: function() {
+        clearTimeout(pollTimer);
+        if (abortCtrl) abortCtrl.abort();
+    }
+};
+</code></pre>
+    </div>
+
+    <!-- 4. QA Verification Test Matrix -->
+    <h2>4. QA Verification &amp; Test Suite Matrix</h2>
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 14%;">Test Case ID</th>
+                <th style="width: 28%;">Test Scenario</th>
+                <th style="width: 28%;">Execution Steps</th>
+                <th style="width: 30%;">Pass / Fail Criteria</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>TC-AUTH-01</strong></td>
+                <td>Concurrent Identity Isolation</td>
+                <td>Simulate 50 parallel requests from Admin and Viewer sessions within 500ms.</td>
+                <td><strong>PASS:</strong> Context reflects correct <code>request.state.user</code> for every individual session. Zero leakage.</td>
+            </tr>
+            <tr>
+                <td><strong>TC-XSS-01</strong></td>
+                <td>OCPP Payload Sanitization</td>
+                <td>Inject <code>&lt;script&gt;alert(1)&lt;/script&gt;</code> into charger model/site payload via simulated boot.</td>
+                <td><strong>PASS:</strong> Rendered in DOM as encoded entities; zero script execution in console.</td>
+            </tr>
+            <tr>
+                <td><strong>TC-NET-01</strong></td>
+                <td>Multi-Tab Socket Saturation</td>
+                <td>Open 6 dashboard tabs simultaneously; inspect Chrome DevTools Network timing.</td>
+                <td><strong>PASS:</strong> Under HTTP/2, all tabs stream and poll concurrently with 0ms socket queuing.</td>
+            </tr>
+            <tr>
+                <td><strong>TC-UX-01</strong></td>
+                <td>Search Box Focus Persistence</td>
+                <td>Type text in <code>#fleet-search</code> while background poll completes.</td>
+                <td><strong>PASS:</strong> Input cursor remains active, search query is never wiped, zero layout shift.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 5. Sign-off and Checklist -->
+    <div class="avoid-break" style="margin-top: 20px;">
+        <h2>5. Engineering Rollout Checklist</h2>
+        <ul>
+            <li>[x] <strong>Backend Deduplication:</strong> In-flight locks and 2.5s TTL cache deployed in <code>routes/dashboard.py</code>.</li>
+            <li>[x] <strong>DOM Stability:</strong> Full-DOM innerHTML swapping replaced with in-place cell reconciliation.</li>
+            <li>[x] <strong>Session Protection:</strong> Context shallow-cloning applied to ensure per-request identity isolation.</li>
+            <li>[x] <strong>Input Sanitization:</strong> Entity encoding integrated across all client-rendered charger rows.</li>
+            <li>[x] <strong>Cadence Recovery:</strong> Manual refresh resets backoff penalties immediately.</li>
+        </ul>
+    </div>
+
+</body>
+</html>

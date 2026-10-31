@@ -15,8 +15,8 @@
   <div class="docs-diagram-label">Certificate Trust Chain</div>
   <svg viewBox="0 0 760 340" style="width:100%;display:block;max-width:760px;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
     <!-- Root CA -->
-    <rect x="280" y="10" width="200" height="54" rx="10" fill="#071828" stroke="#84BD00" stroke-width="1.5"/>
-    <text x="380" y="32" text-anchor="middle" font-size="10" fill="#84BD00" font-family="monospace" font-weight="700">ROOT CA</text>
+    <rect x="280" y="10" width="200" height="54" rx="10" fill="#071828" stroke="#22c55e" stroke-width="1.5"/>
+    <text x="380" y="32" text-anchor="middle" font-size="10" fill="#22c55e" font-family="monospace" font-weight="700">ROOT CA</text>
     <text x="380" y="47" text-anchor="middle" font-size="8" fill="#3d5870">Self-signed · 4096-bit RSA · 20yr</text>
     <text x="380" y="58" text-anchor="middle" font-size="7" fill="#2d4a63">Offline / HSM-protected</text>
 
@@ -26,14 +26,14 @@
     <line x1="420" y1="64" x2="570" y2="112" stroke="#1a3a5c" stroke-width="1.5"/>
 
     <!-- Sub CA: SECC -->
-    <rect x="90" y="112" width="200" height="52" rx="8" fill="#0d2137" stroke="#00B0E4" stroke-opacity="0.6"/>
-    <text x="190" y="132" text-anchor="middle" font-size="9" fill="#00B0E4" font-family="monospace" font-weight="700">SECC SUB-CA</text>
+    <rect x="90" y="112" width="200" height="52" rx="8" fill="#0d2137" stroke="#3b82f6" stroke-opacity="0.6"/>
+    <text x="190" y="132" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="monospace" font-weight="700">SECC SUB-CA</text>
     <text x="190" y="147" text-anchor="middle" font-size="8" fill="#3d5870">Supply Equipment Comm.</text>
     <text x="190" y="158" text-anchor="middle" font-size="7" fill="#2d4a63">2048-bit RSA · 5yr</text>
 
     <!-- Sub CA: Contract -->
-    <rect x="280" y="112" width="200" height="52" rx="8" fill="#0d2137" stroke="#84BD00" stroke-opacity="0.6"/>
-    <text x="380" y="132" text-anchor="middle" font-size="9" fill="#84BD00" font-family="monospace" font-weight="700">CONTRACT SUB-CA</text>
+    <rect x="280" y="112" width="200" height="52" rx="8" fill="#0d2137" stroke="#22c55e" stroke-opacity="0.6"/>
+    <text x="380" y="132" text-anchor="middle" font-size="9" fill="#22c55e" font-family="monospace" font-weight="700">CONTRACT SUB-CA</text>
     <text x="380" y="147" text-anchor="middle" font-size="8" fill="#3d5870">ISO 15118 Plug &amp; Charge</text>
     <text x="380" y="158" text-anchor="middle" font-size="7" fill="#2d4a63">2048-bit RSA · 5yr</text>
 
@@ -49,24 +49,24 @@
     <line x1="230" y1="164" x2="270" y2="212" stroke="#1a3a5c" stroke-width="1"/>
 
     <rect x="30"  y="212" width="130" height="44" rx="6" fill="#0a1e30" stroke="#1a3a5c"/>
-    <text x="95"  y="230" text-anchor="middle" font-size="8" fill="#00B0E4">Charger SECC Cert</text>
+    <text x="95"  y="230" text-anchor="middle" font-size="8" fill="#3b82f6">Charger SECC Cert</text>
     <text x="95"  y="243" text-anchor="middle" font-size="7" fill="#3d5870">1 per charger</text>
     <text x="95"  y="253" text-anchor="middle" font-size="7" fill="#2d4a63">TLS identity</text>
 
     <rect x="130" y="212" width="130" height="44" rx="6" fill="#0a1e30" stroke="#1a3a5c"/>
-    <text x="195" y="230" text-anchor="middle" font-size="8" fill="#00B0E4">Charger OCPP Cert</text>
+    <text x="195" y="230" text-anchor="middle" font-size="8" fill="#3b82f6">Charger OCPP Cert</text>
     <text x="195" y="243" text-anchor="middle" font-size="7" fill="#3d5870">1.6j Security Profile 3</text>
     <text x="195" y="253" text-anchor="middle" font-size="7" fill="#2d4a63">OCPP mTLS</text>
 
     <rect x="230" y="212" width="130" height="44" rx="6" fill="#0a1e30" stroke="#1a3a5c"/>
-    <text x="295" y="230" text-anchor="middle" font-size="8" fill="#84BD00">Contract Cert</text>
+    <text x="295" y="230" text-anchor="middle" font-size="8" fill="#22c55e">Contract Cert</text>
     <text x="295" y="243" text-anchor="middle" font-size="7" fill="#3d5870">1 per EV driver</text>
     <text x="295" y="253" text-anchor="middle" font-size="7" fill="#2d4a63">Plug &amp; Charge auth</text>
 
     <!-- Contract → more -->
     <line x1="380" y1="164" x2="380" y2="212" stroke="#1a3a5c" stroke-width="1"/>
     <rect x="330" y="212" width="100" height="44" rx="6" fill="#0a1e30" stroke="#1a3a5c"/>
-    <text x="380" y="230" text-anchor="middle" font-size="8" fill="#84BD00">Fleet Contracts</text>
+    <text x="380" y="230" text-anchor="middle" font-size="8" fill="#22c55e">Fleet Contracts</text>
     <text x="380" y="243" text-anchor="middle" font-size="7" fill="#3d5870">bulk issuance</text>
     <text x="380" y="253" text-anchor="middle" font-size="7" fill="#2d4a63">by group</text>
 
@@ -85,7 +85,7 @@
     <text x="655" y="253" text-anchor="middle" font-size="7" fill="#2d4a63">service-to-service</text>
 
     <!-- Legend -->
-    <rect x="10" y="288" width="10" height="10" rx="2" fill="#84BD00" opacity="0.7"/>
+    <rect x="10" y="288" width="10" height="10" rx="2" fill="#22c55e" opacity="0.7"/>
     <text x="25" y="297" font-size="7" fill="#3d5870">Issued by OpenCPO CA — no external dependency</text>
     <rect x="280" y="288" width="10" height="10" rx="2" fill="#1a3a5c"/>
     <text x="295" y="297" font-size="7" fill="#3d5870">Trust chain verified on every connection</text>
@@ -131,7 +131,7 @@
   <span class="docs-section-num">06</span>
   ISO 15118 — Plug &amp; Charge
   <span class="docs-badge docs-badge-green">ISO 15118-2</span>
-  <span class="docs-badge" style="background:rgba(132,189,0,0.1);color:#84BD00;border-color:#84BD00;">Advanced</span>
+  <span class="docs-badge docs-badge-green">Advanced</span>
 </summary>
 <div class="docs-section-body">
 
@@ -145,12 +145,12 @@
   <svg viewBox="0 0 700 440" style="width:100%;display:block;max-width:700px;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="seqarr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#2d5a8a"/></marker>
-      <marker id="seqarr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#84BD00"/></marker>
+      <marker id="seqarr-g" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#22c55e"/></marker>
     </defs>
 
     <!-- Column headers -->
-    <text x="80"  y="22" text-anchor="middle" font-size="9" fill="#84BD00" font-family="monospace" font-weight="700">VEHICLE (EV)</text>
-    <text x="350" y="22" text-anchor="middle" font-size="9" fill="#00B0E4" font-family="monospace" font-weight="700">CHARGER (SECC)</text>
+    <text x="80"  y="22" text-anchor="middle" font-size="9" fill="#22c55e" font-family="monospace" font-weight="700">VEHICLE (EV)</text>
+    <text x="350" y="22" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="monospace" font-weight="700">CHARGER (SECC)</text>
     <text x="620" y="22" text-anchor="middle" font-size="9" fill="#c0cdd8" font-family="monospace" font-weight="700">OPENCPO (CSMS)</text>
 
     <!-- Lifelines -->
@@ -161,51 +161,51 @@
     <!-- Step 1 -->
     <rect x="10" y="36" width="700" height="18" rx="3" fill="#0a1628" opacity="0.5"/>
     <text x="355" y="49" text-anchor="middle" font-size="8" fill="#3d5870">① Driver plugs in — IEC 61851 / SAE J1772 pilot signal exchange</text>
-    <line x1="80" y1="60" x2="340" y2="60" stroke="#84BD00" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="57" text-anchor="middle" font-size="8" fill="#84BD00">Physical connection + pilot</text>
+    <line x1="80" y1="60" x2="340" y2="60" stroke="#22c55e" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="57" text-anchor="middle" font-size="8" fill="#22c55e">Physical connection + pilot</text>
 
     <!-- Step 2 -->
     <line x1="350" y1="80" x2="90"  y2="80" stroke="#2d5a8a" stroke-width="1.5" marker-end="url(#seqarr)"/>
     <text x="210" y="76" text-anchor="middle" font-size="8" fill="#3d5870">SupportedAppProtocol (ISO 15118-2)</text>
 
     <!-- Step 3 -->
-    <line x1="80"  y1="100" x2="340" y2="100" stroke="#84BD00" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="96" text-anchor="middle" font-size="8" fill="#84BD00">SupportedAppProtocolRes (Accepted)</text>
+    <line x1="80"  y1="100" x2="340" y2="100" stroke="#22c55e" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="96" text-anchor="middle" font-size="8" fill="#22c55e">SupportedAppProtocolRes (Accepted)</text>
 
     <!-- Step 4 -->
     <rect x="10" y="112" width="700" height="16" rx="3" fill="#071828" opacity="0.6"/>
     <text x="355" y="124" text-anchor="middle" font-size="8" fill="#3d5870">② TLS handshake — charger presents SECC certificate</text>
-    <line x1="350" y1="136" x2="90"  y2="136" stroke="#00B0E4" stroke-width="1.5" marker-end="url(#seqarr)"/>
-    <text x="210" y="132" text-anchor="middle" font-size="8" fill="#00B0E4">TLS ServerHello + SECC Cert</text>
+    <line x1="350" y1="136" x2="90"  y2="136" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#seqarr)"/>
+    <text x="210" y="132" text-anchor="middle" font-size="8" fill="#3b82f6">TLS ServerHello + SECC Cert</text>
 
-    <line x1="80"  y1="155" x2="340" y2="155" stroke="#84BD00" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="151" text-anchor="middle" font-size="8" fill="#84BD00">TLS ClientHello — verify SECC cert chain</text>
+    <line x1="80"  y1="155" x2="340" y2="155" stroke="#22c55e" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="151" text-anchor="middle" font-size="8" fill="#22c55e">TLS ClientHello — verify SECC cert chain</text>
 
     <!-- Step 5 -->
     <rect x="10" y="168" width="700" height="16" rx="3" fill="#071828" opacity="0.6"/>
     <text x="355" y="180" text-anchor="middle" font-size="8" fill="#3d5870">③ Contract certificate exchange — no RFID needed</text>
-    <line x1="80"  y1="192" x2="340" y2="192" stroke="#84BD00" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="188" text-anchor="middle" font-size="8" fill="#84BD00">PaymentServiceSelection (Contract)</text>
+    <line x1="80"  y1="192" x2="340" y2="192" stroke="#22c55e" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="188" text-anchor="middle" font-size="8" fill="#22c55e">PaymentServiceSelection (Contract)</text>
 
-    <line x1="80"  y1="212" x2="340" y2="212" stroke="#84BD00" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="208" text-anchor="middle" font-size="8" fill="#84BD00">ContractAuthenticationReq (cert chain)</text>
+    <line x1="80"  y1="212" x2="340" y2="212" stroke="#22c55e" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="208" text-anchor="middle" font-size="8" fill="#22c55e">ContractAuthenticationReq (cert chain)</text>
 
     <!-- Step 6: Charger → CSMS -->
     <line x1="360" y1="232" x2="610" y2="232" stroke="#2d5a8a" stroke-width="1.5" marker-end="url(#seqarr)"/>
     <text x="490" y="228" text-anchor="middle" font-size="8" fill="#3d5870">OCPP: Authorize (eMAID from cert)</text>
 
     <line x1="610" y1="252" x2="360" y2="252" stroke="#2d5a8a" stroke-width="1.5" marker-end="url(#seqarr)"/>
-    <text x="490" y="248" text-anchor="middle" font-size="8" fill="#84BD00">OCPP: AuthorizeResponse (Accepted)</text>
+    <text x="490" y="248" text-anchor="middle" font-size="8" fill="#22c55e">OCPP: AuthorizeResponse (Accepted)</text>
 
     <!-- Step 7 -->
-    <line x1="350" y1="272" x2="90"  y2="272" stroke="#00B0E4" stroke-width="1.5" marker-end="url(#seqarr)"/>
-    <text x="210" y="268" text-anchor="middle" font-size="8" fill="#00B0E4">AuthorizationRes (Accepted)</text>
+    <line x1="350" y1="272" x2="90"  y2="272" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#seqarr)"/>
+    <text x="210" y="268" text-anchor="middle" font-size="8" fill="#3b82f6">AuthorizationRes (Accepted)</text>
 
     <!-- Step 8 -->
     <rect x="10" y="284" width="700" height="16" rx="3" fill="#071828" opacity="0.6"/>
     <text x="355" y="296" text-anchor="middle" font-size="8" fill="#3d5870">④ Power delivery — charging starts automatically</text>
-    <line x1="80"  y1="308" x2="340" y2="308" stroke="#84BD00" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="304" text-anchor="middle" font-size="8" fill="#84BD00">PowerDeliveryReq (ChargeProgress: Start)</text>
+    <line x1="80"  y1="308" x2="340" y2="308" stroke="#22c55e" stroke-width="1.5" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="304" text-anchor="middle" font-size="8" fill="#22c55e">PowerDeliveryReq (ChargeProgress: Start)</text>
 
     <line x1="360" y1="328" x2="610" y2="328" stroke="#2d5a8a" stroke-width="1.5" marker-end="url(#seqarr)"/>
     <text x="490" y="324" text-anchor="middle" font-size="8" fill="#3d5870">OCPP: StartTransaction</text>
@@ -215,8 +215,8 @@
     <text x="355" y="360" text-anchor="middle" font-size="8" fill="#3d5870">⑤ Session in progress — MeterValues via OCPP, ChargingStatus via ISO 15118</text>
 
     <!-- Step 10: end -->
-    <line x1="80"  y1="380" x2="340" y2="380" stroke="#84BD00" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#seqarr-g)"/>
-    <text x="210" y="376" text-anchor="middle" font-size="8" fill="#84BD00">PowerDeliveryReq (Stop) / cable unplug</text>
+    <line x1="80"  y1="380" x2="340" y2="380" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#seqarr-g)"/>
+    <text x="210" y="376" text-anchor="middle" font-size="8" fill="#22c55e">PowerDeliveryReq (Stop) / cable unplug</text>
     <line x1="360" y1="400" x2="610" y2="400" stroke="#2d5a8a" stroke-width="1.5" marker-end="url(#seqarr)"/>
     <text x="490" y="396" text-anchor="middle" font-size="8" fill="#3d5870">OCPP: StopTransaction + CDR</text>
     <text x="355" y="425" text-anchor="middle" font-size="7" fill="#2d4a63">Total elapsed: typically 3–8 seconds from plug-in to current flow</text>

@@ -1,14 +1,14 @@
 {% extends "base.html" %}
-{% block title %}Features{% endblock %}
+{% block title %}Features — CPO Admin{% endblock %}
 
 {% block content %}
-<div class="mb-6 flex items-center justify-between flex-wrap gap-4">
+<div class="mb-6 flex flex-wrap items-center justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-bold text-gray-100 flex items-center gap-2"><i data-lucide="sliders" class="w-6 h-6 text-blue-500"></i> Feature Flags</h1>
-        <p class="text-gray-500 text-sm mt-1">
-            <span class="text-brand-green font-semibold">{{ active_count }}</span>
+        <h1 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="sliders" class="w-6 h-6 text-brand-500"></i> Feature Flags</h1>
+        <p class="text-subtext-color text-xs mt-1">
+            <span class="text-success-600 font-semibold font-mono">{{ active_count }}</span>
             of
-            <span class="font-semibold">{{ total }}</span>
+            <span class="font-semibold font-mono text-default-font">{{ total }}</span>
             features active
         </p>
     </div>
@@ -17,28 +17,28 @@
         <input
             id="feature-search"
             type="text"
-            placeholder="Search feature…"
+            placeholder="Search features…"
             oninput="filterFlags(this.value)"
-            class="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-brand-green w-64">
-        <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 top-3 text-gray-500 pointer-events-none"></i>
+            class="input w-64 text-sm">
+        <i data-lucide="search" class="w-3.5 h-3.5 absolute right-3 top-3 text-subtext-color pointer-events-none"></i>
     </div>
 </div>
 
 {% if enabled_flags %}
-<div class="mb-2">
-    <h2 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3 px-1 flex items-center gap-1.5">
-        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-500"></i>
+<div class="mb-6">
+    <h2 class="text-xs uppercase tracking-widest text-subtext-color font-semibold mb-3 px-1 flex items-center gap-1.5">
+        <i data-lucide="check-circle" class="w-3.5 h-3.5 text-success-500"></i>
         <span>Active ({{ enabled_flags|length }})</span>
     </h2>
-    <div id="grid-enabled" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mb-6">
+    <div id="grid-enabled" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {% for flag in enabled_flags %}
-        <div id="flag-{{ flag.key }}" class="relative rounded-xl border-l-4 border-l-green-500 bg-gray-900 border border-gray-800 p-4 flex flex-col gap-2 transition-all">
+        <div id="flag-{{ flag.key }}" class="relative card rounded-xl border-l-4 border-l-success-500 p-4 flex flex-col gap-2 transition-all">
             <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-gray-100 text-sm">{{ flag.label }}</div>
-                    <div class="font-mono text-xs text-gray-500 mt-0.5">{{ flag.key }}</div>
+                    <div class="font-semibold text-default-font text-sm">{{ flag.label }}</div>
+                    <div class="font-mono text-xs text-subtext-color mt-0.5">{{ flag.key }}</div>
                     {% if flag.description %}
-                    <div class="text-xs text-gray-400 mt-1">{{ flag.description }}</div>
+                    <div class="text-xs text-subtext-color mt-1">{{ flag.description }}</div>
                     {% endif %}
                 </div>
                 <button
@@ -48,12 +48,12 @@
                     class="flex-shrink-0 mt-0.5 focus:outline-none"
                     title="Toggle {{ flag.label }}">
                     <div class="relative inline-flex items-center cursor-pointer">
-                        <div class="w-10 h-5 rounded-full bg-brand-green transition-colors"></div>
+                        <div class="w-10 h-5 rounded-full bg-brand-secondary transition-colors"></div>
                         <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transform transition-transform translate-x-5"></div>
                     </div>
                 </button>
             </div>
-            <div class="text-xs text-green-400 font-medium">Active</div>
+            <div class="text-xs text-success-600 font-medium">Active</div>
         </div>
         {% endfor %}
     </div>
@@ -61,19 +61,19 @@
 {% endif %}
 
 {% if disabled_flags %}
-<div class="mb-2">
-    <h2 class="text-xs uppercase tracking-widest text-gray-500 font-semibold mb-3 px-1">
-        ⏸ Available ({{ disabled_flags|length }})
+<div class="mb-6">
+    <h2 class="text-xs uppercase tracking-widest text-subtext-color font-semibold mb-3 px-1">
+        Available ({{ disabled_flags|length }})
     </h2>
     <div id="grid-disabled" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {% for flag in disabled_flags %}
-        <div id="flag-{{ flag.key }}" class="relative rounded-xl border-l-4 border-l-gray-600 bg-gray-900/60 border border-gray-800 p-4 flex flex-col gap-2 transition-all">
+        <div id="flag-{{ flag.key }}" class="relative card rounded-xl border-l-4 border-l-neutral-400 p-4 flex flex-col gap-2 transition-all opacity-85">
             <div class="flex items-start justify-between gap-3">
                 <div class="flex-1 min-w-0">
-                    <div class="font-semibold text-gray-100 text-sm">{{ flag.label }}</div>
-                    <div class="font-mono text-xs text-gray-500 mt-0.5">{{ flag.key }}</div>
+                    <div class="font-semibold text-default-font text-sm">{{ flag.label }}</div>
+                    <div class="font-mono text-xs text-subtext-color mt-0.5">{{ flag.key }}</div>
                     {% if flag.description %}
-                    <div class="text-xs text-gray-400 mt-1">{{ flag.description }}</div>
+                    <div class="text-xs text-subtext-color mt-1">{{ flag.description }}</div>
                     {% endif %}
                 </div>
                 <button
@@ -83,12 +83,12 @@
                     class="flex-shrink-0 mt-0.5 focus:outline-none"
                     title="Toggle {{ flag.label }}">
                     <div class="relative inline-flex items-center cursor-pointer">
-                        <div class="w-10 h-5 rounded-full bg-gray-700 transition-colors"></div>
+                        <div class="w-10 h-5 rounded-full bg-neutral-300 dark:bg-neutral-700 transition-colors"></div>
                         <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow transform transition-transform translate-x-0"></div>
                     </div>
                 </button>
             </div>
-            <div class="text-xs text-gray-500 font-medium">Disabled</div>
+            <div class="text-xs text-subtext-color font-medium">Disabled</div>
         </div>
         {% endfor %}
     </div>
@@ -96,9 +96,9 @@
 {% endif %}
 
 {% if not enabled_flags and not disabled_flags %}
-<div class="text-center py-20 text-gray-600">
-    <div class="mb-4 flex justify-center text-slate-500"><i data-lucide="sliders" class="w-10 h-10"></i></div>
-    <div class="text-lg font-semibold">No feature flags found</div>
+<div class="text-center py-20 text-subtext-color card">
+    <div class="mb-4 flex justify-center text-subtext-color"><i data-lucide="sliders" class="w-10 h-10"></i></div>
+    <div class="text-lg font-semibold text-default-font">No feature flags found</div>
     <div class="text-sm mt-1">Add flags via the Core API or database.</div>
 </div>
 {% endif %}

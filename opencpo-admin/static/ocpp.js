@@ -292,12 +292,14 @@ function togglePause() {
   const btn = document.getElementById('btn-pause');
   if (paused) {
     btn.textContent = 'Resume (0)';
-    btn.style.color = '#eab308';
-    btn.style.borderColor = '#78350f';
+    btn.style.color = '#b45309';
+    btn.style.borderColor = '#f59e0b';
+    btn.style.background = '#fef3c7';
   } else {
     btn.textContent = 'Pause';
-    btn.style.color = '#c0cdd8';
-    btn.style.borderColor = '#1e3450';
+    btn.style.color = '#334155';
+    btn.style.borderColor = '#cbd5e1';
+    btn.style.background = '#f8fafc';
     pendingMessages.forEach(e => {
       if (passesFilter(e)) {
         filteredMessages.push(e);
@@ -392,11 +394,11 @@ function connectSSE() {
   const statusEl = document.getElementById('conn-status');
   sseSource.onopen = () => {
     statusEl.textContent = '● Connected';
-    statusEl.style.color = '#84BD00';
+    statusEl.style.color = '#16a34a';
   };
   sseSource.onerror = () => {
     statusEl.textContent = '● Disconnected';
-    statusEl.style.color = '#ef4444';
+    statusEl.style.color = '#dc2626';
     sseSource.close();
     setTimeout(connectSSE, 4000);
   };

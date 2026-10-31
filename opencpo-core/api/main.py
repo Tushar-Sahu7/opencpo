@@ -96,6 +96,7 @@ from api.pricing import router as pricing_router
 from api.cert_setup import router as cert_setup_router
 from api.settings import router as settings_router
 from api.ocpi_management import router as ocpi_mgmt_router
+from ocpi.main import router as ocpi_roaming_router
 from api.network import router as network_router
 from api.api_key_auth import management_auth
 from api.admin_auth import router as admin_auth_router
@@ -144,3 +145,6 @@ app.include_router(pricing_router)
 
 # Cert setup — driver certificate install wizard (public for driver-facing flows)
 app.include_router(cert_setup_router)
+
+# ── OCPI 2.2.1 Roaming Endpoints (for external eMSP / roaming partners) ──
+app.include_router(ocpi_roaming_router)

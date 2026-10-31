@@ -1,27 +1,28 @@
 <!-- ═══ Row 5: Actionable Exception Queue ════════════════════════════════ -->
-<div class="dashboard-panel p-4 mb-4">
+<div class="card p-4 mb-4">
     <!-- Header with Alert Badge & Filter Controls -->
     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
         <div>
             <div class="flex items-center gap-2">
-                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-500 inline-block"></i>
-                <h2 class="text-xs font-bold text-slate-800">Actionable Exception Queue</h2>
-                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full {% if exception_count > 0 %}bg-red-50 text-red-700 border border-red-200{% else %}bg-emerald-50 text-emerald-700 border border-emerald-200{% endif %}">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-error-500 inline-block"></i>
+                <h2 class="text-caption-bold text-default-font">Actionable Exception Queue</h2>
+                <span
+                    class="badge {% if exception_count > 0 %}badge-error{% else %}badge-success{% endif %} text-[9px] font-bold">
                     {% if exception_count > 0 %}{{ exception_count }} ITEMS NEED ATTENTION{% else %}ALL SYSTEMS HEALTHY{% endif %}
                 </span>
             </div>
-            <p class="text-[10px] text-gray-500 mt-0.5">Live anomalies detected in hardware interlocks, heartbeat drops, and expiring certificates</p>
+            <p class="text-[10px] text-subtext-color mt-0.5">Live anomalies detected in hardware interlocks, heartbeat drops, and expiring certificates</p>
         </div>
 
         <div class="flex flex-wrap items-center gap-2">
             <!-- Triage Tabs -->
-            <div class="h-8 flex items-center bg-slate-50 border border-slate-200 rounded-md p-0.5">
+            <div id="exception-triage-tabs" class="h-8 flex items-center bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-md p-0.5">
                 <button type="button" onclick="setExceptionTab('unresolved')" id="tab-exc-unresolved"
-                        class="h-7 px-2.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                    class="h-7 px-2.5 rounded text-[11px] tab-btn-active">
                     Unresolved ({{ exception_count }})
                 </button>
                 <button type="button" onclick="setExceptionTab('acknowledged')" id="tab-exc-acknowledged"
-                        class="h-7 px-2.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-700">
+                    class="h-7 px-2.5 rounded text-[11px] tab-btn-inactive">
                     Acknowledged (0)
                 </button>
             </div>
@@ -29,124 +30,125 @@
             <!-- Severity Dropdown -->
             <div class="relative inline-flex items-center">
                 <select id="exception-severity-filter" onchange="filterExceptionsTable()"
-                        class="filter-select min-w-[130px] appearance-none">
+                    class="select text-caption h-8 py-0 pl-2.5 pr-8 min-w-[130px]">
                     <option value="ALL">All Severities</option>
                     <option value="CRITICAL">🔴 CRITICAL</option>
                     <option value="WARNING">🟡 WARNING</option>
                 </select>
-                <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
             </div>
 
             <!-- Live Search -->
             <div class="relative inline-flex items-center">
+                <i data-lucide="search"
+                    class="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none z-10"></i>
                 <input type="text" id="exception-search" onkeyup="filterExceptionsTable()"
-                       placeholder="Search asset, site, error..."
-                       class="h-8 bg-white border border-slate-300 rounded-md pl-8 pr-3 text-xs text-slate-700 placeholder-slate-400 outline-none w-52 focus:border-blue-500 transition shadow-sm">
-                <i data-lucide="search" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    placeholder="Search asset, site, error..."
+                    class="input text-caption h-8 pl-9 pr-3 w-64">
             </div>
 
             <!-- Export Incident Bundle (.JSON) -->
-            <a href="/api/dashboard/export-exceptions" download class="h-8 px-3 rounded-md bg-white border border-slate-300 hover:border-slate-400 text-slate-700 text-xs font-semibold inline-flex items-center gap-1.5 transition no-underline shadow-sm" title="Download real-incident-bundle.json">
+            <a href="/api/dashboard/export-exceptions" download
+                id="btn-export-exceptions"
+                class="btn-outline h-8 px-3 text-caption font-semibold inline-flex items-center gap-1.5 no-underline"
+                title="Download real-incident-bundle.json">
                 <i data-lucide="download" class="w-3.5 h-3.5 inline-block"></i>
                 <span>Export JSON</span>
             </a>
 
             <!-- Acknowledge All Action -->
-            <button hx-post="/action/dashboard/acknowledge-all"
-                    hx-target="#toast-container"
-                    hx-swap="beforeend"
-                    class="h-8 px-3 rounded-md bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-800 font-semibold text-xs transition inline-flex items-center shadow-sm">
+            <button hx-post="/action/dashboard/acknowledge-all" hx-target="#toast-container" hx-swap="beforeend"
+                id="btn-ack-all-exceptions"
+                class="btn-primary h-8 px-3 font-semibold text-caption inline-flex items-center">
                 Acknowledge All
             </button>
         </div>
     </div>
 
     <!-- Table of Exceptions -->
-    <div class="overflow-x-auto rounded border border-slate-200">
-        <table class="exception-table" id="exceptions-table">
+    <div class="overflow-x-auto rounded border border-neutral-border">
+        <table class="exception-table w-full" id="exceptions-table">
             <thead>
-                <tr>
-                    <th style="width: 110px;">Severity</th>
-                    <th style="width: 160px;">Asset Identifier</th>
-                    <th>Site Location</th>
-                    <th>Detected Anomaly &amp; Diagnostic</th>
-                    <th style="width: 170px;">Observed Timestamp</th>
-                    <th style="width: 90px;">Freshness</th>
-                    <th style="width: 240px;" class="text-right">Quick Remediation Action</th>
+                <tr class="bg-neutral-50 dark:bg-neutral-800/30 border-b border-neutral-border text-subtext-color text-[10px] font-semibold uppercase tracking-wider">
+                    <th class="py-2.5 px-3 text-left" style="width: 110px;">Severity</th>
+                    <th class="py-2.5 px-3 text-left" style="width: 160px;">Asset Identifier</th>
+                    <th class="py-2.5 px-3 text-left">Site Location</th>
+                    <th class="py-2.5 px-3 text-left">Detected Anomaly &amp; Diagnostic</th>
+                    <th class="py-2.5 px-3 text-left" style="width: 170px;">Observed Timestamp</th>
+                    <th class="py-2.5 px-3 text-left" style="width: 90px;">Freshness</th>
+                    <th class="py-2.5 px-3 text-right" style="width: 240px;">Quick Remediation Action</th>
                 </tr>
             </thead>
-            <tbody id="exceptions-tbody">
+            <tbody id="exceptions-tbody" class="divide-y divide-neutral-border">
                 {% for item in exceptions %}
-                <tr class="exception-row" data-severity="{{ item.severity }}" data-asset="{{ item.asset|lower }}" data-site="{{ item.site|lower }}" data-anomaly="{{ item.anomaly|lower }}">
+                <tr class="exception-row hover:bg-neutral-50 dark:hover:bg-neutral-800/40 transition-colors" data-severity="{{ item.severity }}" data-asset="{{ item.asset|lower }}"
+                    data-site="{{ item.site|lower }}" data-anomaly="{{ item.anomaly|lower }}">
                     <!-- Severity -->
-                    <td>
+                    <td class="py-2.5 px-3">
                         {% if item.severity == 'CRITICAL' %}
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-ping"></span> CRITICAL
+                        <span class="badge badge-error text-[10px] font-bold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-error-500 animate-ping"></span> CRITICAL
                         </span>
                         {% else %}
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> WARNING
+                        <span class="badge badge-warning text-[10px] font-bold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-warning-500"></span> WARNING
                         </span>
                         {% endif %}
                     </td>
 
                     <!-- Asset Identifier -->
-                    <td>
-                        <div class="flex items-center gap-1.5 font-mono text-blue-600 font-semibold text-xs">
-                            <i data-lucide="zap" class="w-3.5 h-3.5 text-blue-600 inline-block"></i>
+                    <td class="py-2.5 px-3">
+                        <div class="flex items-center gap-1.5 font-mono text-brand-600 font-semibold text-xs">
+                            <i data-lucide="zap" class="w-3.5 h-3.5 text-brand-600 inline-block"></i>
                             <span>{{ item.asset }}</span>
                         </div>
                     </td>
 
                     <!-- Site Location -->
-                    <td>
-                        <div class="text-slate-800 font-medium">{{ item.site }}</div>
+                    <td class="py-2.5 px-3">
+                        <div class="text-default-font font-medium text-caption">{{ item.site }}</div>
                     </td>
 
                     <!-- Detected Anomaly & Diagnostic -->
-                    <td>
-                        <div class="text-slate-800 font-semibold text-[11px]">{{ item.anomaly }}</div>
-                        <div class="text-[10px] text-slate-500">{{ item.detail }}</div>
+                    <td class="py-2.5 px-3">
+                        <div class="text-default-font font-semibold text-caption">{{ item.anomaly }}</div>
+                        <div class="text-[10px] text-subtext-color">{{ item.detail }}</div>
                     </td>
 
                     <!-- Observed Timestamp -->
-                    <td class="font-mono text-[10.5px]">
-                        <div class="text-slate-700">{{ item.timestamp }}</div>
+                    <td class="py-2.5 px-3 font-mono text-[10.5px]">
+                        <div class="text-subtext-color">{{ item.timestamp|format_datetime(default='Never') }}</div>
                     </td>
 
                     <!-- Freshness -->
-                    <td>
+                    <td class="py-2.5 px-3">
                         {% if item.freshness == 'Stale' %}
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Stale</span>
+                        <span class="badge badge-warning text-[10px]">Stale</span>
                         {% elif item.freshness == 'Fresh' %}
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">Fresh</span>
+                        <span class="badge badge-brand text-[10px]">Fresh</span>
                         {% else %}
-                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">Valid</span>
+                        <span class="badge badge-neutral text-[10px]">Valid</span>
                         {% endif %}
                     </td>
 
                     <!-- Quick Remediation Action -->
-                    <td class="text-right">
+                    <td class="py-2.5 px-3 text-right">
                         <div class="inline-flex items-center gap-1.5 justify-end">
                             {% for act in item.actions %}
-                                <button hx-post="{{ act.url }}"
-                                        hx-target="#toast-container"
-                                        hx-swap="beforeend"
-                                        class="action-btn {% if act.type == 'danger' %}action-btn-danger{% elif act.type == 'accent' %}action-btn-accent{% endif %}">
-                                    {% if act.icon == '📶' %}
-                                        <i data-lucide="radio" class="w-3 h-3 inline-block"></i>
-                                    {% elif act.icon == '🔄' or act.icon == '↻' %}
-                                        <i data-lucide="rotate-ccw" class="w-3 h-3 inline-block"></i>
-                                    {% elif act.icon == '🔓' %}
-                                        <i data-lucide="unlock" class="w-3 h-3 inline-block"></i>
-                                    {% elif act.icon == '👁️' %}
-                                        <i data-lucide="eye" class="w-3 h-3 inline-block"></i>
-                                    {% else %}
-                                        <span>{{ act.icon }}</span>
-                                    {% endif %}
-                                    <span>{{ act.label }}</span>
-                                </button>
+                            <button hx-post="{{ act.url }}" hx-target="#toast-container" hx-swap="beforeend"
+                                class="action-btn {% if act.type == 'danger' %}action-btn-danger{% elif act.type == 'accent' %}action-btn-accent{% endif %}">
+                                {% if act.icon == '📶' %}
+                                <i data-lucide="radio" class="w-3 h-3 inline-block"></i>
+                                {% elif act.icon == '🔄' or act.icon == '↻' %}
+                                <i data-lucide="rotate-ccw" class="w-3 h-3 inline-block"></i>
+                                {% elif act.icon == '🔓' %}
+                                <i data-lucide="unlock" class="w-3 h-3 inline-block"></i>
+                                {% elif act.icon == '👁️' %}
+                                <i data-lucide="eye" class="w-3 h-3 inline-block"></i>
+                                {% else %}
+                                <span>{{ act.icon }}</span>
+                                {% endif %}
+                                <span>{{ act.label }}</span>
+                            </button>
                             {% endfor %}
                         </div>
                     </td>
@@ -154,12 +156,12 @@
                 {% endfor %}
                 {% if not exceptions %}
                 <tr id="no-exceptions-row">
-                    <td colspan="7" class="p-6 text-center text-slate-500">
-                        <div class="flex items-center justify-center gap-2 text-emerald-700 text-xs font-semibold">
-                            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 inline-block"></i>
+                    <td colspan="7" class="p-6 text-center text-subtext-color">
+                        <div class="flex items-center justify-center gap-2 text-success-600 dark:text-success-400 text-caption font-semibold">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-success-500 inline-block"></i>
                             <span>No anomalies detected. All physical chargers and certificate chains operational.</span>
                         </div>
-                        <div class="text-[10px] text-slate-500 mt-1">To test exception alerts, click <strong>"Inject Fault"</strong> in the toolbar above.</div>
+                        <div class="text-[10px] text-subtext-color mt-1">To test exception alerts, click <strong>"Inject Fault"</strong> in the toolbar above.</div>
                     </td>
                 </tr>
                 {% endif %}

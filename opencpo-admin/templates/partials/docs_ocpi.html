@@ -16,12 +16,12 @@
   <svg viewBox="0 0 820 280" style="width:100%;display:block;max-width:820px;margin:0 auto;" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <marker id="arr2" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#2d5a8a"/></marker>
-      <marker id="arr2b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#84BD00"/></marker>
+      <marker id="arr2b" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#22c55e"/></marker>
     </defs>
 
     <!-- Your CPO -->
-    <rect x="10" y="60" width="190" height="160" rx="10" fill="#071828" stroke="#84BD00" stroke-opacity="0.5"/>
-    <text x="105" y="82" text-anchor="middle" font-size="9" fill="#84BD00" font-family="monospace" font-weight="700">YOUR CPO</text>
+    <rect x="10" y="60" width="190" height="160" rx="10" fill="#071828" stroke="#22c55e" stroke-opacity="0.5"/>
+    <text x="105" y="82" text-anchor="middle" font-size="9" fill="#22c55e" font-family="monospace" font-weight="700">YOUR CPO</text>
     <rect x="24" y="92"  width="162" height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="105" y="107" text-anchor="middle" font-size="8" fill="#c0cdd8">OpenCPO Backend</text>
     <rect x="24" y="120" width="162" height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
@@ -39,8 +39,8 @@
     <text x="256" y="160" text-anchor="middle" font-size="7" fill="#2d4a63">HTTPS/REST</text>
 
     <!-- eMSP -->
-    <rect x="312" y="60" width="190" height="160" rx="10" fill="#071828" stroke="#00B0E4" stroke-opacity="0.5"/>
-    <text x="407" y="82" text-anchor="middle" font-size="9" fill="#00B0E4" font-family="monospace" font-weight="700">eMSP PARTNER</text>
+    <rect x="312" y="60" width="190" height="160" rx="10" fill="#071828" stroke="#3b82f6" stroke-opacity="0.5"/>
+    <text x="407" y="82" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="monospace" font-weight="700">eMSP PARTNER</text>
     <rect x="326" y="92"  width="162" height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="407" y="107" text-anchor="middle" font-size="8" fill="#c0cdd8">Shell Recharge / Fastned</text>
     <rect x="326" y="120" width="162" height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
@@ -53,7 +53,7 @@
     <!-- eMSP → Driver App -->
     <line x1="503" y1="130" x2="580" y2="100" stroke="#2d5a8a" stroke-width="1.5" marker-end="url(#arr2)"/>
     <rect x="582" y="60" width="130" height="80" rx="8" fill="#0d2137" stroke="#1a3a5c"/>
-    <text x="647" y="82" text-anchor="middle" font-size="8" fill="#00B0E4" font-weight="600">Driver App</text>
+    <text x="647" y="82" text-anchor="middle" font-size="8" fill="#3b82f6" font-weight="600">Driver App</text>
     <text x="647" y="96" text-anchor="middle" font-size="7" fill="#3d5870">Shell Recharge app</text>
     <text x="647" y="108" text-anchor="middle" font-size="7" fill="#3d5870">sees your charger</text>
     <text x="647" y="120" text-anchor="middle" font-size="7" fill="#3d5870">starts session via RFID</text>
@@ -61,15 +61,15 @@
     <!-- Your chargers -->
     <line x1="105" y1="221" x2="105" y2="258" stroke="#1a3a5c" stroke-width="1.5" marker-end="url(#arr2)"/>
     <rect x="30" y="260" width="150" height="28" rx="6" fill="#0d2137" stroke="#1a3a5c"/>
-    <text x="105" y="275" text-anchor="middle" font-size="8" fill="#84BD00">Physical Chargers (OCPP)</text>
+    <text x="105" y="275" text-anchor="middle" font-size="8" fill="#22c55e">Physical Chargers (OCPP)</text>
 
     <!-- Credentials flow -->
     <rect x="582" y="170" width="230" height="90" rx="8" fill="#071828" stroke="#1a3a5c"/>
-    <text x="697" y="190" text-anchor="middle" font-size="8" fill="#84BD00" font-weight="600">CREDENTIAL HANDSHAKE</text>
+    <text x="697" y="190" text-anchor="middle" font-size="8" fill="#22c55e" font-weight="600">CREDENTIAL HANDSHAKE</text>
     <text x="697" y="205" text-anchor="middle" font-size="7" fill="#3d5870">1. GET /ocpi/versions</text>
     <text x="697" y="217" text-anchor="middle" font-size="7" fill="#3d5870">2. GET /ocpi/2.2.1/details</text>
     <text x="697" y="229" text-anchor="middle" font-size="7" fill="#3d5870">3. POST /ocpi/2.2.1/credentials</text>
-    <text x="697" y="241" text-anchor="middle" font-size="7" fill="#84BD00">4. Exchange tokens — live</text>
+    <text x="697" y="241" text-anchor="middle" font-size="7" fill="#22c55e">4. Exchange tokens — live</text>
   </svg>
 </div>
 
@@ -94,12 +94,12 @@
 <h3 class="docs-h3">Push vs Pull — How Data Flows</h3>
 <p>OCPI supports two synchronization modes. In practice, most deployments use push for performance:</p>
 <div class="docs-two-col">
-  <div class="docs-callout" style="border-color:#84BD00;background:rgba(132,189,0,0.04);">
-    <strong style="color:#84BD00;">Push (Preferred)</strong><br>
+  <div class="docs-callout">
+    <strong class="text-success-600 dark:text-success-400">Push (Preferred)</strong><br>
     Data is sent to the partner immediately when it changes. A charger goes offline → LocationsUpdate pushed to all eMSPs within seconds. Lower latency, lower overhead. Requires your server to be reachable by partners.
   </div>
-  <div class="docs-callout" style="border-color:#2d5a8a;background:rgba(0,176,228,0.04);">
-    <strong style="color:#00B0E4;">Pull (Fallback)</strong><br>
+  <div class="docs-callout">
+    <strong class="text-brand-600 dark:text-brand-400">Pull (Fallback)</strong><br>
     Partner polls your endpoint on a schedule (typically every 5–15 minutes). Used when push isn't available or for initial synchronization. Results in stale availability data in partner apps.
   </div>
 </div>

@@ -3,6 +3,7 @@ Charger read endpoints (list, get, connectors, meter values, sessions).
 
 Write endpoints (create, update, delete, commands) live in api/charger_commands.py.
 """
+import asyncio
 import json
 import logging
 from typing import Optional
@@ -59,9 +60,12 @@ async def list_chargers(
             SELECT COUNT(*) FROM ocpp.charge_points WHERE {' AND '.join(conditions)}
         """, *params[:-2])
 
+    # Fetch live state from Redis in parallel rather than sequential awaits
+    live_states = await asyncio.gather(*(redis_state.get_charger(cp["id"]) for cp in chargers), return_exceptions=True)
+
     result = []
-    for cp in chargers:
-        live = await redis_state.get_charger(cp["id"])
+    for cp, live in zip(chargers, live_states):
+        live_data = live if isinstance(live, dict) else {}
         data = {**dict(cp)}
         meta = data.get("metadata")
         if isinstance(meta, str):
@@ -75,7 +79,7 @@ async def list_chargers(
                     "max_power_kw", "tariff_kwh", "access_type"):
             if mk not in data:
                 data[mk] = meta.get(mk)
-        data["live"] = live or {}
+        data["live"] = live_data
         data["last_boot"] = cp["last_boot"].isoformat() if cp["last_boot"] else None
         data["last_heartbeat"] = cp["last_heartbeat"].isoformat() if cp["last_heartbeat"] else None
         data["registered_at"] = cp["registered_at"].isoformat()

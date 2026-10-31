@@ -3,21 +3,24 @@
 All data is dynamically fetched from ocpp-core, TimescaleDB, and Redis.
 No hardcoded static mock data.
 """
+import os
 import asyncio
+import copy
 import json as json_lib
 import logging
+import time
 from datetime import datetime, timezone, timedelta
 
 import httpx
 from fastapi import APIRouter, Request, Query, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 
-from shared import api, templates
+from shared import api, templates, get_current_user, format_datetime
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-CHARGER_FARM_INTERNAL_URL = "http://charger-farm:8087"
+CHARGER_FARM_INTERNAL_URL = os.getenv("CHARGER_FARM_INTERNAL_URL", os.getenv("CHARGER_FARM_URL", "http://localhost:8087"))
 
 
 def _parse_meta(meta):
@@ -63,7 +66,7 @@ def _build_real_exceptions(chargers: list, pki: dict) -> list:
                 "site": loc,
                 "anomaly": "Heartbeat Timeout / OCPP Offline",
                 "detail": f"No WebSocket ping received. Last seen: {mins_str}",
-                "timestamp": last_hb or "Never",
+                "timestamp": format_datetime(last_hb, default="Never"),
                 "freshness": "Stale",
                 "actions": [
                     {"label": "Ping", "icon": "📶", "type": "ping", "url": f"/action/dashboard/ping/{cp_id}"},
@@ -83,7 +86,7 @@ def _build_real_exceptions(chargers: list, pki: dict) -> list:
                     "site": cp.get("site") or "Default Site",
                     "anomaly": f"Connector Faulted: {error}",
                     "detail": f"Hardware interlock engaged safely. Reported error: {error}",
-                    "timestamp": now.strftime("%Y-%m-%d %H:%M:%S UTC"),
+                    "timestamp": now.strftime("%Y-%m-%d %H:%M:%S"),
                     "freshness": "Fresh",
                     "actions": [
                         {"label": "Unlock Plug", "icon": "🔓", "type": "default", "url": f"/action/unlock/{cp_id}?connector={cid}"},
@@ -100,7 +103,7 @@ def _build_real_exceptions(chargers: list, pki: dict) -> list:
             "site": "Global PKI Authority",
             "anomaly": f"{expiring} SECC Leaf Certificate(s) Expiring",
             "detail": "Certificate expiry within 30 days. Auto-renewal recommended.",
-            "timestamp": now.strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "timestamp": now.strftime("%Y-%m-%d %H:%M:%S"),
             "freshness": "Valid",
             "actions": [
                 {"label": "View in PKI", "icon": "👁️", "type": "default", "url": "/pki"},
@@ -111,14 +114,69 @@ def _build_real_exceptions(chargers: list, pki: dict) -> list:
     return exceptions
 
 
+_dashboard_cache: dict = {}
+_dashboard_inflight: dict = {}
+_DASHBOARD_CACHE_TTL = 6.0  # seconds (covers 8s polling interval with deduplication)
+
+
 async def _get_dashboard_context(request: Request) -> dict:
-    """Fetch complete live data from ocpp-core, PostgreSQL, and Redis."""
+    """Fetch complete live data from ocpp-core, PostgreSQL, and Redis with in-flight deduplication & short TTL cache.
+    Decoupled from user session identity to prevent cross-session identity bleed (SEC-01).
+    """
     days = int(request.query_params.get("days", 7))
     sim_param = request.query_params.get("simulated")
     is_simulated = (sim_param == "1" or sim_param.lower() == "true") if sim_param is not None else None
     region_filter = request.query_params.get("region", "all")
     selected_tz = request.query_params.get("tz", "IST")
 
+    cache_key = (days, is_simulated, region_filter, selected_tz)
+    now = time.time()
+
+    # Per-request cloned user context
+    current_user = getattr(request.state, "user", None)
+    if current_user is None:
+        current_user = get_current_user()
+    user_clone = copy.deepcopy(current_user) if current_user else {}
+
+    # 1. Check cache hit
+    cached = _dashboard_cache.get(cache_key)
+    if cached and (now - cached["ts"]) < _DASHBOARD_CACHE_TTL:
+        # Clone telemetry context and stamp active request's user object
+        ctx = dict(cached["ctx"])
+        ctx["user"] = copy.deepcopy(user_clone)
+        return ctx
+
+    # 2. In-flight request deduplication
+    if cache_key in _dashboard_inflight:
+        shared_ctx = await _dashboard_inflight[cache_key]
+        ctx = dict(shared_ctx)
+        ctx["user"] = copy.deepcopy(user_clone)
+        return ctx
+
+    loop = asyncio.get_running_loop()
+    future = loop.create_future()
+    _dashboard_inflight[cache_key] = future
+
+    try:
+        shared_ctx = await _build_dashboard_context(days, is_simulated, region_filter, selected_tz)
+        # Ensure shared_ctx NEVER stores user identity in the global cache
+        shared_ctx.pop("user", None)
+        _dashboard_cache[cache_key] = {"ctx": shared_ctx, "ts": time.time()}
+        if not future.done():
+            future.set_result(shared_ctx)
+        ctx = dict(shared_ctx)
+        ctx["user"] = copy.deepcopy(user_clone)
+        return ctx
+    except Exception as exc:
+        if not future.done():
+            future.set_exception(exc)
+        raise
+    finally:
+        _dashboard_inflight.pop(cache_key, None)
+
+
+async def _build_dashboard_context(days: int, is_simulated: bool | None, region_filter: str, selected_tz: str) -> dict:
+    """Actual builder that queries backend APIs for shared network telemetry (no user state)."""
     sim_qs = f"&simulated={str(is_simulated).lower()}" if is_simulated is not None else ""
     sim_prefix = f"?simulated={str(is_simulated).lower()}" if is_simulated is not None else ""
 
@@ -152,7 +210,7 @@ async def _get_dashboard_context(request: Request) -> dict:
 
     # 5. Fetch recent sessions for energy distribution
     try:
-        sessions_data = await api(f"/sessions?limit=200{sim_qs}")
+        sessions_data = await api(f"/sessions?limit=50{sim_qs}")
         recent_sessions = sessions_data.get("sessions", [])
     except Exception:
         recent_sessions = []
@@ -290,10 +348,10 @@ async def _get_dashboard_context(request: Request) -> dict:
 
     s_total = total_sampled if total_sampled > 0 else 1
     energy_distribution = [
-        {"label": "< 10 kWh (Top-up)", "pct": round(bucket_counts["<10"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts["<10"], "color": "#0d9488"},
-        {"label": "10 – 30 kWh (Standard)", "pct": round(bucket_counts["10-30"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts["10-30"], "color": "#06b6d4"},
-        {"label": "30 – 60 kWh (Full Refill)", "pct": round(bucket_counts["30-60"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts["30-60"], "color": "#3b82f6"},
-        {"label": "> 60 kWh (Commercial / Heavy EV)", "pct": round(bucket_counts[">60"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts[">60"], "color": "#8b5cf6"},
+        {"label": "< 10 kWh (Top-up)", "pct": round(bucket_counts["<10"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts["<10"], "color": "var(--color-brand-400)"},
+        {"label": "10 – 30 kWh (Standard)", "pct": round(bucket_counts["10-30"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts["10-30"], "color": "var(--color-brand-500)"},
+        {"label": "30 – 60 kWh (Full Refill)", "pct": round(bucket_counts["30-60"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts["30-60"], "color": "var(--color-brand-600)"},
+        {"label": "> 60 kWh (Commercial / Heavy EV)", "pct": round(bucket_counts[">60"] / s_total * 100) if total_sampled else 0, "sessions": bucket_counts[">60"], "color": "var(--color-brand-700)"},
     ]
 
     # Real carbon offset from energy dispensed: 1 kWh ~ 0.45 kg CO2e
@@ -301,7 +359,6 @@ async def _get_dashboard_context(request: Request) -> dict:
 
     # ── Real Exception Queue ───────────────────────────────────────────
     exceptions = _build_real_exceptions(chargers, pki)
-    user = getattr(request.state, "user", {}) or {}
 
     return {
         "charger_count": charger_count,
@@ -342,7 +399,6 @@ async def _get_dashboard_context(request: Request) -> dict:
         "is_simulated_bool": bool(is_simulated),
         "regions_list": sorted(list(regions)) if regions else ["Delhi NCR", "Maharashtra West", "Karnataka South", "Telangana"],
         "sites_list": sorted(list(sites)) if sites else ["Delhi Central Hub", "Mumbai BKC Depot", "Bengaluru Tech Station"],
-        "user": user,
     }
 
 
@@ -379,6 +435,33 @@ async def dashboard_fleet_partial(request: Request):
     """HTMX partial for live charger fleet table."""
     ctx = await _get_dashboard_context(request)
     return templates.TemplateResponse(request, "partials/dashboard_fleet.html", context=ctx)
+
+
+@router.get("/api/dashboard/fleet-status")
+async def api_dashboard_fleet_status(request: Request):
+    """Lightweight live charger fleet status for smooth in-place frontend reconciliation."""
+    ctx = await _get_dashboard_context(request)
+    chargers = ctx.get("chargers", [])
+    
+    fleet_data = []
+    for cp in chargers:
+        fleet_data.append({
+            "id": cp.get("id"),
+            "status": cp.get("status", "offline"),
+            "ocpp_version": cp.get("ocpp_version", "1.6"),
+            "site": cp.get("site") or "Central Depot",
+            "vendor": cp.get("vendor") or "ABB",
+            "model": cp.get("model") or "Terra 54",
+            "last_heartbeat": format_datetime(cp.get("last_heartbeat"), default="Just now"),
+            "live": cp.get("live") or {}
+        })
+
+    return JSONResponse({
+        "charger_count": ctx.get("charger_count", len(chargers)),
+        "online_count": ctx.get("online_count", 0),
+        "chargers": fleet_data,
+        "timestamp": time.time()
+    })
 
 
 @router.get("/partials/dashboard/exceptions", response_class=HTMLResponse)
@@ -514,7 +597,7 @@ async def action_simulate_session_start(connector: int = Query(1)):
         target_cp = next((c["id"] for c in chargers if c.get("status") == "online"), chargers[0]["id"])
 
         # Trigger farm charging session
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=3.0) as client:
             res = await client.post(
                 f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{target_cp}/session/start",
                 json={"connector_id": connector, "id_tag": "DRIVER-CARD-77"}
@@ -526,23 +609,6 @@ async def action_simulate_session_start(connector: int = Query(1)):
                         <span>Vehicle plugged into <strong>{target_cp}</strong> (Conn {connector}). Meter values streaming live!</span>
                     </div>
                 """)
-            if target_cp.startswith("FARM-"):
-                await client.post(
-                    f"{CHARGER_FARM_INTERNAL_URL}/api/farm/start",
-                    json={"count": 3, "profile": "ENC-DCL120B-16"}
-                )
-                await asyncio.sleep(1.0)
-                res = await client.post(
-                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{target_cp}/session/start",
-                    json={"connector_id": connector, "id_tag": "DRIVER-CARD-77"}
-                )
-                if res.status_code == 200 and res.json().get("started"):
-                    return HTMLResponse(f"""
-                        <div class="toast-alert toast-success">
-                            <span>▶</span>
-                            <span>Vehicle plugged into <strong>{target_cp}</strong> (Conn {connector}). Meter values streaming live!</span>
-                        </div>
-                    """)
     except Exception as e:
         logger.warning("Failed to start farm session: %s", e)
 
@@ -565,7 +631,7 @@ async def action_simulate_session_stop(connector: int = Query(1)):
             for k, v in live.items():
                 if k.startswith("connector_") and v == "Charging":
                     cid = int(k.replace("connector_", "").replace("_status", ""))
-                    async with httpx.AsyncClient(timeout=10) as client:
+                    async with httpx.AsyncClient(timeout=3.0) as client:
                         await client.post(
                             f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp['id']}/session/stop",
                             json={"connector_id": cid}
@@ -601,7 +667,7 @@ async def action_inject_fault(error_code: str = Query("GroundFailure")):
                 </div>
             """)
         target_cp = chargers[0]["id"]
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=3.0) as client:
             await client.post(
                 f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{target_cp}/fault",
                 json={"error_code": error_code, "connector": 1}
@@ -628,7 +694,7 @@ async def action_recover_fault():
         chargers_data = await api("/chargers?limit=50")
         chargers = chargers_data.get("chargers", [])
         for cp in chargers:
-            async with httpx.AsyncClient(timeout=10) as client:
+            async with httpx.AsyncClient(timeout=3.0) as client:
                 await client.post(
                     f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp['id']}/fault",
                     json={"error_code": "NoError", "connector": 1}
@@ -701,7 +767,7 @@ async def action_start_charger(cp_id: str, connector: int = Query(1)):
         # Also trigger farm charging start
         if is_farm:
             try:
-                async with httpx.AsyncClient(timeout=3) as client:
+                async with httpx.AsyncClient(timeout=2.0) as client:
                     await client.post(
                         f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
                         json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
@@ -715,38 +781,22 @@ async def action_start_charger(cp_id: str, connector: int = Query(1)):
             </div>
         """)
     except Exception as e:
-        try:
-            async with httpx.AsyncClient(timeout=8) as client:
-                farm_res = await client.post(
-                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
-                    json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
-                )
-                if farm_res.status_code == 200:
-                    return HTMLResponse(f"""
-                        <div class="toast-alert toast-success">
-                            <span>▶</span>
-                            <span><strong>{cp_id}:</strong> Virtual charger session started via farm!</span>
-                        </div>
-                    """)
-                if is_farm:
-                    await client.post(
-                        f"{CHARGER_FARM_INTERNAL_URL}/api/farm/start",
-                        json={"count": 3, "profile": "ENC-DCL120B-16"}
-                    )
-                    await asyncio.sleep(1.0)
-                    retry_res = await client.post(
+        if is_farm:
+            try:
+                async with httpx.AsyncClient(timeout=2.5) as client:
+                    farm_res = await client.post(
                         f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/start",
                         json={"connector_id": connector, "id_tag": "REMOTE-DASH"}
                     )
-                    if retry_res.status_code == 200:
+                    if farm_res.status_code == 200:
                         return HTMLResponse(f"""
                             <div class="toast-alert toast-success">
                                 <span>▶</span>
-                                <span><strong>{cp_id}:</strong> Virtual charger connected and session started!</span>
+                                <span><strong>{cp_id}:</strong> Virtual charger session started via farm!</span>
                             </div>
                         """)
-        except Exception as farm_err:
-            logger.warning("Farm session start fallback failed: %s", farm_err)
+            except Exception as farm_err:
+                logger.warning("Farm session start fallback failed: %s", farm_err)
         return HTMLResponse(f"""
             <div class="toast-alert toast-danger">
                 <span>⚠️</span>
@@ -758,16 +808,18 @@ async def action_start_charger(cp_id: str, connector: int = Query(1)):
 @router.post("/action/stop/{cp_id}", response_class=HTMLResponse)
 async def action_stop_charger(cp_id: str, connector: int = Query(1)):
     """Dispatch RemoteStopTransaction through ocpp-core."""
+    is_farm = cp_id.startswith("FARM-")
     try:
         res = await api(f"/chargers/{cp_id}/stop?connector_id={connector}", method="POST")
-        try:
-            async with httpx.AsyncClient(timeout=3) as client:
-                await client.post(
-                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/stop",
-                    json={"connector_id": connector}
-                )
-        except Exception:
-            pass
+        if is_farm:
+            try:
+                async with httpx.AsyncClient(timeout=2.0) as client:
+                    await client.post(
+                        f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/stop",
+                        json={"connector_id": connector}
+                    )
+            except Exception:
+                pass
         return HTMLResponse(f"""
             <div class="toast-alert toast-info">
                 <span>⏹</span>
@@ -775,21 +827,22 @@ async def action_stop_charger(cp_id: str, connector: int = Query(1)):
             </div>
         """)
     except Exception as e:
-        try:
-            async with httpx.AsyncClient(timeout=3) as client:
-                farm_res = await client.post(
-                    f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/stop",
-                    json={"connector_id": connector}
-                )
-                if farm_res.status_code == 200:
-                    return HTMLResponse(f"""
-                        <div class="toast-alert toast-info">
-                            <span>⏹</span>
-                            <span><strong>{cp_id}:</strong> Virtual charger session stopped via farm.</span>
-                        </div>
-                    """)
-        except Exception:
-            pass
+        if is_farm:
+            try:
+                async with httpx.AsyncClient(timeout=2.5) as client:
+                    farm_res = await client.post(
+                        f"{CHARGER_FARM_INTERNAL_URL}/api/charger/{cp_id}/session/stop",
+                        json={"connector_id": connector}
+                    )
+                    if farm_res.status_code == 200:
+                        return HTMLResponse(f"""
+                            <div class="toast-alert toast-info">
+                                <span>⏹</span>
+                                <span><strong>{cp_id}:</strong> Virtual charger session stopped via farm.</span>
+                            </div>
+                        """)
+            except Exception:
+                pass
         return HTMLResponse(f"""
             <div class="toast-alert toast-danger">
                 <span>⚠️</span>

@@ -14,6 +14,26 @@
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
+    .dashboard-panel-clickable {
+        cursor: pointer;
+        user-select: none;
+        transition: transform var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+                    box-shadow var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1)),
+                    border-color var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+    }
+    .dashboard-panel-clickable:hover {
+        border-color: var(--color-brand-primary, #2563eb);
+        box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1)), 0 4px 12px rgba(37, 99, 235, 0.08);
+        transform: translateY(-2px);
+    }
+    .dashboard-panel-clickable:active {
+        transform: translateY(0);
+    }
+    .dashboard-panel-clickable:focus-visible {
+        outline: 2px solid var(--color-brand-primary, #2563eb);
+        outline-offset: 2px;
+    }
+
     .panel-header-title {
         font-size: 10px;
         font-weight: 700;
@@ -36,11 +56,11 @@
 
     /* Filters bar */
     .filter-select {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 6px;
-        color: #0f172a;
-        font-size: 11.5px;
+        background-color: var(--color-white);
+        border: 1px solid var(--color-neutral-border);
+        border-radius: var(--radius-md);
+        color: var(--color-default-font);
+        font-size: var(--text-caption);
         font-weight: 500;
         height: 32px;
         line-height: 20px;
@@ -52,15 +72,34 @@
         appearance: none;
         -webkit-appearance: none;
         -moz-appearance: none;
-        transition: border-color var(--duration-fast, 150ms) var(--ease-out, ease-out), box-shadow var(--duration-fast, 150ms) var(--ease-out, ease-out);
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+        transition: border-color var(--duration-fast, 150ms) var(--ease-out, ease-out), box-shadow var(--duration-fast, 150ms) var(--ease-out, ease-out), background-color var(--duration-fast, 150ms) ease;
+        box-shadow: var(--shadow-sm);
     }
     .filter-select:hover {
-        border-color: #94a3b8;
+        border-color: var(--color-neutral-400);
     }
     .filter-select:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.2);
+        border-color: var(--color-brand-500);
+        box-shadow: 0 0 0 1px var(--color-brand-500);
+    }
+
+    /* Filters bar Dark Mode */
+    .dark .filter-select {
+        background-color: var(--color-white) !important;
+        border-color: var(--color-neutral-border) !important;
+        color: var(--color-default-font) !important;
+        box-shadow: var(--shadow-sm) !important;
+    }
+    .dark .filter-select:hover {
+        border-color: var(--color-neutral-500) !important;
+    }
+    .dark .filter-select:focus {
+        border-color: var(--color-brand-400) !important;
+        box-shadow: 0 0 0 1px var(--color-brand-400) !important;
+    }
+    .dark .filter-select option {
+        background-color: var(--color-neutral-900) !important;
+        color: var(--color-default-font) !important;
     }
 
     /* Custom Table */
@@ -89,6 +128,50 @@
     }
     .exception-table tr:hover td {
         background: #f8fafc;
+    }
+
+    /* Custom Table Dark Mode */
+    .dark .exception-table th {
+        background: #1e293b !important;
+        color: #94a3b8 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+    .dark .exception-table td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        color: #cbd5e1 !important;
+    }
+    .dark .exception-table tr:hover td {
+        background: rgba(255, 255, 255, 0.03) !important;
+    }
+
+    /* Exception Triage Tabs */
+    .tab-btn-active {
+        font-weight: 700;
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+    .tab-btn-inactive {
+        font-weight: 500;
+        color: #64748b;
+        background-color: transparent;
+        border: 1px solid transparent;
+    }
+    .tab-btn-inactive:hover {
+        color: #0f172a;
+    }
+    .dark .tab-btn-active {
+        background-color: rgba(59, 130, 246, 0.18) !important;
+        color: #60a5fa !important;
+        border: 1px solid rgba(59, 130, 246, 0.35) !important;
+    }
+    .dark .tab-btn-inactive {
+        color: #94a3b8 !important;
+        background-color: transparent !important;
+        border: 1px solid transparent !important;
+    }
+    .dark .tab-btn-inactive:hover {
+        color: #f8fafc !important;
     }
 
     /* Action buttons */
@@ -128,6 +211,44 @@
     .action-btn-accent:hover {
         background: rgba(37, 99, 235, 0.2);
         color: #1d4ed8;
+    }
+    .action-btn-stop:hover {
+        background: #fee2e2 !important;
+        border-color: #ef4444 !important;
+        color: #dc2626 !important;
+    }
+
+    /* Action buttons Dark Mode */
+    .dark .action-btn {
+        background: #1e293b !important;
+        color: #e2e8f0 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    .dark .action-btn:hover {
+        background: #27354f !important;
+        border-color: #3b82f6 !important;
+        color: #60a5fa !important;
+    }
+    .dark .action-btn-danger,
+    .dark .action-btn-stop {
+        background: rgba(239, 68, 68, 0.15) !important;
+        color: #f87171 !important;
+        border-color: rgba(239, 68, 68, 0.35) !important;
+    }
+    .dark .action-btn-danger:hover,
+    .dark .action-btn-stop:hover {
+        background: rgba(239, 68, 68, 0.3) !important;
+        color: #fca5a5 !important;
+        border-color: #ef4444 !important;
+    }
+    .dark .action-btn-accent {
+        background: rgba(59, 130, 246, 0.15) !important;
+        color: #60a5fa !important;
+        border-color: rgba(59, 130, 246, 0.35) !important;
+    }
+    .dark .action-btn-accent:hover {
+        background: rgba(59, 130, 246, 0.3) !important;
+        color: #93c5fd !important;
     }
 
     /* Live Toast Alerts */
@@ -263,15 +384,15 @@
 <!-- ═══ Top Breadcrumb & Live Filters Bar ═════════════════════════════════ -->
 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
     <div class="flex items-center gap-2">
-        <i data-lucide="layout-dashboard" class="w-4 h-4 text-blue-600 inline-block"></i>
-        <h1 class="text-sm font-semibold text-slate-800">Dashboard</h1>
+        <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-600 dark:text-brand-400 inline-block"></i>
+        <h1 class="text-sm font-semibold text-default-font">Dashboard</h1>
     </div>
 
     <!-- Interactive Top Filters -->
     <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
         <!-- 1. Region / Hub Filter -->
         <div class="relative inline-flex items-center">
-            <i data-lucide="globe" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="globe" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
             <select id="filter-region" onchange="applyDashboardFilters()" class="filter-select min-w-[175px] appearance-none">
                 <option value="all" {% if selected_region == 'all' or not selected_region %}selected{% endif %}>All Regions &amp; Sites</option>
                 {% for r in regions_list %}
@@ -279,47 +400,48 @@
                 {{ r }}</option>
                 {% endfor %}
             </select>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
         </div>
 
         <!-- 2. Date Range Filter -->
         <div class="relative inline-flex items-center">
-            <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="calendar" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
             <select id="filter-days" onchange="applyDashboardFilters()" class="filter-select min-w-[170px] appearance-none">
                 <option value="7" {% if selected_days == 7 %}selected{% endif %}>Live (Past 7 Days)</option>
                 <option value="1" {% if selected_days == 1 %}selected{% endif %}>Today / Last 24 Hours</option>
                 <option value="30" {% if selected_days == 30 %}selected{% endif %}>Last 30 Days</option>
                 <option value="90" {% if selected_days == 90 %}selected{% endif %}>Last Quarter (90 Days)</option>
             </select>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
         </div>
 
         <!-- 3. Timezone Selector -->
         <div class="relative inline-flex items-center">
-            <i data-lucide="clock" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="clock" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
             <select id="filter-tz" onchange="applyDashboardFilters()" class="filter-select min-w-[140px] appearance-none">
                 <option value="IST" {% if selected_tz == 'IST' %}selected{% endif %}>IST (UTC+5:30)</option>
                 <option value="UTC" {% if selected_tz == 'UTC' %}selected{% endif %}>UTC</option>
                 <option value="EST" {% if selected_tz == 'EST' %}selected{% endif %}>EST (UTC-5)</option>
             </select>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
         </div>
 
         <!-- 4. Simulated Data Switch Pill -->
         <div class="relative inline-flex items-center">
-            <i data-lucide="cpu" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="cpu" class="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
             <select id="filter-simulated" onchange="applyDashboardFilters()" class="filter-select min-w-[215px] appearance-none">
                 <option value="all" {% if is_simulated is none %}selected{% endif %}>All Data (Live + Simulated)</option>
                 <option value="0" {% if is_simulated is sameas false %}selected{% endif %}>Physical Chargers Only</option>
                 <option value="1" {% if is_simulated is sameas true %}selected{% endif %}>Simulated Farm Only</option>
             </select>
-            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+            <i data-lucide="chevron-down" class="w-3.5 h-3.5 absolute right-2.5 top-1/2 -translate-y-1/2 text-subtext-color pointer-events-none"></i>
         </div>
 
         <!-- 5. Manual Sync Button -->
         <button onclick="applyDashboardFilters(true)"
+                id="dashboard-sync-btn"
                 title="Force refresh now"
-                class="h-8 px-3 rounded-md bg-white border border-slate-300 text-xs font-semibold text-slate-700 hover:border-blue-500 hover:text-blue-600 transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+                class="btn-outline h-8 px-3 rounded-md text-xs font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm">
             <i id="sync-icon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
             <span>Sync</span>
         </button>
@@ -327,19 +449,19 @@
 </div>
 
 <!-- ═══ Interactive Operations & Command Center Toolbar ═══════════════════ -->
-<div class="mb-4 p-3 rounded-lg bg-white border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+<div class="card mb-4 p-3 flex flex-wrap items-center justify-between gap-3">
     <div class="flex flex-wrap items-center gap-2.5 sm:gap-3">
         <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-800 uppercase tracking-wider">Live Control Center</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-success-500 animate-pulse"></span>
+            <span class="text-xs font-bold text-default-font uppercase tracking-wider">Live Control Center</span>
         </div>
-        <span class="text-slate-300 hidden sm:inline">|</span>
-        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-            <span>Connected: <strong id="tb-chargers" class="text-blue-600 font-mono font-bold">{{ online_count }}/{{ charger_count }}</strong> Chargers</span>
-            <span class="text-slate-300">&bull;</span>
-            <span>Load: <strong id="tb-load" class="text-blue-600 font-mono font-bold">{{ current_load_kw }} kW</strong></span>
-            <span class="text-slate-300">&bull;</span>
-            <span>Plugs: <strong id="tb-charging" class="text-emerald-600 font-mono font-bold">{{ actively_charging }}</strong> Charging / <strong id="tb-ready" class="text-slate-700 font-mono font-bold">{{ connector_statuses.Available }}</strong> Ready</span>
+        <span class="text-subtext-color hidden sm:inline">|</span>
+        <div class="flex flex-wrap items-center gap-2 text-xs text-subtext-color">
+            <span>Connected: <strong id="tb-chargers" class="text-brand-600 dark:text-brand-400 font-mono font-bold">{{ online_count }}/{{ charger_count }}</strong> Chargers</span>
+            <span class="text-neutral-border">&bull;</span>
+            <span>Load: <strong id="tb-load" class="text-brand-600 dark:text-brand-400 font-mono font-bold">{{ current_load_kw }} kW</strong></span>
+            <span class="text-neutral-border">&bull;</span>
+            <span>Plugs: <strong id="tb-charging" class="text-success-600 dark:text-success-400 font-mono font-bold">{{ actively_charging }}</strong> Charging / <strong id="tb-ready" class="text-default-font font-mono font-bold">{{ connector_statuses.Available }}</strong> Ready</span>
         </div>
     </div>
 
@@ -349,7 +471,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Connect 3 simulated OCPP 1.6 chargers via Charger Farm"
-                class="h-8 px-3 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm">
+                class="badge badge-brand h-8 px-3 cursor-pointer hover:opacity-90">
             <i data-lucide="zap" class="w-3.5 h-3.5"></i>
             <span>+3 Chargers</span>
         </button>
@@ -358,7 +480,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Plug in EV and stream live active meter values (kW load)"
-                class="h-8 px-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm btn-press">
+                class="badge badge-success h-8 px-3 cursor-pointer hover:opacity-90 btn-press">
             <i data-lucide="play" class="w-3.5 h-3.5 fill-current btn-icon-default"></i>
             <span class="btn-spinner"></span>
             <span>Plug &amp; Charge</span>
@@ -368,7 +490,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Finish transaction and write CDR to database"
-                class="h-8 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm btn-press">
+                class="badge badge-warning h-8 px-3 cursor-pointer hover:opacity-90 btn-press">
             <i data-lucide="square" class="w-3.5 h-3.5 fill-current btn-icon-default"></i>
             <span class="btn-spinner"></span>
             <span>Stop Charge</span>
@@ -378,7 +500,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Inject hardware ground fault to trigger Exception Queue alert"
-                class="h-8 px-3 bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm">
+                class="badge badge-error h-8 px-3 cursor-pointer hover:opacity-90">
             <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
             <span>Inject Fault</span>
         </button>
@@ -387,7 +509,7 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Clear hardware fault and restore connector to Available"
-                class="h-8 px-3 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 text-xs font-semibold rounded-md inline-flex items-center gap-1.5 transition shadow-sm">
+                class="btn btn-outline h-8 px-3 text-xs">
             <i data-lucide="check" class="w-3.5 h-3.5"></i>
             <span>Clear Faults</span>
         </button>
@@ -396,22 +518,22 @@
                 hx-target="#toast-container"
                 hx-swap="beforeend"
                 title="Disconnect all farm chargers"
-                class="h-8 px-3 bg-slate-50 hover:bg-red-50 border border-slate-300 hover:border-red-300 text-slate-500 hover:text-red-600 text-xs font-semibold rounded-md transition inline-flex items-center gap-1.5 shadow-sm">
+                class="btn btn-outline text-error-600 border-error-200 dark:border-error-800 hover:bg-error-50 dark:hover:bg-error-900/30 h-8 px-3 text-xs">
             <i data-lucide="power-off" class="w-3.5 h-3.5"></i>
             <span>Disconnect Farm</span>
         </button>
     </div>
 </div>
 
-<!-- ═══ Row 1: 5 Top Metric KPI Cards (Polled every 3s via HTMX) ═════════ -->
+<!-- ═══ Row 1: 5 Top Metric KPI Cards (Polled every 8s via HTMX) ═════════ -->
 <div class="relative overflow-hidden rounded-lg mb-4 min-h-[140px]" id="kpis-wrapper">
     <div class="shimmer-progress-line" id="kpi-progress-line"></div>
-    <div class="component-shimmer-overlay is-active" id="kpis-shimmer-overlay">
+    <div class="component-shimmer-overlay hidden" id="kpis-shimmer-overlay">
         {{ skeletons.kpis_skeleton() }}
     </div>
     <div id="kpi-cards-container"
          hx-get="/partials/dashboard/kpis?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
-         hx-trigger="every 3s"
+         hx-trigger="every 8s"
          hx-swap="innerHTML">
         {% include "partials/dashboard_kpis.html" %}
     </div>
@@ -424,21 +546,21 @@
     <!-- Left Chart: Daily Delivered Energy & Session Throughput (8 cols) -->
     <div class="lg:col-span-8 dashboard-panel p-4 flex flex-col justify-between relative overflow-hidden" id="energy-chart-panel">
         <div class="shimmer-progress-line" id="energy-chart-progress-line"></div>
-        <div class="component-shimmer-overlay is-active" id="energy-chart-shimmer-overlay">
+        <div class="component-shimmer-overlay hidden" id="energy-chart-shimmer-overlay">
             {{ skeletons.energy_chart_skeleton() }}
         </div>
         <div>
             <div class="flex items-center justify-between mb-1">
                 <div class="flex items-center gap-2">
-                    <h2 class="text-xs font-bold text-slate-800">Daily Delivered Energy &amp; Session Throughput</h2>
-                    <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-200">Dual Axis</span>
+                    <h2 class="text-xs font-bold text-default-font">Daily Delivered Energy &amp; Session Throughput</h2>
+                    <span class="badge badge-brand">Dual Axis</span>
                 </div>
-                <div class="flex items-center gap-3 text-[10px] text-slate-500">
+                <div class="flex items-center gap-3 text-[10px] text-subtext-color">
                     <span class="flex items-center gap-1.5">
                         <span class="w-2.5 h-2.5 rounded-sm bg-blue-500"></span> Delivered Energy (kWh)
                     </span>
                     <span class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Session Count
+                        <span class="w-2 h-2 rounded-full bg-success-500"></span> Session Count
                     </span>
                 </div>
             </div>
@@ -451,22 +573,22 @@
         </div>
 
         <!-- 4-Stat Metric Summary Bar under chart -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 mt-2 border-t border-slate-200 text-center text-[10px]">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 mt-2 border-t border-neutral-border text-center text-[10px]">
             <div>
-                <div class="text-slate-500">Min Output Day</div>
-                <div id="stat-min-day" class="font-semibold text-slate-700 font-mono">{{ min_day.date }} ({{ min_day.energy }} kWh)</div>
+                <div class="text-subtext-color">Min Output Day</div>
+                <div id="stat-min-day" class="font-semibold text-default-font font-mono">{{ min_day.date }} ({{ min_day.energy }} kWh)</div>
             </div>
             <div>
-                <div class="text-slate-500">Max Output Day</div>
-                <div id="stat-max-day" class="font-semibold text-blue-600 font-mono">{{ max_day.date }} ({{ max_day.energy }} kWh)</div>
+                <div class="text-subtext-color">Max Output Day</div>
+                <div id="stat-max-day" class="font-semibold text-brand-600 dark:text-brand-400 font-mono">{{ max_day.date }} ({{ max_day.energy }} kWh)</div>
             </div>
             <div>
-                <div class="text-slate-500">Average Output / Day</div>
-                <div id="stat-mean-energy" class="font-semibold text-slate-700 font-mono">{{ mean_energy }} kWh</div>
+                <div class="text-subtext-color">Average Output / Day</div>
+                <div id="stat-mean-energy" class="font-semibold text-default-font font-mono">{{ mean_energy }} kWh</div>
             </div>
             <div>
-                <div class="text-slate-500">Completed Runs</div>
-                <div id="stat-mean-sessions" class="font-semibold text-emerald-600 font-mono">{{ mean_sessions }} sess / day</div>
+                <div class="text-subtext-color">Completed Runs</div>
+                <div id="stat-mean-sessions" class="font-semibold text-success-600 dark:text-success-400 font-mono">{{ mean_sessions }} sess / day</div>
             </div>
         </div>
     </div>
@@ -474,116 +596,115 @@
     <!-- Right Chart: Connector Status Share (4 cols) -->
     <div class="lg:col-span-4 dashboard-panel p-4 flex flex-col justify-between relative overflow-hidden" id="donut-chart-panel">
         <div class="shimmer-progress-line" id="donut-chart-progress-line"></div>
-        <div class="component-shimmer-overlay is-active" id="donut-chart-shimmer-overlay">
+        <div class="component-shimmer-overlay hidden" id="donut-chart-shimmer-overlay">
             {{ skeletons.donut_chart_skeleton() }}
         </div>
         <div>
             <div class="flex items-center justify-between mb-1">
-                <h2 class="text-xs font-bold text-slate-800">Connector Status Share</h2>
-                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">LIVE BREAKDOWN</span>
+                <h2 class="text-caption-bold text-default-font">Connector Status Share</h2>
+                <span class="badge badge-success">LIVE BREAKDOWN</span>
             </div>
-            <p class="text-[10px] text-gray-500 mb-3">Instant physical port state across all charging pedestals</p>
+            <p class="text-[10px] text-subtext-color mb-3">Instant physical port state across all charging pedestals</p>
 
             <!-- Stable Permanent Doughnut Canvas with Center Badge -->
             <div class="relative flex items-center justify-center" style="height: 170px;">
                 <canvas id="connectorDonutChart"></canvas>
                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span id="donut-total-plugs" class="text-2xl font-bold text-slate-800 font-mono leading-none">{{ total_connectors }}</span>
-                    <span class="text-[9px] text-slate-500 tracking-wider">TOTAL PLUGS</span>
-                    <span id="donut-ready-pct" class="text-[10px] font-bold text-emerald-600 mt-0.5">{{ ready_pct }}% READY</span>
+                    <span id="donut-total-plugs" class="text-2xl font-bold text-default-font font-mono leading-none">{{ total_connectors }}</span>
+                    <span class="text-[9px] text-subtext-color tracking-wider">TOTAL PLUGS</span>
+                    <span id="donut-ready-pct" class="text-[10px] font-bold text-success-600 dark:text-success-400 mt-0.5">{{ ready_pct }}% READY</span>
                 </div>
             </div>
         </div>
 
         <!-- Legend Breakdown -->
-        <div class="space-y-1 pt-2 border-t border-slate-200 text-[11px]">
+        <div class="space-y-1 pt-2 border-t border-neutral-border text-[11px]">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span class="text-slate-600">Available</span>
+                    <span class="w-2 h-2 rounded-full bg-success-500"></span>
+                    <span class="text-subtext-color">Available</span>
                 </div>
-                <div class="font-mono text-slate-800">
+                <div class="font-mono text-default-font">
                     <span id="legend-available" class="font-semibold">{{ connector_statuses.Available }}</span>
                 </div>
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-                    <span class="text-slate-600">Charging</span>
+                    <span class="w-2 h-2 rounded-full bg-brand-500"></span>
+                    <span class="text-subtext-color">Charging</span>
                 </div>
-                <div class="font-mono text-slate-800">
+                <div class="font-mono text-default-font">
                     <span id="legend-charging" class="font-semibold">{{ connector_statuses.Charging }}</span>
                 </div>
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                    <span class="text-slate-600">Preparing / Handshake</span>
+                    <span class="w-2 h-2 rounded-full bg-warning-500"></span>
+                    <span class="text-subtext-color">Preparing / Handshake</span>
                 </div>
-                <div class="font-mono text-slate-800">
+                <div class="font-mono text-default-font">
                     <span id="legend-preparing" class="font-semibold">{{ connector_statuses.Preparing }}</span>
                 </div>
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                    <span class="text-slate-600">Suspended EV</span>
+                    <span class="w-2 h-2 rounded-full bg-brand-700"></span>
+                    <span class="text-subtext-color">Suspended EV</span>
                 </div>
-                <div class="font-mono text-slate-800">
+                <div class="font-mono text-default-font">
                     <span id="legend-suspended" class="font-semibold">{{ connector_statuses.SuspendedEV }}</span>
                 </div>
             </div>
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                    <span class="text-slate-600">Faulted / Lockout</span>
+                    <span class="w-2 h-2 rounded-full bg-error-500"></span>
+                    <span class="text-subtext-color">Faulted / Out of Order</span>
                 </div>
-                <div class="font-mono text-slate-800">
+                <div class="font-mono text-default-font">
                     <span id="legend-faulted" class="font-semibold">{{ connector_statuses.Faulted }}</span>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
 
-<!-- ═══ Row 3: Energy Intensity Distribution Profile (Polled every 4s via HTMX) ═ -->
+<!-- ═══ Row 3: Energy Intensity Distribution Profile (Polled every 8s via HTMX) ═ -->
 <div class="relative overflow-hidden rounded-lg min-h-[120px]" id="energy-profile-wrapper">
     <div class="shimmer-progress-line" id="energy-profile-progress-line"></div>
-    <div class="component-shimmer-overlay is-active" id="energy-profile-shimmer-overlay">
+    <div class="component-shimmer-overlay hidden" id="energy-profile-shimmer-overlay">
         {{ skeletons.energy_profile_skeleton() }}
     </div>
     <div id="energy-profile-container"
          hx-get="/partials/dashboard/energy-profile?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
-         hx-trigger="every 4s"
+         hx-trigger="every 8s"
          hx-swap="innerHTML">
         {% include "partials/dashboard_energy_profile.html" %}
     </div>
 </div>
 
-<!-- ═══ Row 4: Live Connected Chargers Fleet Table (Polled every 3s via HTMX) ═ -->
+<!-- ═══ Row 4: Live Connected Chargers Fleet Table (Polled every 8s via HTMX) ═ -->
 <div class="relative overflow-hidden rounded-lg min-h-[220px]" id="fleet-table-wrapper">
     <div class="shimmer-progress-line" id="fleet-table-progress-line"></div>
-    <div class="component-shimmer-overlay is-active" id="fleet-table-shimmer-overlay">
+    <div class="component-shimmer-overlay hidden" id="fleet-table-shimmer-overlay">
         {{ skeletons.fleet_table_skeleton() }}
     </div>
     <div id="fleet-table-container"
          hx-get="/partials/dashboard/fleet?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
-         hx-trigger="every 3s"
+         hx-trigger="every 8s"
          hx-swap="innerHTML">
         {% include "partials/dashboard_fleet.html" %}
     </div>
 </div>
 
-<!-- ═══ Row 5: Actionable Exception Queue (Polled every 3s via HTMX) ════════ -->
+<!-- ═══ Row 5: Actionable Exception Queue (Polled every 8s via HTMX) ════════ -->
 <div class="relative overflow-hidden rounded-lg min-h-[160px]" id="exceptions-wrapper">
     <div class="shimmer-progress-line" id="exceptions-progress-line"></div>
-    <div class="component-shimmer-overlay is-active" id="exceptions-shimmer-overlay">
+    <div class="component-shimmer-overlay hidden" id="exceptions-shimmer-overlay">
         {{ skeletons.exceptions_skeleton() }}
     </div>
     <div id="exceptions-container"
          hx-get="/partials/dashboard/exceptions?days={{ selected_days }}&region={{ selected_region }}&tz={{ selected_tz }}{% if is_simulated is not none %}&simulated={{ '1' if is_simulated else '0' }}{% endif %}"
-         hx-trigger="every 3s"
+         hx-trigger="every 8s"
          hx-swap="innerHTML">
         {% include "partials/dashboard_exceptions.html" %}
     </div>
@@ -593,16 +714,16 @@
 {% include "partials/dashboard_skeletons.html" %}
 
 <!-- ═══ Bottom Footer Status ═════════════════════════════════════════════ -->
-<div class="flex items-center justify-between text-[11px] text-slate-500 pt-3 border-t border-slate-200 mt-2">
+<div class="flex items-center justify-between text-[11px] text-subtext-color pt-3 border-t border-neutral-border mt-2">
     <div class="flex items-center gap-3">
         <span>&copy; 2026 OpenCPO Enterprise Operations</span>
         <span>•</span>
         <span>OCPP 1.6j &amp; 2.0.1 Live Engine</span>
     </div>
     <div class="flex items-center gap-2">
-        <span>CSMS Backend: <span class="font-mono text-blue-600">ocpp-core:8000</span></span>
+        <span>CSMS Backend: <span class="font-mono text-brand-600 dark:text-brand-400">ocpp-core:8000</span></span>
         <span>•</span>
-        <span class="text-emerald-600 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> TimescaleDB + Redis Synchronized</span>
+        <span class="text-success-600 dark:text-success-400 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-success-500"></span> TimescaleDB + Redis Synchronized</span>
     </div>
 </div>
 
@@ -718,6 +839,113 @@ function hideAllFilterShimmers() {
     Object.keys(SKELETON_MAP).forEach(hideSectionShimmer);
 }
 
+// ── 1. Chart Theme Tokens & Helper Functions ─────────────────────────
+function getChartThemeTokens(isDark) {
+    if (isDark) {
+        return {
+            barColor: '#3b82f6',              // Brand Primary (design token brand-500)
+            barHover: '#60a5fa',              // brand-400
+            lineColor: '#10b981',             // Success (design token success-500)
+            linePoint: '#34d399',             // success-400
+            pointBorder: '#0f172a',           // Card surface
+            gridColor: 'rgba(255, 255, 255, 0.08)',
+            tickColor: '#94a3b8',             // Subtext color
+            tooltipBg: '#0f172a',
+            tooltipTitle: '#f8fafc',
+            tooltipBody: '#cbd5e1',
+            tooltipBorder: 'rgba(255, 255, 255, 0.12)',
+            donutBorder: '#0f172a',           // Match dark card surface
+            // Design tokens: Available (success), Charging (brand), Preparing (warning), Suspended (indigo/purple), Faulted (error)
+            donutColors: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'],
+            donutEmpty: '#1e293b'
+        };
+    } else {
+        return {
+            barColor: '#2563eb',              // Brand Primary / brand-600
+            barHover: '#1d4ed8',              // brand-700
+            lineColor: '#10b981',             // Success / success-500
+            linePoint: '#10b981',
+            pointBorder: '#ffffff',
+            gridColor: 'rgba(0, 0, 0, 0.05)',
+            tickColor: '#64748b',
+            tooltipBg: '#ffffff',
+            tooltipTitle: '#0f172a',
+            tooltipBody: '#475569',
+            tooltipBorder: '#e2e8f0',
+            donutBorder: '#ffffff',
+            donutColors: ['#10b981', '#2563eb', '#f59e0b', '#6366f1', '#ef4444'],
+            donutEmpty: '#e2e8f0'
+        };
+    }
+}
+
+function applyChartTheme(isDark) {
+    const tokens = getChartThemeTokens(isDark);
+    if (window.dailyChartInstance) {
+        const chart = window.dailyChartInstance;
+        if (chart.data.datasets[0]) {
+            chart.data.datasets[0].backgroundColor = tokens.barColor;
+            chart.data.datasets[0].hoverBackgroundColor = tokens.barHover;
+        }
+        if (chart.data.datasets[1]) {
+            chart.data.datasets[1].borderColor = tokens.lineColor;
+            chart.data.datasets[1].backgroundColor = tokens.lineColor;
+            chart.data.datasets[1].pointBackgroundColor = tokens.linePoint;
+            chart.data.datasets[1].pointBorderColor = tokens.pointBorder;
+        }
+        if (chart.options.plugins?.tooltip) {
+            chart.options.plugins.tooltip.backgroundColor = tokens.tooltipBg;
+            chart.options.plugins.tooltip.titleColor = tokens.tooltipTitle;
+            chart.options.plugins.tooltip.bodyColor = tokens.tooltipBody;
+            chart.options.plugins.tooltip.borderColor = tokens.tooltipBorder;
+        }
+        if (chart.options.scales?.x?.ticks) chart.options.scales.x.ticks.color = tokens.tickColor;
+        if (chart.options.scales?.y) {
+            if (chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = tokens.tickColor;
+            if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = tokens.gridColor;
+        }
+        if (chart.options.scales?.y1?.ticks) chart.options.scales.y1.ticks.color = tokens.tickColor;
+        chart.update('none');
+    }
+
+    if (window.donutChartInstance) {
+        const donut = window.donutChartInstance;
+        if (donut.data.datasets[0]) {
+            donut.data.datasets[0].borderColor = tokens.donutBorder;
+            const values = donut.data.datasets[0].data || [];
+            const sum = values.reduce((a, b) => a + b, 0);
+            if (sum > 0) {
+                donut.data.datasets[0].backgroundColor = tokens.donutColors;
+            } else {
+                donut.data.datasets[0].backgroundColor = Array(5).fill(tokens.donutEmpty);
+            }
+        }
+        if (donut.options.plugins?.tooltip) {
+            donut.options.plugins.tooltip.backgroundColor = tokens.tooltipBg;
+            donut.options.plugins.tooltip.titleColor = tokens.tooltipTitle;
+            donut.options.plugins.tooltip.bodyColor = tokens.tooltipBody;
+            donut.options.plugins.tooltip.borderColor = tokens.tooltipBorder;
+        }
+        donut.update('none');
+    }
+}
+
+window.addEventListener('opencpo_theme_changed', (e) => {
+    applyChartTheme(e.detail.isDark);
+});
+
+try {
+    const themeObserver = new MutationObserver((mutations) => {
+        for (const m of mutations) {
+            if (m.attributeName === 'class') {
+                const isDark = document.documentElement.classList.contains('dark');
+                applyChartTheme(isDark);
+            }
+        }
+    });
+    themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+} catch(e) {}
+
 // ── 1. Chart Initialization ──────────────────────────────────────────
 function initCharts() {
     const rawEl = document.getElementById('initial-chart-data');
@@ -725,6 +953,9 @@ function initCharts() {
     if (rawEl) {
         try { initData = JSON.parse(rawEl.textContent); } catch(e) {}
     }
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const tokens = getChartThemeTokens(isDark);
 
     const dailyData = initData.daily_data || [];
     const labels = dailyData.map(d => d.date);
@@ -745,8 +976,8 @@ function initCharts() {
                         type: 'bar',
                         label: 'Delivered Energy (kWh)',
                         data: energyData.length ? energyData : [0],
-                        backgroundColor: '#2563eb',
-                        hoverBackgroundColor: '#1d4ed8',
+                        backgroundColor: tokens.barColor,
+                        hoverBackgroundColor: tokens.barHover,
                         borderRadius: 4,
                         barPercentage: 0.45,
                         yAxisID: 'y'
@@ -755,11 +986,11 @@ function initCharts() {
                         type: 'line',
                         label: 'Session Count',
                         data: sessionData.length ? sessionData : [0],
-                        borderColor: '#22c55e',
-                        backgroundColor: '#22c55e',
+                        borderColor: tokens.lineColor,
+                        backgroundColor: tokens.lineColor,
                         borderWidth: 2.5,
-                        pointBackgroundColor: '#22c55e',
-                        pointBorderColor: '#ffffff',
+                        pointBackgroundColor: tokens.linePoint,
+                        pointBorderColor: tokens.pointBorder,
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6,
@@ -779,10 +1010,10 @@ function initCharts() {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#ffffff',
-                        titleColor: '#0f172a',
-                        bodyColor: '#475569',
-                        borderColor: '#e2e8f0',
+                        backgroundColor: tokens.tooltipBg,
+                        titleColor: tokens.tooltipTitle,
+                        bodyColor: tokens.tooltipBody,
+                        borderColor: tokens.tooltipBorder,
                         borderWidth: 1,
                         padding: 10
                     }
@@ -790,7 +1021,7 @@ function initCharts() {
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { color: '#64748b', font: { size: 10, family: 'monospace' } }
+                        ticks: { color: tokens.tickColor, font: { size: 10, family: 'monospace' } }
                     },
                     y: {
                         type: 'linear',
@@ -798,9 +1029,9 @@ function initCharts() {
                         position: 'left',
                         beginAtZero: true,
                         suggestedMax: 10,
-                        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                        grid: { color: tokens.gridColor },
                         ticks: {
-                            color: '#64748b',
+                            color: tokens.tickColor,
                             font: { size: 10, family: 'monospace' },
                             callback: function(v) { return v + ' kWh'; }
                         }
@@ -813,7 +1044,7 @@ function initCharts() {
                         suggestedMax: 5,
                         grid: { drawOnChartArea: false },
                         ticks: {
-                            color: '#64748b',
+                            color: tokens.tickColor,
                             font: { size: 10, family: 'monospace' },
                             precision: 0
                         }
@@ -837,8 +1068,8 @@ function initCharts() {
         const sumVal = donutValues.reduce((a, b) => a + b, 0);
         const finalValues = sumVal > 0 ? donutValues : [1, 0, 0, 0, 0];
         const finalColors = sumVal > 0
-            ? ['#22c55e', '#2563eb', '#f59e0b', '#6366f1', '#ef4444']
-            : ['#e2e8f0', '#e2e8f0', '#e2e8f0', '#e2e8f0', '#e2e8f0'];
+            ? tokens.donutColors
+            : Array(5).fill(tokens.donutEmpty);
 
         window.donutChartInstance = new Chart(ctxDonut, {
             type: 'doughnut',
@@ -848,7 +1079,7 @@ function initCharts() {
                     data: finalValues,
                     backgroundColor: finalColors,
                     borderWidth: 3,
-                    borderColor: '#ffffff',
+                    borderColor: tokens.donutBorder,
                     hoverOffset: 4
                 }]
             },
@@ -863,10 +1094,10 @@ function initCharts() {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        backgroundColor: '#ffffff',
-                        titleColor: '#0f172a',
-                        bodyColor: '#475569',
-                        borderColor: '#e2e8f0',
+                        backgroundColor: tokens.tooltipBg,
+                        titleColor: tokens.tooltipTitle,
+                        bodyColor: tokens.tooltipBody,
+                        borderColor: tokens.tooltipBorder,
                         borderWidth: 1,
                         padding: 8
                     }
@@ -877,7 +1108,12 @@ function initCharts() {
 }
 
 // ── 2. Live Chart & Stat Sync (Smooth Updates without Canvas destruction) ──
+let _isSyncingCharts = false;
+
 async function syncCharts(isFilterChange = false) {
+    if (_isSyncingCharts && !isFilterChange) return;
+    _isSyncingCharts = true;
+
     if (isFilterChange) {
         showSectionShimmer('energy-chart');
         showSectionShimmer('donut-chart');
@@ -900,18 +1136,28 @@ async function syncCharts(isFilterChange = false) {
 
         // 1. Update Daily Energy Chart
         if (window.dailyChartInstance && data.daily_data) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const tokens = getChartThemeTokens(isDark);
             const labels = data.daily_data.map(d => d.date);
             const energyData = data.daily_data.map(d => d.energy_kwh);
             const sessionData = data.daily_data.map(d => d.sessions);
 
             window.dailyChartInstance.data.labels = labels.length ? labels : ['Today'];
             window.dailyChartInstance.data.datasets[0].data = energyData.length ? energyData : [0];
+            window.dailyChartInstance.data.datasets[0].backgroundColor = tokens.barColor;
+            window.dailyChartInstance.data.datasets[0].hoverBackgroundColor = tokens.barHover;
             window.dailyChartInstance.data.datasets[1].data = sessionData.length ? sessionData : [0];
+            window.dailyChartInstance.data.datasets[1].borderColor = tokens.lineColor;
+            window.dailyChartInstance.data.datasets[1].backgroundColor = tokens.lineColor;
+            window.dailyChartInstance.data.datasets[1].pointBackgroundColor = tokens.linePoint;
+            window.dailyChartInstance.data.datasets[1].pointBorderColor = tokens.pointBorder;
             window.dailyChartInstance.update();
         }
 
         // 2. Update Donut Chart
         if (window.donutChartInstance && data.connector_statuses) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const tokens = getChartThemeTokens(isDark);
             const st = data.connector_statuses;
             const values = [
                 st.Available || 0,
@@ -923,11 +1169,12 @@ async function syncCharts(isFilterChange = false) {
             const sumVal = values.reduce((a, b) => a + b, 0);
             const finalValues = sumVal > 0 ? values : [1, 0, 0, 0, 0];
             const finalColors = sumVal > 0
-                ? ['#22c55e', '#2563eb', '#f59e0b', '#6366f1', '#ef4444']
-                : ['#e2e8f0', '#e2e8f0', '#e2e8f0', '#e2e8f0', '#e2e8f0'];
+                ? tokens.donutColors
+                : Array(5).fill(tokens.donutEmpty);
 
             window.donutChartInstance.data.datasets[0].data = finalValues;
             window.donutChartInstance.data.datasets[0].backgroundColor = finalColors;
+            window.donutChartInstance.data.datasets[0].borderColor = tokens.donutBorder;
             window.donutChartInstance.update();
         }
 
@@ -978,6 +1225,7 @@ async function syncCharts(isFilterChange = false) {
     } catch (e) {
         console.warn('Live chart sync error:', e);
     } finally {
+        _isSyncingCharts = false;
         if (isFilterChange) {
             hideSectionShimmer('energy-chart');
             hideSectionShimmer('donut-chart');
@@ -1105,11 +1353,23 @@ function setExceptionTab(tab) {
     const tabAck = document.getElementById('tab-exc-acknowledged');
 
     if (tab === 'unresolved') {
-        if (tabUnres) tabUnres.className = "h-7 px-2.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200";
-        if (tabAck) tabAck.className = "h-7 px-2.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-700";
+        if (tabUnres) {
+            tabUnres.classList.add('tab-btn-active');
+            tabUnres.classList.remove('tab-btn-inactive');
+        }
+        if (tabAck) {
+            tabAck.classList.add('tab-btn-inactive');
+            tabAck.classList.remove('tab-btn-active');
+        }
     } else {
-        if (tabAck) tabAck.className = "h-7 px-2.5 rounded text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200";
-        if (tabUnres) tabUnres.className = "h-7 px-2.5 rounded text-[11px] font-medium text-slate-500 hover:text-slate-700";
+        if (tabAck) {
+            tabAck.classList.add('tab-btn-active');
+            tabAck.classList.remove('tab-btn-inactive');
+        }
+        if (tabUnres) {
+            tabUnres.classList.add('tab-btn-inactive');
+            tabUnres.classList.remove('tab-btn-active');
+        }
     }
     filterExceptionsTable();
 }
@@ -1174,8 +1434,11 @@ if (document.readyState === 'loading') {
     onDashboardInitialized();
 }
 
-// Periodically sync charts every 3 seconds
-setInterval(syncCharts, 3000);
+// Periodically sync charts every 8 seconds
+let _chartSyncIntervalId = setInterval(syncCharts, 8000);
+window.addEventListener('beforeunload', () => {
+    if (_chartSyncIntervalId) clearInterval(_chartSyncIntervalId);
+});
 
 // Live Metric Number Animator & Tab indicator sync on HTMX swaps
 // Shimmer hooks for background polling & request life-cycle
@@ -1205,6 +1468,18 @@ document.addEventListener('htmx:afterRequest', function(evt) {
     }
 });
 
+document.addEventListener('htmx:beforeSwap', function(evt) {
+    const target = evt.detail?.target;
+    if (!target) return;
+    if (target.id === 'fleet-table-container') {
+        window._savedFleetSearch = document.getElementById('fleet-search')?.value || '';
+    }
+    if (target.id === 'exceptions-container') {
+        window._savedExcSearch = document.getElementById('exception-search')?.value || '';
+        window._savedExcSeverity = document.getElementById('exception-severity-filter')?.value || 'ALL';
+    }
+});
+
 document.addEventListener('htmx:afterSwap', function(evt) {
     if (!evt.detail || !evt.detail.target) return;
     const target = evt.detail.target;
@@ -1219,26 +1494,56 @@ document.addEventListener('htmx:afterSwap', function(evt) {
         window.lucide.createIcons();
     }
 
-    // Fleet tab indicator sync
+    // Fleet table: preserve active filter tab, sliding indicator position, and search query
     if (target.id === 'fleet-table-container' || target.querySelector('#fleet-tabs-container')) {
+        if (typeof filterFleet === 'function') {
+            filterFleet(currentFleetFilter);
+        }
+        const searchInput = document.getElementById('fleet-search');
+        if (searchInput && window._savedFleetSearch) {
+            searchInput.value = window._savedFleetSearch;
+            if (typeof searchFleetTable === 'function') {
+                searchFleetTable();
+            }
+        }
         setTimeout(positionFleetTabIndicator, 20);
+        const staleWarning = document.getElementById('fleet-stale-warning');
+        const liveIndicator = document.getElementById('fleet-sync-indicator');
+        if (staleWarning) staleWarning.classList.add('hidden');
+        if (liveIndicator) liveIndicator.classList.remove('hidden');
     }
 
-    // Emil Kowalski live number animation for polled KPI metrics (kWh, kW, Sessions)
+    // Exceptions queue: preserve active tab, severity dropdown, and search query
+    if (target.id === 'exceptions-container' || target.querySelector('#tab-exc-unresolved')) {
+        if (typeof setExceptionTab === 'function') {
+            setExceptionTab(currentExceptionTab);
+        }
+        const sevSelect = document.getElementById('exception-severity-filter');
+        if (sevSelect && window._savedExcSeverity) {
+            sevSelect.value = window._savedExcSeverity;
+        }
+        const excSearchInput = document.getElementById('exception-search');
+        if (excSearchInput && window._savedExcSearch) {
+            excSearchInput.value = window._savedExcSearch;
+        }
+        if (typeof filterExceptionsTable === 'function') {
+            filterExceptionsTable();
+        }
+    }
+
+    // Emil Kowalski live number animation for polled KPI metrics (animates ONLY value span to preserve units & styles)
     if (target.id === 'kpi-cards-container' || target.id === 'live-toolbar') {
-        target.querySelectorAll('.metric-value-huge, [data-animate-num]').forEach(el => {
-            const raw = el.innerText || el.textContent || '';
+        target.querySelectorAll('[data-kpi-val]').forEach(el => {
+            const raw = (el.innerText || el.textContent || '').trim();
             const match = raw.match(/([0-9,]+(\.[0-9]+)?)/);
             if (match) {
                 const num = parseFloat(match[1].replace(/,/g, ''));
                 if (!isNaN(num)) {
                     const decimals = match[1].includes('.') ? match[1].split('.')[1].length : 0;
-                    const parts = raw.split(match[1]);
                     if (window.animateNumber) {
                         window.animateNumber(el, num, {
                             decimals: decimals,
-                            prefix: parts[0] || '',
-                            suffix: parts[1] || '',
+                            useGrouping: raw.includes(','),
                             duration: 260
                         });
                     }
@@ -1248,7 +1553,7 @@ document.addEventListener('htmx:afterSwap', function(evt) {
     }
 });
 
-// Error handling: Stop shimmer and show retry state on API failures
+// Error handling: Stop shimmer and show non-intrusive retry state on API failures
 function handleDashboardRequestError(evt) {
     const target = evt.detail?.target;
     if (!target) return;
@@ -1259,19 +1564,12 @@ function handleDashboardRequestError(evt) {
         const prog = document.getElementById(config.progressLineId);
         if (prog) prog.classList.remove('is-active');
 
-        if (!target.querySelector('.error-banner')) {
-            const errDiv = document.createElement('div');
-            errDiv.className = 'error-banner p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center justify-between text-xs my-2';
-            errDiv.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    <span>Failed to fetch real-time updates from server.</span>
-                </div>
-                <button type="button" onclick="htmx.trigger(document.getElementById('${target.id}'), 'refresh')" class="px-2.5 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold transition">
-                    Retry
-                </button>
-            `;
-            target.prepend(errDiv);
+        // Non-intrusive status: toggle subtle stale warning rather than injecting layout-breaking banners
+        if (target.id === 'fleet-table-container') {
+            const staleWarning = document.getElementById('fleet-stale-warning');
+            const liveIndicator = document.getElementById('fleet-sync-indicator');
+            if (staleWarning) staleWarning.classList.remove('hidden');
+            if (liveIndicator) liveIndicator.classList.add('hidden');
         }
     }
 }

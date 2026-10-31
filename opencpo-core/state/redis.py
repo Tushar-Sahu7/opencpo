@@ -84,12 +84,17 @@ class RedisState:
 
     async def update_session_meter(self, session_id: str, meter: dict) -> None:
         """Update latest meter reading for an active session."""
-        await self.client.hset(f"session:{session_id}", mapping={
-            "power_kw": str(meter.get("power_kw", 0)),
-            "energy_kwh": str(meter.get("energy_kwh", 0)),
-            "soc_pct": str(meter.get("soc_pct", 0)),
-            "last_meter": meter.get("timestamp", ""),
-        })
+        updates = {}
+        if "power_kw" in meter and meter["power_kw"] is not None:
+            updates["power_kw"] = str(meter["power_kw"])
+        if "energy_kwh" in meter and meter["energy_kwh"] is not None:
+            updates["energy_kwh"] = str(meter["energy_kwh"])
+        if "soc_pct" in meter and meter["soc_pct"] is not None:
+            updates["soc_pct"] = str(meter["soc_pct"])
+        if "timestamp" in meter and meter["timestamp"]:
+            updates["last_meter"] = str(meter["timestamp"])
+        if updates:
+            await self.client.hset(f"session:{session_id}", mapping=updates)
 
     async def list_active_sessions(self) -> list[str]:
         """List all active session IDs."""

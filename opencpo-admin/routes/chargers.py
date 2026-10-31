@@ -107,26 +107,42 @@ async def remote_connectors_partial(request: Request, cp_id: str):
         border_color = {"Available": "#22c55e", "Charging": "#3b82f6", "Preparing": "#f59e0b", "Faulted": "#ef4444"}.get(status, "#64748b")
         dot_class = {"Available": "bg-green-500", "Charging": "bg-blue-500 animate-pulse", "Preparing": "bg-yellow-500", "Faulted": "bg-red-500"}.get(status, "bg-gray-500")
 
+        cid = conn.get("connector_id")
+        start_btn_class = "bg-gradient-to-br from-green-600 to-green-500 text-white shadow-lg shadow-green-500/30 cursor-pointer hover:from-green-500" if can_start else "bg-gray-800 text-gray-500 cursor-not-allowed"
+        stop_btn_class = "bg-gradient-to-br from-red-600 to-red-500 text-white shadow-lg shadow-red-500/30 cursor-pointer hover:from-red-500" if can_stop else "bg-gray-800 text-gray-500 cursor-not-allowed"
+        start_disabled = "" if can_start else "disabled"
+        stop_disabled = "" if can_stop else "disabled"
+
+        card_class = "border-green-800 bg-green-900/10 border-t-blue-500" if status == "Charging" else ("border-gray-700 border-t-green-500" if status == "Available" else ("border-gray-700 border-t-red-500" if status == "Faulted" else "border-gray-700 border-t-slate-500"))
+
         html += f'''
-        <div class="rounded-xl p-4 mb-3 border {"border-green-800 bg-green-900/10" if is_charging else "border-gray-700"}" style="border-top:3px solid {border_color};">
+        <div class="rounded-xl p-4 mb-3 border {card_class}" style="border-top:3px solid {border_color};">
             <div class="flex items-center justify-between mb-3">
                 <div class="flex items-center gap-2">
                     <span class="w-2 h-2 rounded-full {dot_class}"></span>
-                    <span class="font-bold">Connector {conn.get("connector_id")}</span>
+                    <span class="font-bold">Connector {cid}</span>
                     <span class="text-xs text-gray-400">{status}</span>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-2">
-                <button hx-post="/action/start/{cp_id}?connector={conn.get("connector_id")}" hx-swap="outerHTML"
-                    class="py-3 rounded-lg font-bold text-sm {"bg-gradient-to-br from-green-600 to-green-500 text-white shadow-lg shadow-green-500/30" if can_start else "bg-gray-800 text-gray-500 cursor-not-allowed"}"
-                    {"" if can_start else "disabled"}>▶ Start</button>
-                <button hx-post="/action/stop/{cp_id}?connector={conn.get("connector_id")}" hx-swap="outerHTML"
-                    class="py-3 rounded-lg font-bold text-sm {"bg-gradient-to-br from-red-600 to-red-500 text-white shadow-lg shadow-red-500/30" if can_stop else "bg-gray-800 text-gray-500 cursor-not-allowed"}"
-                    {"" if can_stop else "disabled"}>■ Stop</button>
+                <button hx-post="/action/start/{cp_id}?connector={cid}" hx-swap="outerHTML"
+                        class="py-3 rounded-lg font-bold text-sm {start_btn_class} flex items-center justify-center gap-2 btn-press"
+                        {start_disabled}>
+                    <i data-lucide="play" class="w-4 h-4 fill-current inline-block btn-icon-default"></i>
+                    <span class="btn-spinner"></span>
+                    <span>Start</span>
+                </button>
+                <button hx-post="/action/stop/{cp_id}" hx-swap="outerHTML"
+                        class="py-3 rounded-lg font-bold text-sm {stop_btn_class} flex items-center justify-center gap-2 btn-press"
+                        {stop_disabled}>
+                    <i data-lucide="square" class="w-4 h-4 fill-current inline-block btn-icon-default"></i>
+                    <span class="btn-spinner"></span>
+                    <span>Stop</span>
+                </button>
             </div>
         </div>'''
 
-    return HTMLResponse(html or '<div class="text-sm text-gray-500 py-4">No connector data</div>')
+    return HTMLResponse(html or '<div class="text-sm text-gray-500 py-4">No connector data — charger may be offline</div>')
 
 
 @router.get("/partials/remote/pki/{cp_id}", response_class=HTMLResponse)

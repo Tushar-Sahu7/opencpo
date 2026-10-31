@@ -1,81 +1,81 @@
 <!-- Step: {{ step }} -->
-<div class="setup-card" style="padding:32px;">
+<div class="card p-8">
 
-    <div style="font-size:13px;color:#84BD00;margin-bottom:4px;">{{ step_icons[step] }} Step {{ steps.index(step) + 1 if step in steps else '' }}</div>
-    <h2 style="font-size:20px;font-weight:600;color:#e8edf2;margin-bottom:6px;">{{ step_labels[step] }}</h2>
-    <p style="font-size:13px;color:#3d5870;margin-bottom:24px;">{{ step_descriptions[step] }}</p>
+    <div class="text-caption font-semibold text-brand-600 dark:text-brand-400 mb-1">{{ step_icons[step] }} Step {{ steps.index(step) + 1 if step in steps else '' }}</div>
+    <h2 class="text-heading-2 font-semibold text-default-font mb-1.5">{{ step_labels[step] }}</h2>
+    <p class="text-caption text-subtext-color mb-6">{{ step_descriptions[step] }}</p>
 
     {% if error %}
-    <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:7px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#f87171;">
+    <div class="border border-error-500/30 bg-error-50/20 text-error-600 dark:text-error-400 text-caption rounded-md p-3 mb-5">
         {{ error }}
     </div>
     {% endif %}
 
     <form hx-post="/setup/step/{{ step }}" hx-target="#wizard-content" hx-swap="outerHTML"
-          style="display:flex;flex-direction:column;gap:16px;">
+          class="flex flex-col gap-4">
 
         {% if step == "admin" %}
         <div>
-            <label for="name">Name</label>
-            <input id="name" name="name" type="text" class="input-field" value="Admin" placeholder="Admin" required>
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="name">Name</label>
+            <input id="name" name="name" type="text" class="input w-full" value="Admin" placeholder="Admin" required>
         </div>
         <div>
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" class="input-field" placeholder="admin@example.com" required>
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="email">Email</label>
+            <input id="email" name="email" type="email" class="input w-full" placeholder="admin@example.com" required>
         </div>
         <div>
-            <label for="password">Password (min 8 characters)</label>
-            <input id="password" name="password" type="password" class="input-field" placeholder="••••••••" minlength="8" required>
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="password">Password (min 8 characters)</label>
+            <input id="password" name="password" type="password" class="input w-full" placeholder="••••••••" minlength="8" required>
         </div>
 
         {% elif step == "tailscale" %}
-        <div style="font-size:12px;color:#3d5870;margin-bottom:4px;">
+        <div class="text-caption text-subtext-color mb-1">
             Tailscale connects your OpenCPO instance to your tailnet, enabling secure
             remote access to the admin panel and charger WebSocket ports from any
             device on your network.
         </div>
-        <div style="background:#060d19;border:1px solid #1e3452;border-radius:7px;padding:14px;">
-            <div style="font-size:13px;color:#8ba3b8;margin-bottom:10px;">Expose services on your tailnet:</div>
-            <div style="display:flex;flex-direction:column;gap:8px;">
-                <label class="checkbox-label">
-                    <input type="checkbox" name="enable_admin" checked style="margin-right:8px;">
+        <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3.5">
+            <div class="text-caption font-medium text-default-font mb-2.5">Expose services on your tailnet:</div>
+            <div class="flex flex-col gap-2">
+                <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                    <input type="checkbox" name="enable_admin" checked class="rounded border-neutral-border text-brand-600">
                     Admin Panel (port 8080)
                 </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="enable_api" checked style="margin-right:8px;">
+                <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                    <input type="checkbox" name="enable_api" checked class="rounded border-neutral-border text-brand-600">
                     REST API (port 8000)
                 </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="enable_charge_app" style="margin-right:8px;">
+                <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                    <input type="checkbox" name="enable_charge_app" class="rounded border-neutral-border text-brand-600">
                     Charge App (port 8003)
                 </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="enable_ocpp16" style="margin-right:8px;">
+                <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                    <input type="checkbox" name="enable_ocpp16" class="rounded border-neutral-border text-brand-600">
                     OCPP 1.6 WebSocket (port 9100)
                 </label>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="enable_ocpp201" style="margin-right:8px;">
+                <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                    <input type="checkbox" name="enable_ocpp201" class="rounded border-neutral-border text-brand-600">
                     OCPP 2.0.1 WebSocket (port 9201)
                 </label>
             </div>
         </div>
         <div>
-            <label for="tags">Tailscale ACL Tags (comma-separated, optional)</label>
-            <input id="tags" name="tags" type="text" class="input-field" placeholder="tag:opencpo, tag:admin" value="tag:opencpo">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="tags">Tailscale ACL Tags (comma-separated, optional)</label>
+            <input id="tags" name="tags" type="text" class="input w-full" placeholder="tag:opencpo, tag:admin" value="tag:opencpo">
         </div>
-        <div style="font-size:12px;color:#3d5870;margin-top:-4px;">
+        <div class="text-[12px] text-subtext-color -mt-1">
             Tags are applied to the machine for ACL-based access control.
-            Requires <code style="color:#6b8299;">--accept-tags</code> in your Tailscale auth key.
+            Requires <code class="text-brand-600">--accept-tags</code> in your Tailscale auth key.
         </div>
 
         {% elif step == "org" %}
         <div>
-            <label for="name">Organization Name</label>
-            <input id="name" name="name" type="text" class="input-field" value="My CPO" placeholder="My CPO">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="name">Organization Name</label>
+            <input id="name" name="name" type="text" class="input w-full" value="My CPO" placeholder="My CPO">
         </div>
         <div>
-            <label for="timezone">Timezone</label>
-            <select id="timezone" name="timezone" class="input-field">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="timezone">Timezone</label>
+            <select id="timezone" name="timezone" class="select w-full">
                 <option value="Europe/Amsterdam">Europe/Amsterdam (CET)</option>
                 <option value="Europe/London">Europe/London (GMT)</option>
                 <option value="Europe/Berlin">Europe/Berlin (CET)</option>
@@ -89,8 +89,8 @@
             </select>
         </div>
         <div>
-            <label for="currency">Currency</label>
-            <select id="currency" name="currency" class="input-field">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="currency">Currency</label>
+            <select id="currency" name="currency" class="select w-full">
                 <option value="EUR">EUR (€)</option>
                 <option value="USD">USD ($)</option>
                 <option value="GBP">GBP (£)</option>
@@ -99,27 +99,25 @@
             </select>
         </div>
         <div>
-            <label for="public_url">Public URL</label>
-            <input id="public_url" name="public_url" type="url" class="input-field" value="http://localhost" placeholder="https://cpo.example.com">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="public_url">Public URL</label>
+            <input id="public_url" name="public_url" type="url" class="input w-full" value="http://localhost" placeholder="https://cpo.example.com">
         </div>
 
         {% elif step == "branding" %}
-        <div style="font-size:12px;color:#3d5870;margin-bottom:4px;">
+        <div class="text-caption text-subtext-color mb-1">
             Customize the platform appearance. All settings can be changed later.
         </div>
         <div>
-            <label for="accent_color">Accent Color</label>
-            <div style="display:flex;gap:10px;align-items:center;">
-                <input id="accent_color" name="accent_color" type="color" class="input-field" value="#2563EB"
-                       style="width:48px;height:40px;padding:4px;flex-shrink:0;">
-                <input type="text" class="input-field" value="#2563EB"
-                       oninput="document.getElementById('accent_color').value=this.value"
-                       style="flex:1;" placeholder="#2563EB">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="accent_color">Accent Color</label>
+            <div class="flex gap-2.5 items-center">
+                <input id="accent_color" name="accent_color" type="color" class="input p-1 w-12 h-10 shrink-0" value="#2563EB">
+                <input type="text" class="input flex-1" value="#2563EB"
+                       oninput="document.getElementById('accent_color').value=this.value" placeholder="#2563EB">
             </div>
         </div>
         <div>
-            <label for="skin">Charge App Skin</label>
-            <select id="skin" name="skin" class="input-field">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="skin">Charge App Skin</label>
+            <select id="skin" name="skin" class="select w-full">
                 <option value="default">Default — OpenCPO branded</option>
                 <option value="minimal">Minimal — clean, unbranded</option>
                 <option value="dark">Dark — high-contrast dark theme</option>
@@ -127,56 +125,56 @@
             </select>
         </div>
         <div>
-            <label for="charge_app_name">Charge App Name</label>
-            <input id="charge_app_name" name="charge_app_name" type="text" class="input-field"
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="charge_app_name">Charge App Name</label>
+            <input id="charge_app_name" name="charge_app_name" type="text" class="input w-full"
                    value="OpenCPO Charge" placeholder="My Charging App">
         </div>
         <div>
-            <label for="logo_url">Logo URL (optional)</label>
-            <input id="logo_url" name="logo_url" type="url" class="input-field" placeholder="https://example.com/logo.png">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="logo_url">Logo URL (optional)</label>
+            <input id="logo_url" name="logo_url" type="url" class="input w-full" placeholder="https://example.com/logo.png">
         </div>
 
         {% elif step == "smtp" %}
-        <div style="font-size:12px;color:#3d5870;margin-bottom:4px;">Leave empty to skip — can be configured later.</div>
+        <div class="text-caption text-subtext-color mb-1">Leave empty to skip — can be configured later.</div>
         <div>
-            <label for="host">SMTP Host</label>
-            <input id="host" name="host" type="text" class="input-field" placeholder="smtp.example.com">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="host">SMTP Host</label>
+            <input id="host" name="host" type="text" class="input w-full" placeholder="smtp.example.com">
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-                <label for="port">Port</label>
-                <input id="port" name="port" type="number" class="input-field" value="587">
+                <label class="text-caption font-medium text-default-font block mb-1.5" for="port">Port</label>
+                <input id="port" name="port" type="number" class="input w-full" value="587">
             </div>
             <div>
-                <label for="from_email">From Email</label>
-                <input id="from_email" name="from_email" type="email" class="input-field" placeholder="noreply@example.com">
+                <label class="text-caption font-medium text-default-font block mb-1.5" for="from_email">From Email</label>
+                <input id="from_email" name="from_email" type="email" class="input w-full" placeholder="noreply@example.com">
             </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-                <label for="username">Username</label>
-                <input id="username" name="username" type="text" class="input-field" placeholder="user@example.com">
+                <label class="text-caption font-medium text-default-font block mb-1.5" for="username">Username</label>
+                <input id="username" name="username" type="text" class="input w-full" placeholder="user@example.com">
             </div>
             <div>
-                <label for="smtp_password">Password</label>
-                <input id="smtp_password" name="password" type="password" class="input-field" placeholder="••••••">
+                <label class="text-caption font-medium text-default-font block mb-1.5" for="smtp_password">Password</label>
+                <input id="smtp_password" name="password" type="password" class="input w-full" placeholder="••••••">
             </div>
         </div>
         <div>
-            <label class="checkbox-label">
-                <input type="checkbox" name="use_tls" checked style="margin-right:6px;"> Use TLS
+            <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                <input type="checkbox" name="use_tls" checked class="rounded border-neutral-border text-brand-600"> Use TLS
             </label>
         </div>
 
         {% elif step == "pki" %}
-        <div style="font-size:12px;color:#3d5870;margin-bottom:4px;">PKI is initialized automatically on startup. This step ensures root and user CAs exist.</div>
+        <div class="text-caption text-subtext-color mb-1">PKI is initialized automatically on startup. This step ensures root and user CAs exist.</div>
         <div>
-            <label for="org_name">Organization Name (for certificates)</label>
-            <input id="org_name" name="org_name" type="text" class="input-field" value="" placeholder="My CPO">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="org_name">Organization Name (for certificates)</label>
+            <input id="org_name" name="org_name" type="text" class="input w-full" value="" placeholder="My CPO">
         </div>
         <div>
-            <label for="country">Country</label>
-            <select id="country" name="country" class="input-field">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="country">Country</label>
+            <select id="country" name="country" class="select w-full">
                 <option value="NL">Netherlands</option>
                 <option value="DE">Germany</option>
                 <option value="UK">United Kingdom</option>
@@ -189,42 +187,42 @@
 
         {% elif step == "pricing" %}
         <div>
-            <label for="currency">Currency</label>
-            <select id="currency" name="currency" class="input-field">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="currency">Currency</label>
+            <select id="currency" name="currency" class="select w-full">
                 <option value="EUR">EUR (€)</option>
                 <option value="USD">USD ($)</option>
                 <option value="GBP">GBP (£)</option>
             </select>
         </div>
         <div>
-            <label for="default_rate_kwh">Default rate (€/kWh)</label>
-            <input id="default_rate_kwh" name="default_rate_kwh" type="number" step="0.01" class="input-field" value="0.35">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="default_rate_kwh">Default rate (€/kWh)</label>
+            <input id="default_rate_kwh" name="default_rate_kwh" type="number" step="0.01" class="input w-full" value="0.35">
         </div>
         <div>
-            <label for="tariff_name">Tariff name</label>
-            <input id="tariff_name" name="tariff_name" type="text" class="input-field" value="Standard Rate">
+            <label class="text-caption font-medium text-default-font block mb-1.5" for="tariff_name">Tariff name</label>
+            <input id="tariff_name" name="tariff_name" type="text" class="input w-full" value="Standard Rate">
         </div>
 
         {% elif step == "features" %}
-        <div style="font-size:12px;color:#3d5870;margin-bottom:4px;">Enable optional modules. All can be toggled later.</div>
-        <div style="display:flex;flex-direction:column;gap:10px;">
-            <label class="checkbox-label">
-                <input type="checkbox" name="ocpi" style="margin-right:8px;"> OCPI Roaming — connect to other charging networks
+        <div class="text-caption text-subtext-color mb-1">Enable optional modules. All can be toggled later.</div>
+        <div class="flex flex-col gap-2.5">
+            <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                <input type="checkbox" name="ocpi" class="rounded border-neutral-border text-brand-600"> OCPI Roaming — connect to other charging networks
             </label>
-            <label class="checkbox-label">
-                <input type="checkbox" name="billing" style="margin-right:8px;"> Billing & Invoicing — generate invoices for fleet clients
+            <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                <input type="checkbox" name="billing" class="rounded border-neutral-border text-brand-600"> Billing & Invoicing — generate invoices for fleet clients
             </label>
-            <label class="checkbox-label">
-                <input type="checkbox" name="iso15118" style="margin-right:8px;"> ISO 15118 — Plug & Charge support
+            <label class="flex items-center gap-2 text-caption text-default-font cursor-pointer">
+                <input type="checkbox" name="iso15118" class="rounded border-neutral-border text-brand-600"> ISO 15118 — Plug & Charge support
             </label>
         </div>
         {% endif %}
 
-        <div style="display:flex;gap:12px;margin-top:8px;">
+        <div class="flex gap-3 mt-2">
             <button type="submit" class="btn-primary">
                 {% if step == "features" %}Finish Setup{% else %}Continue →{% endif %}
             </button>
-            <button type="button" class="btn-skip"
+            <button type="button" class="btn-outline"
                     hx-post="/setup/skip/{{ step }}" hx-target="#wizard-content" hx-swap="outerHTML">
                 Skip — I'll configure manually
             </button>

@@ -1,18 +1,18 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-    <div class="bg-white rounded-lg p-3.5 border border-slate-200 shadow-sm">
-        <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total Chargers</div>
-        <div class="text-2xl font-bold text-blue-600 font-mono mt-1">{{ charger_count or 42 }} <span class="text-xs font-normal text-blue-500">Units</span></div>
+    <div class="card p-3.5">
+        <div class="text-[10px] text-subtext-color uppercase tracking-wider font-semibold">Total Chargers</div>
+        <div class="text-heading-2 font-bold text-brand-600 dark:text-brand-400 font-mono mt-1">{{ charger_count or 42 }} <span class="text-caption font-normal text-subtext-color">Units</span></div>
     </div>
-    <div class="bg-white rounded-lg p-3.5 border border-slate-200 shadow-sm">
-        <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Active Sessions</div>
-        <div class="text-2xl font-bold text-emerald-600 font-mono mt-1">{{ stats.active or 18 }} <span class="text-xs font-normal text-emerald-500">Active</span></div>
+    <div class="card p-3.5">
+        <div class="text-[10px] text-subtext-color uppercase tracking-wider font-semibold">Active Sessions</div>
+        <div class="text-heading-2 font-bold text-success-600 dark:text-success-400 font-mono mt-1">{{ stats.active or 18 }} <span class="text-caption font-normal text-success-500">Active</span></div>
     </div>
-    <div class="bg-white rounded-lg p-3.5 border border-slate-200 shadow-sm">
-        <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Total Energy Dispensed</div>
-        <div class="text-2xl font-bold text-slate-800 font-mono mt-1">{{ "%.1f"|format(stats.total_energy_kwh or 38420.5) }} <span class="text-xs font-normal text-slate-500">kWh</span></div>
+    <div class="card p-3.5">
+        <div class="text-[10px] text-subtext-color uppercase tracking-wider font-semibold">Total Energy Dispensed</div>
+        <div class="text-heading-2 font-bold text-default-font font-mono mt-1">{{ "%.1f"|format(stats.total_energy_kwh or 38420.5) }} <span class="text-caption font-normal text-subtext-color">kWh</span></div>
     </div>
-    <div class="bg-white rounded-lg p-3.5 border border-slate-200 shadow-sm">
-        <div class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Completed Charging Sessions</div>
-        <div class="text-2xl font-bold text-amber-600 font-mono mt-1">{{ stats.completed or 1284 }} <span class="text-xs font-normal text-amber-500">Runs</span></div>
+    <div class="card p-3.5">
+        <div class="text-[10px] text-subtext-color uppercase tracking-wider font-semibold">Completed Charging Sessions</div>
+        <div class="text-heading-2 font-bold text-warning-600 dark:text-warning-400 font-mono mt-1">{{ stats.completed or 1284 }} <span class="text-caption font-normal text-warning-500">Runs</span></div>
     </div>
 </div>

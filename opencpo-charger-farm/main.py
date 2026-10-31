@@ -239,7 +239,7 @@ async def on_startup():
             farm.running = True
             farm_metrics.log_event("info", "farm", f"Auto-started {count} default virtual chargers")
         except Exception as e:
-            logger.warning(f"Failed to auto-start farm chargers: {e}")
+            log.warning(f"Failed to auto-start farm chargers: {e}")
 
     asyncio.create_task(_auto_start())
 

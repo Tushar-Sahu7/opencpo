@@ -5,151 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <title>Setup — OpenCPO Admin</title>
+    <link rel="stylesheet" href="/static/design-system.css">
     <script src="/static/tailwind.js"></script>
     <script src="/static/htmx.min.js"></script>
     <script src="/static/lucide.min.js"></script>
     <script>
+        // Check for system or stored dark mode
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
         tailwind.config = {
+            darkMode: 'selector',
             theme: {
                 extend: {
                     colors: {
-                        brand: { dark: '#0f172a', green: '#22c55e', blue: '#2563eb' }
-                    },
+                        'brand-primary': 'var(--color-brand-primary)',
+                        'brand-secondary': 'var(--color-brand-secondary)',
+                        'default-font': 'var(--color-default-font)',
+                        'subtext-color': 'var(--color-subtext-color)',
+                        'neutral-border': 'var(--color-neutral-border)',
+                        'brand-50': 'var(--color-brand-50)',
+                        'brand-500': 'var(--color-brand-500)',
+                        'brand-600': 'var(--color-brand-600)',
+                        'brand-700': 'var(--color-brand-700)',
+                        'neutral-0': 'var(--color-neutral-0)',
+                        'neutral-50': 'var(--color-neutral-50)',
+                        'neutral-100': 'var(--color-neutral-100)',
+                        'neutral-800': 'var(--color-neutral-800)',
+                        'neutral-900': 'var(--color-neutral-900)',
+                        'success-500': 'var(--color-success-500)',
+                        'success-600': 'var(--color-success-600)',
+                        'warning-500': 'var(--color-warning-500)',
+                        'warning-600': 'var(--color-warning-600)',
+                        'error-500': 'var(--color-error-500)',
+                        'error-600': 'var(--color-error-600)',
+                    }
                 }
             }
-        }
+        };
     </script>
-    <style>
-        body { background: #f8fafc; color: #0f172a; }
-        .setup-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-        .welcome-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-        }
-        .step-indicator { color: #64748b; font-size: 13px; }
-        .step-indicator .active { color: #2563eb; font-weight: 600; }
-        .step-indicator .done { color: #22c55e; }
-        .input-field {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            color: #0f172a;
-            font-size: 15px;
-            padding: 11px 14px;
-            width: 100%;
-            outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
-        }
-        .input-field::placeholder { color: #94a3b8; }
-        .input-field:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-        }
-        .btn-primary {
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            border-radius: 7px;
-            font-size: 15px;
-            font-weight: 600;
-            padding: 12px 24px;
-            cursor: pointer;
-            transition: background 0.15s, box-shadow 0.15s;
-        }
-        .btn-primary:hover { background: #1d4ed8; box-shadow: 0 4px 16px rgba(37,99,235,0.3); }
-        .btn-skip {
-            background: transparent;
-            color: #64748b;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            font-size: 13px;
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .btn-skip:hover { color: #0f172a; border-color: #94a3b8; }
-        .checkbox-label { font-size: 14px; color: #475569; cursor: pointer; }
-        label { font-size: 13px; color: #475569; letter-spacing: 0.3px; display: block; margin-bottom: 6px; }
-        select.input-field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233d5870' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
-    </style>
 </head>
-<body class="h-full flex flex-col items-center justify-center" style="min-height:100vh;">
+<body class="h-full flex flex-col items-center justify-center bg-default-background text-default-font p-4 transition-colors">
 
     <!-- ════════════════════════════════════════════════════════════════ -->
     <!-- WELCOME SCREEN (shown on first visit, before any steps)        -->
     <!-- ════════════════════════════════════════════════════════════════ -->
     {% if show_welcome %}
 
-    <div style="max-width:600px;width:100%;padding:0 24px;">
+    <div class="max-w-[600px] w-full">
 
-        <div class="welcome-card" style="padding:48px 40px;text-align:center;">
+        <div class="card p-10 sm:p-12 text-center shadow-lg">
 
             <!-- Logo -->
-            <div style="font-size:40px;font-weight:700;letter-spacing:-1px;margin-bottom:4px;">
-                <span style="color:#e8edf2;">Open</span><span style="color:#4a6580;">CPO</span>
+            <div class="text-4xl font-bold tracking-tight mb-1">
+                <span class="text-default-font">Open</span><span class="text-brand-600">CPO</span>
             </div>
 
             <!-- Tagline -->
-            <p style="font-size:13px;color:#3d5870;letter-spacing:3px;text-transform:uppercase;margin-bottom:32px;">
+            <p class="text-caption uppercase tracking-widest text-subtext-color mb-6 font-semibold">
                 Open Source EV Charging Platform
             </p>
 
             <!-- Divider -->
-            <div style="height:1px;background:linear-gradient(90deg,transparent,#15283f,transparent);margin-bottom:32px;"></div>
+            <div class="h-px bg-neutral-border mb-6"></div>
 
             <!-- Description -->
-            <p style="font-size:15px;color:#8ba3b8;line-height:1.6;margin-bottom:32px;text-align:left;">
+            <p class="text-body text-subtext-color leading-relaxed mb-6 text-left">
                 OpenCPO is a zero-trust EV charging management platform built for
-                charge point operators. It supports <strong style="color:#e8edf2;">OCPP 1.6</strong> and
-                <strong style="color:#e8edf2;">OCPP 2.0.1</strong>, <strong style="color:#e8edf2;">ISO 15118</strong>
+                charge point operators. It supports <strong class="text-default-font">OCPP 1.6</strong> and
+                <strong class="text-default-font">OCPP 2.0.1</strong>, <strong class="text-default-font">ISO 15118</strong>
                 Plug &amp; Charge, PKI-based charger authentication, OCPI roaming,
                 and real-time energy management.
             </p>
 
             <!-- Feature grid -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:36px;text-align:left;">
-                <div style="background:#060d19;border:1px solid #15283f;border-radius:8px;padding:12px 14px;">
-                    <div style="font-size:11px;color:#00B0E4;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">OCPP</div>
-                    <div style="font-size:13px;color:#8ba3b8;">1.6 &amp; 2.0.1</div>
+            <div class="grid grid-cols-2 gap-3 mb-8 text-left">
+                <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3">
+                    <div class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5">OCPP</div>
+                    <div class="text-caption text-subtext-color">1.6 &amp; 2.0.1</div>
                 </div>
-                <div style="background:#060d19;border:1px solid #15283f;border-radius:8px;padding:12px 14px;">
-                    <div style="font-size:11px;color:#00B0E4;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">Auth</div>
-                    <div style="font-size:13px;color:#8ba3b8;">PKI + mTLS + JWT</div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3">
+                    <div class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5">Auth</div>
+                    <div class="text-caption text-subtext-color">PKI + mTLS + JWT</div>
                 </div>
-                <div style="background:#060d19;border:1px solid #15283f;border-radius:8px;padding:12px 14px;">
-                    <div style="font-size:11px;color:#00B0E4;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">ISO 15118</div>
-                    <div style="font-size:13px;color:#8ba3b8;">Plug &amp; Charge</div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3">
+                    <div class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5">ISO 15118</div>
+                    <div class="text-caption text-subtext-color">Plug &amp; Charge</div>
                 </div>
-                <div style="background:#060d19;border:1px solid #15283f;border-radius:8px;padding:12px 14px;">
-                    <div style="font-size:11px;color:#00B0E4;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">Tailscale</div>
-                    <div style="font-size:13px;color:#8ba3b8;">Secure tailnet access</div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3">
+                    <div class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5">Tailscale</div>
+                    <div class="text-caption text-subtext-color">Secure tailnet access</div>
                 </div>
-                <div style="background:#060d19;border:1px solid #15283f;border-radius:8px;padding:12px 14px;">
-                    <div style="font-size:11px;color:#00B0E4;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">OCPI</div>
-                    <div style="font-size:13px;color:#8ba3b8;">Network roaming</div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3">
+                    <div class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5">OCPI</div>
+                    <div class="text-caption text-subtext-color">Network roaming</div>
                 </div>
-                <div style="background:#060d19;border:1px solid #15283f;border-radius:8px;padding:12px 14px;">
-                    <div style="font-size:11px;color:#00B0E4;letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;">Billing</div>
-                    <div style="font-size:13px;color:#8ba3b8;">Invoicing &amp; tariffs</div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border rounded-lg p-3">
+                    <div class="text-[11px] font-semibold text-brand-600 uppercase tracking-wider mb-0.5">Billing</div>
+                    <div class="text-caption text-subtext-color">Invoicing &amp; tariffs</div>
                 </div>
             </div>
 
             <!-- Get Started button -->
-            <button class="btn-primary" style="font-size:16px;padding:14px 40px;"
+            <button class="btn-primary text-body py-3 px-8 w-full sm:w-auto font-semibold"
                     hx-get="/setup/start" hx-target="body" hx-swap="innerHTML">
                 Begin Setup →
             </button>
 
             <!-- Footer -->
-            <div style="margin-top:24px;font-size:12px;color:#2d4a63;">
-                Open source · <a href="https://github.com/opencpo" style="color:#3d5870;">github.com/opencpo</a>
+            <div class="mt-6 text-caption text-subtext-color">
+                Open source · <a href="https://github.com/opencpo" class="hover:underline text-brand-600" target="_blank">github.com/opencpo</a>
             </div>
         </div>
     </div>
@@ -159,21 +126,21 @@
     <!-- ════════════════════════════════════════════════════════════════ -->
     {% else %}
 
-    <div style="max-width:540px;width:100%;padding:0 20px;">
+    <div class="max-w-[540px] w-full">
 
         <!-- Logo -->
-        <div style="text-align:center;margin-bottom:28px;">
-            <div style="font-size:28px;font-weight:700;letter-spacing:-0.5px;">
-                <span style="color:#e8edf2;">Open</span><span style="color:#4a6580;">CPO</span>
+        <div class="text-center mb-6">
+            <div class="text-3xl font-bold tracking-tight">
+                <span class="text-default-font">Open</span><span class="text-brand-600">CPO</span>
             </div>
-            <div style="font-size:10px;color:#3d5870;letter-spacing:2.5px;text-transform:uppercase;margin-top:6px;">
+            <div class="text-caption uppercase tracking-widest text-subtext-color mt-1 font-semibold">
                 Setup Wizard
             </div>
         </div>
 
         <!-- Error banner -->
         {% if error %}
-        <div style="background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:7px;padding:10px 14px;margin-bottom:20px;font-size:13px;color:#f87171;">
+        <div class="border border-error-500/30 bg-error-50/20 text-error-600 dark:text-error-400 text-caption rounded-md p-3 mb-5">
             {{ error }}
         </div>
         {% endif %}

@@ -3,9 +3,9 @@
 {% block title %}OCPP Messages — CPO Admin{% endblock %}
 
 {% block content %}
-<div style="margin-bottom:20px;">
-  <h1 class="text-2xl font-bold mb-1">OCPP Protocol Log</h1>
-  <p style="color:#4a6580;font-size:13px;max-width:760px;">
+<div class="mb-6">
+  <h1 class="text-heading-1 font-semibold text-default-font mb-1">OCPP Protocol Log</h1>
+  <p class="text-caption text-subtext-color max-w-3xl">
     Every message exchanged between your chargers and this central system.
     Think of it as a live debug console — each line shows a command sent to a charger
     or a status report received from one.
@@ -13,14 +13,13 @@
 </div>
 
 <!-- Controls -->
-<div style="background:#0a1221;border:1px solid #15283f;border-radius:10px;padding:14px 16px;margin-bottom:12px;">
-  <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;">
+<div class="card p-4 mb-4">
+  <div class="flex flex-wrap gap-3 items-end">
 
     <!-- Charger filter -->
-    <div style="display:flex;flex-direction:column;gap:4px;min-width:160px;">
-      <label style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;">Charger</label>
-      <select id="filter-charger" onchange="applyFilters()"
-        style="background:#111c2e;border:1px solid #1e3450;color:#c0cdd8;padding:6px 10px;border-radius:6px;font-size:12px;min-width:160px;">
+    <div class="flex flex-col gap-1 min-w-[160px]">
+      <label class="text-[10px] font-semibold uppercase tracking-wider text-subtext-color">Charger</label>
+      <select id="filter-charger" onchange="applyFilters()" class="select text-caption min-w-[160px]">
         <option value="">All chargers</option>
         {% for cp in chargers %}
         <option value="{{ cp.id }}">{{ cp.id }}</option>
@@ -29,10 +28,9 @@
     </div>
 
     <!-- Event type filter -->
-    <div style="display:flex;flex-direction:column;gap:4px;min-width:180px;">
-      <label style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;">Event Type</label>
-      <select id="filter-type" onchange="applyFilters()"
-        style="background:#111c2e;border:1px solid #1e3450;color:#c0cdd8;padding:6px 10px;border-radius:6px;font-size:12px;min-width:180px;">
+    <div class="flex flex-col gap-1 min-w-[180px]">
+      <label class="text-[10px] font-semibold uppercase tracking-wider text-subtext-color">Event Type</label>
+      <select id="filter-type" onchange="applyFilters()" class="select text-caption min-w-[180px]">
         <option value="">All types</option>
         <optgroup label="Charger">
           <option value="charger.boot">Boot</option>
@@ -59,10 +57,9 @@
     </div>
 
     <!-- Direction filter -->
-    <div style="display:flex;flex-direction:column;gap:4px;">
-      <label style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;">Direction</label>
-      <select id="filter-direction" onchange="applyFilters()"
-        style="background:#111c2e;border:1px solid #1e3450;color:#c0cdd8;padding:6px 10px;border-radius:6px;font-size:12px;width:160px;">
+    <div class="flex flex-col gap-1">
+      <label class="text-[10px] font-semibold uppercase tracking-wider text-subtext-color">Direction</label>
+      <select id="filter-direction" onchange="applyFilters()" class="select text-caption w-40">
         <option value="">All</option>
         <option value="from">From charger</option>
         <option value="to">To charger</option>
@@ -70,122 +67,114 @@
     </div>
 
     <!-- Search -->
-    <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:200px;">
-      <label style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;">Search</label>
-      <input id="filter-search" type="text" placeholder="Filter payload..." oninput="applyFilters()"
-        style="background:#111c2e;border:1px solid #1e3450;color:#c0cdd8;padding:6px 10px;border-radius:6px;font-size:12px;width:100%;">
+    <div class="flex flex-col gap-1 flex-1 min-w-[200px]">
+      <label class="text-[10px] font-semibold uppercase tracking-wider text-subtext-color">Search</label>
+      <input id="filter-search" type="text" placeholder="Filter payload..." oninput="applyFilters()" class="input text-caption w-full">
     </div>
 
     <!-- Buttons -->
-    <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
-      <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:#6b8299;">
-        <input type="checkbox" id="auto-scroll" checked
-          style="accent-color:#00B0E4;">
+    <div class="flex gap-2 items-center flex-wrap pt-2 sm:pt-0">
+      <label class="flex items-center gap-2 cursor-pointer text-caption text-default-font font-medium mr-2">
+        <input type="checkbox" id="auto-scroll" checked class="rounded border-neutral-border text-brand-600 focus:ring-brand-500">
         Auto-scroll
       </label>
-      <button id="btn-pause" onclick="togglePause()"
-        style="padding:6px 14px;background:#111c2e;border:1px solid #1e3450;color:#c0cdd8;border-radius:6px;font-size:12px;cursor:pointer;">
+      <button id="btn-pause" onclick="togglePause()" class="btn-outline text-caption py-1.5 px-3">
         Pause
       </button>
-      <button onclick="clearLog()"
-        style="padding:6px 14px;background:#111c2e;border:1px solid #1e3450;color:#c0cdd8;border-radius:6px;font-size:12px;cursor:pointer;">
+      <button onclick="clearLog()" class="btn-outline text-caption py-1.5 px-3">
         Clear
       </button>
-      <button onclick="exportMessages()"
-        style="padding:6px 14px;background:#111c2e;border:1px solid #1e3450;color:#00B0E4;border-radius:6px;font-size:12px;cursor:pointer;">
+      <button onclick="exportMessages()" class="btn-primary text-caption py-1.5 px-3">
         Export JSON
       </button>
     </div>
   </div>
 
   <!-- Status bar -->
-  <div style="display:flex;align-items:center;gap:20px;margin-top:12px;padding-top:12px;border-top:1px solid #15283f;">
-    <span id="conn-status" style="font-size:12px;color:#84BD00;">● Connected</span>
-    <span id="msg-counter" style="font-size:12px;color:#4a6580;">0 events</span>
-    <span id="msg-rate" style="font-size:12px;color:#4a6580;">0 /sec</span>
-    <span id="filter-count" style="font-size:12px;color:#4a6580;"></span>
+  <div class="flex items-center gap-5 mt-3 pt-3 border-t border-neutral-border">
+    <span id="conn-status" class="text-caption font-semibold text-success-600 dark:text-success-400">● Connected</span>
+    <span id="msg-counter" class="text-caption text-subtext-color">0 events</span>
+    <span id="msg-rate" class="text-caption text-subtext-color">0 /sec</span>
+    <span id="filter-count" class="text-caption text-subtext-color"></span>
   </div>
 </div>
 
 <!-- Message stream -->
-<div style="background:#060d18;border:1px solid #15283f;border-radius:10px;overflow:hidden;">
-  <div id="msg-log"
-    style="height:calc(100vh - 360px);min-height:320px;overflow-y:auto;font-family:'SF Mono','Fira Code',monospace;font-size:11px;padding:8px 0;">
-    <div id="msg-empty" style="padding:24px;color:#2d4a63;text-align:center;">Connecting to event stream…</div>
+<div class="card overflow-hidden">
+  <div id="msg-log" class="h-[calc(100vh-360px)] min-h-[320px] overflow-y-auto font-mono text-[11px] py-2 bg-white dark:bg-neutral-0">
+    <div id="msg-empty" class="p-6 text-subtext-color text-center">Connecting to event stream…</div>
   </div>
 </div>
 
 <!-- Detail panel (hidden by default) -->
 <div id="detail-panel"
-  style="display:none;position:fixed;top:60px;right:20px;width:520px;max-height:calc(100vh - 80px);background:#0a1221;border:1px solid #1e3450;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,0.6);z-index:1000;overflow:hidden;display:flex;flex-direction:column;">
-  <div style="padding:12px 16px;border-bottom:1px solid #15283f;display:flex;justify-between;align-items:center;">
+  class="card shadow-2xl fixed top-[60px] right-5 w-[520px] max-h-[calc(100vh-80px)] z-[1000] overflow-hidden flex flex-col hidden border border-neutral-border">
+  <div class="p-3 px-4 border-b border-neutral-border flex justify-between items-center bg-white dark:bg-neutral-0">
     <div>
-      <span id="detail-title" style="font-size:13px;font-weight:600;color:#e8edf2;"></span>
-      <span id="detail-cp" style="font-size:11px;color:#4a6580;margin-left:8px;font-family:monospace;"></span>
+      <span id="detail-title" class="text-caption-bold text-default-font"></span>
+      <span id="detail-cp" class="text-[11px] text-subtext-color ml-2 font-mono"></span>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <button onclick="copyDetail()" id="btn-copy"
-        style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#00B0E4;border-radius:5px;font-size:11px;cursor:pointer;">
+    <div class="flex gap-2 items-center">
+      <button onclick="copyDetail()" id="btn-copy" class="btn-primary text-[11px] py-1 px-2.5">
         Copy
       </button>
-      <button onclick="closeDetail()"
-        style="padding:4px 8px;background:#111c2e;border:1px solid #1e3450;color:#6b8299;border-radius:5px;font-size:11px;cursor:pointer;">
+      <button onclick="closeDetail()" class="btn-outline text-[11px] py-1 px-2">
         Close
       </button>
     </div>
   </div>
-  <div id="detail-meta" style="padding:10px 16px;border-bottom:1px solid #15283f;font-size:11px;color:#4a6580;font-family:monospace;"></div>
-  <div style="flex:1;overflow-y:auto;padding:12px 16px;">
-    <pre id="detail-json" style="margin:0;font-size:11px;line-height:1.6;white-space:pre-wrap;word-break:break-all;"></pre>
+  <div id="detail-meta" class="py-2.5 px-4 border-b border-neutral-border text-[11px] text-subtext-color font-mono bg-neutral-50 dark:bg-neutral-800/40"></div>
+  <div class="flex-1 overflow-y-auto p-4 bg-white dark:bg-neutral-0">
+    <pre id="detail-json" class="m-0 text-[11px] leading-relaxed whitespace-pre-wrap break-all bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-border rounded-md p-3 text-default-font font-mono"></pre>
   </div>
 </div>
 <div id="detail-backdrop" onclick="closeDetail()"
-  style="display:none;position:fixed;inset:0;z-index:999;"></div>
+  class="hidden fixed inset-0 bg-neutral-950/40 backdrop-blur-sm z-[999]"></div>
 
 <style>
   .msg-row {
     display: flex;
     align-items: baseline;
     gap: 0;
-    padding: 3px 12px;
-    border-bottom: 1px solid #0d1b2e;
+    padding: 5px 12px;
+    border-bottom: 1px solid var(--color-neutral-border);
     cursor: pointer;
-    transition: background 0.1s;
+    transition: background-color 0.1s ease;
     line-height: 1.5;
   }
-  .msg-row:hover { background: #0d1b2e; }
+  .msg-row:hover { background-color: var(--color-brand-50); }
   .msg-row:last-child { border-bottom: none; }
-  .msg-ts   { color: #2d4a63; width: 88px; flex-shrink: 0; font-size: 10px; }
+  .msg-ts   { color: var(--color-subtext-color); width: 88px; flex-shrink: 0; font-size: 10px; }
   .msg-dir  { width: 20px; flex-shrink: 0; text-align: center; font-size: 12px; }
-  .msg-dir-from { color: #84BD00; }
-  .msg-dir-to   { color: #00B0E4; }
-  .msg-cp   { color: #6b8299; width: 90px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+  .msg-dir-from { color: var(--color-success-600); font-weight: 600; }
+  .msg-dir-to   { color: var(--color-brand-600); font-weight: 600; }
+  .msg-cp   { color: var(--color-default-font); width: 90px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; font-weight: 500; }
   .msg-cp a { color: inherit; text-decoration: none; }
-  .msg-cp a:hover { color: #c0cdd8; text-decoration: underline; }
-  .msg-type { width: 140px; flex-shrink: 0; font-weight: 500; font-size: 11px; }
-  .msg-preview { color: #4a6580; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+  .msg-cp a:hover { color: var(--color-brand-600); text-decoration: underline; }
+  .msg-type { width: 140px; flex-shrink: 0; font-weight: 600; font-size: 11px; }
+  .msg-preview { color: var(--color-subtext-color); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
 
-  /* Type colors — OCPP actions */
-  .type-BootNotification, .type-Heartbeat, .type-boot, .type-heartbeat, .type-online, .type-offline { color: #64748b; }
-  .type-StatusNotification, .type-status { color: #3b82f6; }
-  .type-MeterValues, .type-meter { color: #22c55e; }
-  .type-StartTransaction, .type-start { color: #eab308; }
-  .type-StopTransaction, .type-stop { color: #f59e0b; }
-  .type-Authorize, .type-auth { color: #a855f7; }
-  .type-RemoteStartTransaction, .type-RemoteStopTransaction, .type-Reset, .type-TriggerMessage, .type-remote { color: #f97316; }
-  .type-ChangeConfiguration, .type-GetConfiguration, .type-SetChargingProfile { color: #06b6d4; }
-  .type-DataTransfer { color: #8b5cf6; }
-  .type-FirmwareStatusNotification, .type-DiagnosticsStatusNotification { color: #6b7280; }
-  .type-error, .type-alert { color: #ef4444; }
-  .type-pki    { color: #f97316; }
+  /* Type colors — OCPP actions using design tokens */
+  .type-BootNotification, .type-Heartbeat, .type-boot, .type-heartbeat, .type-online, .type-offline { color: var(--color-subtext-color); }
+  .type-StatusNotification, .type-status { color: var(--color-brand-600); }
+  .type-MeterValues, .type-meter { color: var(--color-success-600); }
+  .type-StartTransaction, .type-start { color: var(--color-warning-600); }
+  .type-StopTransaction, .type-stop { color: var(--color-warning-700); }
+  .type-Authorize, .type-auth { color: var(--color-brand-500); }
+  .type-RemoteStartTransaction, .type-RemoteStopTransaction, .type-Reset, .type-TriggerMessage, .type-remote { color: var(--color-warning-700); }
+  .type-ChangeConfiguration, .type-GetConfiguration, .type-SetChargingProfile { color: var(--color-brand-500); }
+  .type-DataTransfer { color: var(--color-brand-600); }
+  .type-FirmwareStatusNotification, .type-DiagnosticsStatusNotification { color: var(--color-subtext-color); }
+  .type-error, .type-alert { color: var(--color-error-600); }
+  .type-pki    { color: var(--color-warning-700); }
 
-  /* JSON syntax highlight */
-  .json-key    { color: #60a5fa; }
-  .json-str    { color: #86efac; }
-  .json-num    { color: #fde68a; }
-  .json-bool   { color: #c084fc; }
-  .json-null   { color: #9ca3af; }
-  .json-punct  { color: #475569; }
+  /* JSON syntax highlight using tokens */
+  .json-key    { color: var(--color-brand-600); font-weight: 600; }
+  .json-str    { color: var(--color-success-600); }
+  .json-num    { color: var(--color-warning-600); }
+  .json-bool   { color: var(--color-brand-500); font-weight: 600; }
+  .json-null   { color: var(--color-subtext-color); font-style: italic; }
+  .json-punct  { color: var(--color-default-font); }
 
   @media (max-width: 768px) {
     #detail-panel { width: calc(100vw - 24px); right: 12px; top: 50px; }

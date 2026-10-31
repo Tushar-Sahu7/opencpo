@@ -1,101 +1,100 @@
 {% extends "base.html" %}
 {% set active = "tariffs" %}
-{% block title %}Tariffs{% endblock %}
+{% block title %}Tariffs — CPO Admin{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
     <div>
         <h1 class="text-2xl font-bold">Tariffs</h1>
-        <p style="color:#4a6580;font-size:13px;margin-top:4px;margin-bottom:0;">Tariffs control how much drivers pay when they charge. Each tariff is a pricing rule you assign to one or more chargers. Drivers see the price before they start charging.</p>
+        <p class="text-xs text-subtext-color mt-1 mb-0 leading-normal">Tariffs control how much drivers pay when they charge. Each tariff is a pricing rule you assign to one or more chargers. Drivers see the price before they start charging.</p>
     </div>
     <button onclick="openModal('modal-create')"
-        class="px-4 py-2 bg-brand-green text-black font-bold rounded-lg hover:opacity-90 transition-opacity text-sm">
+        class="btn btn-primary text-xs py-1.5 px-3">
         + New Tariff
     </button>
 </div>
 
 <!-- Pricing field legend -->
-<div class="mb-5 p-4 bg-gray-900 border border-gray-800 rounded-xl text-xs text-gray-400 grid grid-cols-2 md:grid-cols-4 gap-3">
-    <div><span class="text-gray-200 font-semibold block mb-0.5">Energy Rate (€/kWh)</span>The main charge — drivers pay this per kilowatt-hour of electricity delivered. Most tariffs only need this.</div>
-    <div><span class="text-gray-200 font-semibold block mb-0.5">Time Rate (€/min)</span>Optional per-minute fee while charging. Useful for busy locations where you want to encourage faster turnover.</div>
-    <div><span class="text-gray-200 font-semibold block mb-0.5">Idle Rate (€/min)</span>Fee that kicks in after charging is complete but the car is still plugged in. Encourages drivers to free up the charger promptly.</div>
-    <div><span class="text-gray-200 font-semibold block mb-0.5">Flat Fee (€)</span>A fixed connection fee charged once per session, regardless of energy or time. Can be used to cover infrastructure costs.</div>
-</div>
-<!-- ── Section 1: Tariff Cards ───────────────────────────────────────── -->
-<div id="tariff-cards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
-{% for t in tariffs %}
-{% set now = now_iso %}
-{% if t.valid_until and t.valid_until < now %}
-  {% set card_border = "border-red-800" %}
-  {% set status_badge = '<span class="px-2 py-0.5 bg-red-900/60 text-red-300 rounded-full text-xs">Expired</span>' %}
-{% elif t.valid_from and t.valid_from > now %}
-  {% set card_border = "border-blue-800" %}
-  {% set status_badge = '<span class="px-2 py-0.5 bg-blue-900/60 text-blue-300 rounded-full text-xs">Upcoming</span>' %}
-{% else %}
-  {% set card_border = "border-green-700" %}
-  {% set status_badge = '<span class="px-2 py-0.5 bg-green-900/60 text-green-300 rounded-full text-xs">Active</span>' %}
-{% endif %}
-<div class="bg-gray-900 border {{ card_border }} rounded-xl p-5 cursor-pointer hover:bg-gray-800/80 transition-colors group"
-     hx-get="/partials/tariff/edit/{{ t.id }}"
-     hx-target="#edit-form-container"
-     hx-swap="innerHTML"
-     onclick="openModal('modal-edit')">
-    <div class="flex justify-between items-start mb-3">
-        <div>
-            <div class="font-bold text-gray-100 text-base">{{ t.name }}</div>
-            <div class="text-xs text-gray-500 font-mono">{{ t.id }}</div>
-        </div>
-        {{ status_badge | safe }}
-    </div>
-    <div class="text-3xl font-bold text-brand-green mb-1">
-        €{{ "%.4f"|format(t.energy_rate or 0)|replace(".", ",") }}
-        <span class="text-sm text-gray-400 font-normal">/kWh</span>
-    </div>
-    <div class="grid grid-cols-3 gap-2 mt-3 text-xs text-gray-400">
-        <div class="bg-gray-800 rounded p-2 text-center">
-            <div class="text-gray-500 mb-0.5">Time</div>
-            <div class="font-mono text-gray-200">€{{ "%.4f"|format(t.time_rate or 0)|replace(".", ",") }}</div>
-            <div class="text-gray-600">/min</div>
-        </div>
-        <div class="bg-gray-800 rounded p-2 text-center">
-            <div class="text-gray-500 mb-0.5">Idle</div>
-            <div class="font-mono text-gray-200">€{{ "%.4f"|format(t.idle_rate or 0)|replace(".", ",") }}</div>
-            <div class="text-gray-600">/min</div>
-        </div>
-        <div class="bg-gray-800 rounded p-2 text-center">
-            <div class="text-gray-500 mb-0.5">Start</div>
-            <div class="font-mono text-gray-200">€{{ "%.2f"|format(t.flat_fee or 0)|replace(".", ",") }}</div>
-            <div class="text-gray-600">flat</div>
-        </div>
-    </div>
-    {% if t.valid_from or t.valid_until %}
-    <div class="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-500">
-        {% if t.valid_from %}From: {{ t.valid_from[:10] }}{% endif %}
-        {% if t.valid_until %} — Until: {{ t.valid_until[:10] }}{% endif %}
-    </div>
-    {% endif %}
-    <div class="mt-2 text-xs text-brand-blue opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"><i data-lucide="pencil" class="w-3 h-3"></i> Click to edit →</div>
-</div>
-{% endfor %}
-{% if not tariffs %}
-<div class="col-span-3 p-12 text-center text-gray-500">
-    <div class="mb-3 flex justify-center text-blue-500"><i data-lucide="zap" class="w-10 h-10"></i></div>
-    <div class="text-lg mb-1">No tariffs yet</div>
-    <div class="text-sm">Create a tariff to get started</div>
-</div>
-{% endif %}
+<div class="mb-5 p-4 card text-xs text-subtext-color grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+    <div><span class="text-default-font font-semibold block mb-0.5">Energy Rate (€/kWh)</span>The main charge — drivers pay this per kilowatt-hour of electricity delivered. Most tariffs only need this.</div>
+    <div><span class="text-default-font font-semibold block mb-0.5">Time Rate (€/min)</span>Optional per-minute fee while charging. Useful for busy locations where you want to encourage faster turnover.</div>
+    <div><span class="text-default-font font-semibold block mb-0.5">Idle Rate (€/min)</span>Fee that kicks in after charging is complete but the car is still plugged in. Encourages drivers to free up the charger promptly.</div>
+    <div><span class="text-default-font font-semibold block mb-0.5">Flat Fee (€)</span>A fixed connection fee charged once per session, regardless of energy or time. Can be used to cover infrastructure costs.</div>
 </div>
 
-<!-- ── Section 3: Cost Calculator ──────────────────────────────────────── -->
+<!-- ═══ Section 1: Tariff Cards ═════════════════════════════════════════ -->
+<div id="tariff-cards" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
+    {% for t in tariffs %}
+    {% set now = now_iso %}
+    {% if t.valid_until and t.valid_until < now %}
+        {% set status_badge = '<span class="badge badge-error">Expired</span>' %}
+    {% elif t.valid_from and t.valid_from > now %}
+        {% set status_badge = '<span class="badge badge-brand">Upcoming</span>' %}
+    {% else %}
+        {% set status_badge = '<span class="badge badge-success"><span class="status-dot status-dot-green"></span>Active</span>' %}
+    {% endif %}
+        <div class="card p-5 cursor-pointer hover:border-brand-500 transition-colors group"
+            hx-get="/partials/tariff/edit/{{ t.id }}" hx-target="#edit-form-container" hx-swap="innerHTML"
+            onclick="openModal('modal-edit')">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <div class="font-bold text-default-font text-base">{{ t.name }}</div>
+                    <div class="text-xs text-subtext-color font-mono">{{ t.id }}</div>
+                </div>
+                {{ status_badge | safe }}
+            </div>
+            <div class="text-3xl font-bold text-brand-600 dark:text-brand-400 mb-1 font-mono">
+                €{{ "%.4f"|format(t.energy_rate or 0)|replace(".", ",") }}
+                <span class="text-xs text-subtext-color font-normal font-sans">/kWh</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-3 text-xs text-subtext-color">
+                <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-border rounded p-2 text-center">
+                    <div class="text-subtext-color mb-0.5">Time</div>
+                    <div class="font-mono text-default-font">€{{ "%.4f"|format(t.time_rate or 0)|replace(".", ",") }}</div>
+                    <div class="text-[10px] text-subtext-color">/min</div>
+                </div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-border rounded p-2 text-center">
+                    <div class="text-subtext-color mb-0.5">Idle</div>
+                    <div class="font-mono text-default-font">€{{ "%.4f"|format(t.idle_rate or 0)|replace(".", ",") }}</div>
+                    <div class="text-[10px] text-subtext-color">/min</div>
+                </div>
+                <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-border rounded p-2 text-center">
+                    <div class="text-subtext-color mb-0.5">Start</div>
+                    <div class="font-mono text-default-font">€{{ "%.2f"|format(t.flat_fee or 0)|replace(".", ",") }}</div>
+                    <div class="text-[10px] text-subtext-color">flat</div>
+                </div>
+            </div>
+            {% if t.valid_from or t.valid_until %}
+            <div class="mt-3 pt-3 border-t border-neutral-border text-xs text-subtext-color font-mono">
+                {% if t.valid_from %}From: {{ t.valid_from[:10] }}{% endif %}
+                {% if t.valid_until %} — Until: {{ t.valid_until[:10] }}{% endif %}
+            </div>
+            {% endif %}
+            <div class="mt-2 text-xs text-brand-600 dark:text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                <i data-lucide="pencil" class="w-3 h-3"></i> Click to edit &rarr;
+            </div>
+        </div>
+    {% endfor %}
+    {% if not tariffs %}
+    <div class="col-span-3 card p-12 text-center text-subtext-color">
+        <div class="mb-3 flex justify-center text-brand-500"><i data-lucide="zap" class="w-10 h-10"></i></div>
+        <div class="text-lg font-semibold text-default-font mb-1">No tariffs yet</div>
+        <div class="text-sm">Create a tariff to get started</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- ═══ Section 2: Cost Calculator ═══════════════════════════════════════ -->
 <div class="mb-8">
-    <h2 class="text-lg font-semibold mb-4 text-gray-200 flex items-center gap-2"><i data-lucide="calculator" class="w-5 h-5 text-blue-500"></i> Cost Calculator</h2>
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <h2 class="text-lg font-semibold mb-4 text-default-font flex items-center gap-2">
+        <i data-lucide="calculator" class="w-5 h-5 text-brand-500"></i> Cost Calculator
+    </h2>
+    <div class="card p-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
                 <div class="mb-4">
-                    <label class="block text-xs text-gray-400 mb-1">Tariff</label>
-                    <select id="calc-tariff" onchange="calcUpdate()"
-                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                    <label class="block text-xs text-subtext-color mb-1">Tariff</label>
+                    <select id="calc-tariff" onchange="calcUpdate()" class="select w-full text-sm">
                         {% for t in tariffs %}
                         <option value="{{ t.energy_rate }}" data-time="{{ t.time_rate }}" data-idle="{{ t.idle_rate }}" data-flat="{{ t.flat_fee }}">
                             {{ t.name }} (€{{ "%.4f"|format(t.energy_rate or 0)|replace(".", ",") }}/kWh)
@@ -107,93 +106,90 @@
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-xs text-gray-400 mb-2">Calculation Method</label>
+                    <label class="block text-xs text-subtext-color mb-2">Calculation Method</label>
                     <div class="flex gap-2">
-                        <button onclick="setCalcMode('kwh')" id="btn-kwh"
-                            class="flex-1 py-2 text-xs rounded-lg bg-brand-green text-black font-bold">
+                        <button onclick="setCalcMode('kwh')" id="btn-kwh" class="btn btn-primary flex-1 py-1.5 text-xs">
                             Per kWh
                         </button>
-                        <button onclick="setCalcMode('time')" id="btn-time"
-                            class="flex-1 py-2 text-xs rounded-lg bg-gray-700 text-gray-300">
+                        <button onclick="setCalcMode('time')" id="btn-time" class="btn btn-outline flex-1 py-1.5 text-xs">
                             Per time
                         </button>
                     </div>
                 </div>
                 <div id="input-kwh" class="mb-4">
-                    <label class="block text-xs text-gray-400 mb-1">Energy (kWh)</label>
-                    <input type="number" id="calc-kwh" value="30" min="0" step="1" oninput="calcUpdate()"
-                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    <label class="block text-xs text-subtext-color mb-1">Energy (kWh)</label>
+                    <input type="number" id="calc-kwh" value="30" min="0" step="1" oninput="calcUpdate()" class="input w-full text-sm font-mono">
                 </div>
                 <div id="input-time" class="mb-4 hidden">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Duration (minutes)</label>
-                            <input type="number" id="calc-minutes" value="60" min="0" oninput="calcUpdate()"
-                                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                            <label class="block text-xs text-subtext-color mb-1">Duration (minutes)</label>
+                            <input type="number" id="calc-minutes" value="60" min="0" oninput="calcUpdate()" class="input w-full text-sm font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-400 mb-1">Power (kW)</label>
-                            <input type="number" id="calc-power" value="50" min="0" oninput="calcUpdate()"
-                                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                            <label class="block text-xs text-subtext-color mb-1">Power (kW)</label>
+                            <input type="number" id="calc-power" value="50" min="0" oninput="calcUpdate()" class="input w-full text-sm font-mono">
                         </div>
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label class="block text-xs text-gray-400 mb-1">Idle Time (minutes)</label>
-                    <input type="number" id="calc-idle" value="0" min="0" oninput="calcUpdate()"
-                        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                    <label class="block text-xs text-subtext-color mb-1">Idle Time (minutes)</label>
+                    <input type="number" id="calc-idle" value="0" min="0" oninput="calcUpdate()" class="input w-full text-sm font-mono">
                 </div>
                 <div>
-                    <label class="block text-xs text-gray-400 mb-2">Presets</label>
+                    <label class="block text-xs text-subtext-color mb-2">Presets</label>
                     <div class="flex flex-wrap gap-2">
-                        <button onclick="setPreset(30, 50, 0)" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300 transition-colors">30 min @ 50kW</button>
-                        <button onclick="setPreset(60, 120, 0)" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300 transition-colors">1 hr @ 120kW</button>
-                        <button onclick="setPresetKwh(80)" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300 transition-colors">80 kWh full charge</button>
+                        <button onclick="setPreset(30, 50, 0)" class="btn btn-outline text-xs py-1 px-3">30 min @ 50kW</button>
+                        <button onclick="setPreset(60, 120, 0)" class="btn btn-outline text-xs py-1 px-3">1 hr @ 120kW</button>
+                        <button onclick="setPresetKwh(80)" class="btn btn-outline text-xs py-1 px-3">80 kWh full charge</button>
                     </div>
                 </div>
             </div>
-            <div class="bg-gray-800 rounded-xl p-5">
-                <div class="text-sm text-gray-400 mb-4">Cost Breakdown</div>
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">Energy Cost</span>
-                        <span id="result-energy" class="font-mono text-gray-100">€0,00</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">Time Rate</span>
-                        <span id="result-time" class="font-mono text-gray-100">€0,00</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">Idle Rate</span>
-                        <span id="result-idle" class="font-mono text-gray-100">€0,00</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-400">Flat Fee</span>
-                        <span id="result-flat" class="font-mono text-gray-100">€0,00</span>
-                    </div>
-                    <div class="flex justify-between pt-3 border-t border-gray-700">
-                        <span class="font-bold text-gray-200">Total</span>
-                        <span id="result-total" class="font-mono font-bold text-brand-green text-lg">€0,00</span>
+
+            <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-border rounded-xl p-5 flex flex-col justify-between">
+                <div>
+                    <div class="text-sm font-semibold text-default-font mb-4">Cost Breakdown</div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-subtext-color">Energy Cost</span>
+                            <span id="result-energy" class="font-mono text-default-font">€0,00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-subtext-color">Time Rate</span>
+                            <span id="result-time" class="font-mono text-default-font">€0,00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-subtext-color">Idle Rate</span>
+                            <span id="result-idle" class="font-mono text-default-font">€0,00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-subtext-color">Flat Fee</span>
+                            <span id="result-flat" class="font-mono text-default-font">€0,00</span>
+                        </div>
+                        <div class="flex justify-between pt-3 border-t border-neutral-border">
+                            <span class="font-bold text-default-font">Total</span>
+                            <span id="result-total" class="font-mono font-bold text-brand-600 dark:text-brand-400 text-lg">€0,00</span>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-4 pt-3 border-t border-gray-700 text-xs text-gray-500" id="calc-details"></div>
+                <div class="mt-4 pt-3 border-t border-neutral-border text-xs text-subtext-color font-mono" id="calc-details"></div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- ── Section 5: Power Cost Analysis ──────────────────────────────────── -->
+<!-- ═══ Section 3: Margin Analysis ═══════════════════════════════════════ -->
 <div class="mb-8">
-    <h2 class="text-lg font-semibold mb-4 text-gray-200 flex items-center gap-2"><i data-lucide="bar-chart-2" class="w-5 h-5 text-purple-500"></i> Margin Analysis</h2>
-    <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+    <h2 class="text-lg font-semibold mb-4 text-default-font flex items-center gap-2">
+        <i data-lucide="bar-chart-2" class="w-5 h-5 text-brand-500"></i> Margin Analysis
+    </h2>
+    <div class="card p-5">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-                <label class="block text-xs text-gray-400 mb-1">Purchase Price Energy (€/kWh)</label>
-                <input type="number" id="inkoop-prijs" value="0.12" min="0" step="0.01" oninput="margeUpdate()"
-                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono mb-4">
-                <label class="block text-xs text-gray-400 mb-1">Compare with Tariff</label>
-                <select id="marge-tariff" onchange="margeUpdate()"
-                    class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                <label class="block text-xs text-subtext-color mb-1">Purchase Price Energy (€/kWh)</label>
+                <input type="number" id="inkoop-prijs" value="0.12" min="0" step="0.01" oninput="margeUpdate()" class="input w-full text-sm font-mono mb-4">
+                <label class="block text-xs text-subtext-color mb-1">Compare with Tariff</label>
+                <select id="marge-tariff" onchange="margeUpdate()" class="select w-full text-sm">
                     {% for t in tariffs %}
                     <option value="{{ t.energy_rate }}" data-name="{{ t.name }}">
                         {{ t.name }}
@@ -204,27 +200,27 @@
                     {% endif %}
                 </select>
             </div>
-            <div class="bg-gray-800 rounded-xl p-5">
+            <div class="bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-border rounded-xl p-5">
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Selling Price</span>
-                        <span id="marge-verkoop" class="font-mono text-gray-100">—</span>
+                        <span class="text-subtext-color">Selling Price</span>
+                        <span id="marge-verkoop" class="font-mono text-default-font">—</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Purchase Price</span>
-                        <span id="marge-inkoop" class="font-mono text-gray-100">—</span>
+                        <span class="text-subtext-color">Purchase Price</span>
+                        <span id="marge-inkoop" class="font-mono text-default-font">—</span>
                     </div>
-                    <div class="flex justify-between pt-3 border-t border-gray-700">
-                        <span class="font-bold text-gray-200">Margin per kWh</span>
+                    <div class="flex justify-between pt-3 border-t border-neutral-border">
+                        <span class="font-bold text-default-font">Margin per kWh</span>
                         <span id="marge-result" class="font-mono font-bold text-lg">—</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Margin per session (30 kWh)</span>
-                        <span id="marge-sessie" class="font-mono text-gray-400">—</span>
+                        <span class="text-subtext-color">Margin per session (30 kWh)</span>
+                        <span id="marge-sessie" class="font-mono text-subtext-color">—</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-gray-400">Margin % of selling price</span>
-                        <span id="marge-pct" class="font-mono text-gray-400">—</span>
+                        <span class="text-subtext-color">Margin % of selling price</span>
+                        <span id="marge-pct" class="font-mono text-subtext-color">—</span>
                     </div>
                 </div>
             </div>
@@ -232,13 +228,15 @@
     </div>
 </div>
 
-<!-- ── Section 4: Charger Tariff Assignment ─────────────────────────────── -->
+<!-- ═══ Section 4: Charger Tariff Assignment ═════════════════════════════ -->
 <div class="mb-8">
-    <h2 class="text-lg font-semibold mb-4 text-gray-200 flex items-center gap-2"><i data-lucide="plug-zap" class="w-5 h-5 text-emerald-500"></i> Chargers — Tariff Assignment</h2>
-    <div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+    <h2 class="text-lg font-semibold mb-4 text-default-font flex items-center gap-2">
+        <i data-lucide="plug-zap" class="w-5 h-5 text-success-500"></i> Chargers — Tariff Assignment
+    </h2>
+    <div class="card overflow-hidden">
         <table class="w-full text-sm">
             <thead>
-                <tr class="border-b border-gray-800 text-gray-500 text-xs tracking-widest uppercase">
+                <tr class="border-b border-neutral-border text-subtext-color text-xs tracking-widest uppercase">
                     <th class="p-3 text-left">Charger</th>
                     <th class="p-3 text-left">Status</th>
                     <th class="p-3 text-left">Current Tariff (€/kWh)</th>
@@ -246,111 +244,96 @@
                 </tr>
             </thead>
             <tbody>
-            {% for c in chargers %}
-            <tr class="border-b border-gray-800 hover:bg-gray-800/30">
-                <td class="p-3 font-mono font-bold text-gray-200">{{ c.id }}</td>
-                <td class="p-3">
-                    {% if c.status == "online" %}
-                    <span class="px-2 py-0.5 bg-green-900/60 text-green-300 rounded-full text-xs">Online</span>
-                    {% else %}
-                    <span class="px-2 py-0.5 bg-gray-800 text-gray-500 rounded-full text-xs">{{ c.status }}</span>
-                    {% endif %}
-                </td>
-                <td class="p-3 font-mono text-gray-300">
-                    {% if c.tariff_kwh %}€{{ "%.4f"|format(c.tariff_kwh)|replace(".", ",") }}{% else %}<span class="text-gray-600">—</span>{% endif %}
-                </td>
-                <td class="p-3">
-                    <form hx-post="/action/charger/assign-tariff/{{ c.id }}"
-                          hx-swap="outerHTML"
-                          class="flex gap-2 items-center">
-                        <select name="tariff_id"
-                            class="bg-gray-800 border border-gray-700 rounded px-2 py-1 text-xs">
-                            <option value="">— none —</option>
-                            {% for t in tariffs %}
-                            <option value="{{ t.id }}" {% if c.tariff_kwh and t.energy_rate == c.tariff_kwh %}selected{% endif %}>
-                                {{ t.name }} (€{{ "%.4f"|format(t.energy_rate or 0)|replace(".", ",") }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                        <button type="submit"
-                            class="px-3 py-1 bg-brand-blue/20 hover:bg-brand-blue/40 text-brand-blue border border-brand-blue/30 rounded text-xs transition-colors">
-                            Save
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-            {% if not chargers %}
-            <tr><td colspan="4" class="p-6 text-center text-gray-500">No chargers found</td></tr>
-            {% endif %}
+                {% for c in chargers %}
+                <tr class="border-b border-neutral-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                    <td class="p-3 font-mono font-bold text-brand-600 dark:text-brand-400">{{ c.id }}</td>
+                    <td class="p-3">
+                        {% if c.status == "online" %}
+                        <span class="badge badge-success"><span class="status-dot status-dot-green"></span>Online</span>
+                        {% else %}
+                        <span class="badge badge-neutral">{{ c.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-3 font-mono text-default-font">
+                        {% if c.tariff_kwh %}€{{ "%.4f"|format(c.tariff_kwh)|replace(".", ",") }}{% else %}<span class="text-subtext-color">—</span>{% endif %}
+                    </td>
+                    <td class="p-3">
+                        <form hx-post="/action/charger/assign-tariff/{{ c.id }}" hx-swap="outerHTML" class="flex gap-2 items-center flex-wrap">
+                            <select name="tariff_id" class="select text-xs py-1 px-2.5">
+                                <option value="">— none —</option>
+                                {% for t in tariffs %}
+                                <option value="{{ t.id }}" {% if c.tariff_kwh and t.energy_rate == c.tariff_kwh %}selected{% endif %}>
+                                    {{ t.name }} (€{{ "%.4f"|format(t.energy_rate or 0)|replace(".", ",") }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-outline text-xs py-1 px-2.5">
+                                Save
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if not chargers %}
+                <tr>
+                    <td colspan="4" class="p-6 text-center text-subtext-color">No chargers found</td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- ── Modal: Create Tariff ──────────────────────────────────────────────── -->
+<!-- ═══ Modal: Create Tariff ═════════════════════════════════════════════ -->
 <div id="modal-create" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-create')"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-        <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div class="flex justify-between items-center p-5 border-b border-gray-800">
-                <h3 class="font-semibold text-gray-100">New Tariff</h3>
-                <button onclick="closeModal('modal-create')" class="text-gray-500 hover:text-gray-300 p-1 rounded"><i data-lucide="x" class="w-5 h-5"></i></button>
+        <div class="card p-6 w-full max-w-lg shadow-2xl text-default-font">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-neutral-border">
+                <h3 class="font-semibold text-default-font text-base">New Tariff</h3>
+                <button onclick="closeModal('modal-create')" class="text-subtext-color hover:text-default-font p-1 rounded inline-flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <form hx-post="/action/tariff/create"
-                  hx-target="#create-result"
-                  hx-swap="innerHTML"
-                  class="p-5 space-y-4">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="col-span-2">
-                        <label class="block text-xs text-gray-400 mb-1">Name <span class="text-red-400">*</span></label>
-                        <input name="name" required placeholder="Standard Tariff" oninput="autoSlug(this)"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+            <form hx-post="/action/tariff/create" hx-target="#create-result" hx-swap="innerHTML" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs text-subtext-color mb-1">Name <span class="text-error-500">*</span></label>
+                        <input name="name" required placeholder="Standard Tariff" oninput="autoSlug(this)" class="input w-full text-sm">
                     </div>
-                    <div class="col-span-2">
-                        <label class="block text-xs text-gray-400 mb-1">ID (slug)</label>
-                        <input name="id" id="tariff-slug" placeholder="standard-tariff"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono text-gray-400">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs text-subtext-color mb-1">ID (slug)</label>
+                        <input name="id" id="tariff-slug" placeholder="standard-tariff" class="input w-full text-sm font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Energy Rate (€/kWh)</label>
-                        <input name="energy_rate" type="number" step="0.0001" min="0" value="0.35" required
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                        <label class="block text-xs text-subtext-color mb-1">Energy Rate (€/kWh)</label>
+                        <input name="energy_rate" type="number" step="0.0001" min="0" value="0.35" required class="input w-full text-sm font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Time Rate (€/min)</label>
-                        <input name="time_rate" type="number" step="0.0001" min="0" value="0"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                        <label class="block text-xs text-subtext-color mb-1">Time Rate (€/min)</label>
+                        <input name="time_rate" type="number" step="0.0001" min="0" value="0" class="input w-full text-sm font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Idle Rate (€/min)</label>
-                        <input name="idle_rate" type="number" step="0.0001" min="0" value="0"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                        <label class="block text-xs text-subtext-color mb-1">Idle Rate (€/min)</label>
+                        <input name="idle_rate" type="number" step="0.0001" min="0" value="0" class="input w-full text-sm font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Flat Fee (€)</label>
-                        <input name="flat_fee" type="number" step="0.01" min="0" value="0"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono">
+                        <label class="block text-xs text-subtext-color mb-1">Flat Fee (€)</label>
+                        <input name="flat_fee" type="number" step="0.01" min="0" value="0" class="input w-full text-sm font-mono">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Valid From</label>
-                        <input name="valid_from" type="datetime-local"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                        <label class="block text-xs text-subtext-color mb-1">Valid From</label>
+                        <input name="valid_from" type="datetime-local" class="input w-full text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs text-gray-400 mb-1">Valid Until</label>
-                        <input name="valid_until" type="datetime-local"
-                            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm">
+                        <label class="block text-xs text-subtext-color mb-1">Valid Until</label>
+                        <input name="valid_until" type="datetime-local" class="input w-full text-sm">
                     </div>
                 </div>
                 <div id="create-result"></div>
-                <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeModal('modal-create')"
-                        class="flex-1 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm text-gray-300 transition-colors">
+                <div class="flex gap-3 pt-3">
+                    <button type="button" onclick="closeModal('modal-create')" class="btn btn-outline flex-1 py-2">
                         Cancel
                     </button>
-                    <button type="submit"
-                        class="flex-1 py-2 bg-brand-green text-black font-bold rounded-lg text-sm hover:opacity-90 transition-opacity">
+                    <button type="submit" class="btn btn-primary flex-1 py-2">
                         Save
                     </button>
                 </div>
@@ -359,14 +342,14 @@
     </div>
 </div>
 
-<!-- ── Modal: Edit Tariff ────────────────────────────────────────────────── -->
+<!-- ═══ Modal: Edit Tariff ═══════════════════════════════════════════════ -->
 <div id="modal-edit" class="fixed inset-0 z-50 hidden">
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeModal('modal-edit')"></div>
     <div class="absolute inset-0 flex items-center justify-center p-4">
-        <div class="bg-gray-900 border border-gray-700 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div id="edit-form-container" class="p-5">
+        <div class="card p-6 w-full max-w-lg shadow-2xl text-default-font">
+            <div id="edit-form-container">
                 <div class="flex justify-center py-8">
-                    <div class="animate-spin text-brand-blue"><i data-lucide="loader-2" class="w-8 h-8"></i></div>
+                    <div class="animate-spin text-brand-600"><i data-lucide="loader-2" class="w-8 h-8"></i></div>
                 </div>
             </div>
         </div>
@@ -374,114 +357,106 @@
 </div>
 
 <script>
-// ── Modal helpers ────────────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
-// ── Auto-slug from name ──────────────────────────────────────────────────
-function autoSlug(input) {
-    const slug = input.value.toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '')
-        .replace(/-+/g, '-');
-    document.getElementById('tariff-slug').value = slug;
-}
-
-// ── Cost Calculator ──────────────────────────────────────────────────────
-let calcMode = 'kwh';
-
-function setCalcMode(mode) {
-    calcMode = mode;
-    document.getElementById('input-kwh').classList.toggle('hidden', mode !== 'kwh');
-    document.getElementById('input-time').classList.toggle('hidden', mode !== 'time');
-    document.getElementById('btn-kwh').className = mode === 'kwh'
-        ? 'flex-1 py-2 text-xs rounded-lg bg-brand-green text-black font-bold'
-        : 'flex-1 py-2 text-xs rounded-lg bg-gray-700 text-gray-300';
-    document.getElementById('btn-time').className = mode === 'time'
-        ? 'flex-1 py-2 text-xs rounded-lg bg-brand-green text-black font-bold'
-        : 'flex-1 py-2 text-xs rounded-lg bg-gray-700 text-gray-300';
-    calcUpdate();
-}
-
-function setPreset(minutes, power, idle) {
-    setCalcMode('time');
-    document.getElementById('calc-minutes').value = minutes;
-    document.getElementById('calc-power').value = power;
-    document.getElementById('calc-idle').value = idle;
-    calcUpdate();
-}
-
-function setPresetKwh(kwh) {
-    setCalcMode('kwh');
-    document.getElementById('calc-kwh').value = kwh;
-    document.getElementById('calc-idle').value = 0;
-    calcUpdate();
-}
-
-function fmtEur(val) {
-    return '€' + val.toFixed(2).replace('.', ',');
-}
-
-function calcUpdate() {
-    const sel = document.getElementById('calc-tariff');
-    const opt = sel.options[sel.selectedIndex];
-    const energyRate = parseFloat(sel.value) || 0;
-    const timeRate = parseFloat(opt.dataset.time) || 0;
-    const idleRate = parseFloat(opt.dataset.idle) || 0;
-    const flatFee = parseFloat(opt.dataset.flat) || 0;
-    const idleMins = parseFloat(document.getElementById('calc-idle').value) || 0;
-
-    let kwh = 0, minutes = 0;
-    if (calcMode === 'kwh') {
-        kwh = parseFloat(document.getElementById('calc-kwh').value) || 0;
-    } else {
-        minutes = parseFloat(document.getElementById('calc-minutes').value) || 0;
-        const power = parseFloat(document.getElementById('calc-power').value) || 0;
-        kwh = (power * minutes) / 60;
+    function autoSlug(input) {
+        const slug = input.value.toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^a-z0-9-]/g, '')
+            .replace(/-+/g, '-');
+        document.getElementById('tariff-slug').value = slug;
     }
 
-    const energyCost = kwh * energyRate;
-    const timeCost = minutes * timeRate;
-    const idleCost = idleMins * idleRate;
-    const total = energyCost + timeCost + idleCost + flatFee;
+    let calcMode = 'kwh';
 
-    document.getElementById('result-energy').textContent = fmtEur(energyCost);
-    document.getElementById('result-time').textContent = fmtEur(timeCost);
-    document.getElementById('result-idle').textContent = fmtEur(idleCost);
-    document.getElementById('result-flat').textContent = fmtEur(flatFee);
-    document.getElementById('result-total').textContent = fmtEur(total);
-
-    let details = '';
-    if (calcMode === 'time') {
-        details = `${minutes} min × ${document.getElementById('calc-power').value} kW = ${kwh.toFixed(2)} kWh`;
-    } else {
-        details = `${kwh} kWh × €${energyRate.toFixed(4).replace('.',',')} /kWh`;
+    function setCalcMode(mode) {
+        calcMode = mode;
+        document.getElementById('input-kwh').classList.toggle('hidden', mode !== 'kwh');
+        document.getElementById('input-time').classList.toggle('hidden', mode !== 'time');
+        document.getElementById('btn-kwh').className = mode === 'kwh'
+            ? 'btn btn-primary flex-1 py-1.5 text-xs'
+            : 'btn btn-outline flex-1 py-1.5 text-xs';
+        document.getElementById('btn-time').className = mode === 'time'
+            ? 'btn btn-primary flex-1 py-1.5 text-xs'
+            : 'btn btn-outline flex-1 py-1.5 text-xs';
+        calcUpdate();
     }
-    document.getElementById('calc-details').textContent = details;
-}
 
-// ── Marge Analysis ───────────────────────────────────────────────────────
-function margeUpdate() {
-    const inkoop = parseFloat(document.getElementById('inkoop-prijs').value) || 0;
-    const sel = document.getElementById('marge-tariff');
-    const verkoop = parseFloat(sel.value) || 0;
-    const marge = verkoop - inkoop;
-    const margePerSessie = marge * 30;
-    const pct = verkoop > 0 ? (marge / verkoop * 100) : 0;
-    const color = marge >= 0 ? 'text-green-400' : 'text-red-400';
+    function setPreset(minutes, power, idle) {
+        setCalcMode('time');
+        document.getElementById('calc-minutes').value = minutes;
+        document.getElementById('calc-power').value = power;
+        document.getElementById('calc-idle').value = idle;
+        calcUpdate();
+    }
 
-    document.getElementById('marge-verkoop').textContent = fmtEur(verkoop) + '/kWh';
-    document.getElementById('marge-inkoop').textContent = fmtEur(inkoop) + '/kWh';
-    document.getElementById('marge-result').className = `font-mono font-bold text-lg ${color}`;
-    document.getElementById('marge-result').textContent = fmtEur(marge) + '/kWh';
-    document.getElementById('marge-sessie').textContent = fmtEur(margePerSessie);
-    document.getElementById('marge-pct').textContent = pct.toFixed(1).replace('.', ',') + '%';
-}
+    function setPresetKwh(kwh) {
+        setCalcMode('kwh');
+        document.getElementById('calc-kwh').value = kwh;
+        document.getElementById('calc-idle').value = 0;
+        calcUpdate();
+    }
 
-// Init on load
-document.addEventListener('DOMContentLoaded', () => {
-    calcUpdate();
-    margeUpdate();
-});
+    function fmtEur(val) {
+        return '€' + val.toFixed(2).replace('.', ',');
+    }
+
+    function calcUpdate() {
+        const sel = document.getElementById('calc-tariff');
+        const opt = sel.options[sel.selectedIndex];
+        const energyRate = parseFloat(sel.value) || 0;
+        const timeRate = parseFloat(opt.dataset.time) || 0;
+        const idleRate = parseFloat(opt.dataset.idle) || 0;
+        const flatFee = parseFloat(opt.dataset.flat) || 0;
+        const idleMins = parseFloat(document.getElementById('calc-idle').value) || 0;
+
+        let kwh = 0, minutes = 0;
+        if (calcMode === 'kwh') {
+            kwh = parseFloat(document.getElementById('calc-kwh').value) || 0;
+        } else {
+            minutes = parseFloat(document.getElementById('calc-minutes').value) || 0;
+            const power = parseFloat(document.getElementById('calc-power').value) || 0;
+            kwh = (power * minutes) / 60;
+        }
+
+        const energyCost = kwh * energyRate;
+        const timeCost = minutes * timeRate;
+        const idleCost = idleMins * idleRate;
+        const total = energyCost + timeCost + idleCost + flatFee;
+
+        document.getElementById('result-energy').textContent = fmtEur(energyCost);
+        document.getElementById('result-time').textContent = fmtEur(timeCost);
+        document.getElementById('result-idle').textContent = fmtEur(idleCost);
+        document.getElementById('result-flat').textContent = fmtEur(flatFee);
+        document.getElementById('result-total').textContent = fmtEur(total);
+
+        let details = '';
+        if (calcMode === 'time') {
+            details = `${minutes} min × ${document.getElementById('calc-power').value} kW = ${kwh.toFixed(2)} kWh`;
+        } else {
+            details = `${kwh} kWh × €${energyRate.toFixed(4).replace('.', ',')} /kWh`;
+        }
+        document.getElementById('calc-details').textContent = details;
+    }
+
+    function margeUpdate() {
+        const inkoop = parseFloat(document.getElementById('inkoop-prijs').value) || 0;
+        const sel = document.getElementById('marge-tariff');
+        const verkoop = parseFloat(sel.value) || 0;
+        const marge = verkoop - inkoop;
+        const margePerSessie = marge * 30;
+        const pct = verkoop > 0 ? (marge / verkoop * 100) : 0;
+        const color = marge >= 0 ? 'text-success-600' : 'text-error-600';
+
+        document.getElementById('marge-verkoop').textContent = fmtEur(verkoop) + '/kWh';
+        document.getElementById('marge-inkoop').textContent = fmtEur(inkoop) + '/kWh';
+        document.getElementById('marge-result').className = `font-mono font-bold text-lg ${color}`;
+        document.getElementById('marge-result').textContent = fmtEur(marge) + '/kWh';
+        document.getElementById('marge-sessie').textContent = fmtEur(margePerSessie);
+        document.getElementById('marge-pct').textContent = pct.toFixed(1).replace('.', ',') + '%';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        calcUpdate();
+        margeUpdate();
+    });
 </script>
 {% endblock %}

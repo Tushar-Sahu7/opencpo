@@ -5,31 +5,39 @@
 {% block content %}
 <div class="mb-5">
     <h1 class="text-2xl font-bold">Authorization Tokens</h1>
-    <p style="color:#4a6580;font-size:13px;margin-top:4px;margin-bottom:0;">Tokens are the physical RFID cards (or app credentials) that drivers use to start a charging session — they tap the card on the charger's reader. This page shows every token in your network: who it belongs to, whether it's active, and when it was last used.</p>
+    <p class="text-xs text-subtext-color mt-1 mb-0 leading-normal">Tokens are the physical RFID cards (or app credentials) that drivers use to start a charging session — they tap the card on the charger's reader. This page shows every token in your network: who it belongs to, whether it's active, and when it was last used.</p>
 </div>
-<p style="color:#4a6580;font-size:12px;margin-bottom:10px;"><span style="color:#86efac;">Active</span> = card can start charging &nbsp;·&nbsp; <span style="color:#f87171;">Blocked</span> = card has been denied (lost/stolen/policy) &nbsp;·&nbsp; <span style="color:#fbbf24;">Expired</span> = validity date has passed &nbsp;·&nbsp; RFID = physical card &nbsp;·&nbsp; App = mobile app token &nbsp;·&nbsp; P&amp;C = Plug &amp; Charge (automatic, no card needed)</p>
+<div class="card bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border py-2 px-3 mb-3 text-xs flex flex-wrap items-center gap-3">
+    <span class="text-success-600 font-medium">● Active <span class="text-subtext-color font-normal">= card can start charging</span></span>
+    <span class="text-neutral-300 dark:text-neutral-700">|</span>
+    <span class="text-error-600 font-medium">● Blocked <span class="text-subtext-color font-normal">= card denied</span></span>
+    <span class="text-neutral-300 dark:text-neutral-700">|</span>
+    <span class="text-warning-600 font-medium">● Expired <span class="text-subtext-color font-normal">= validity date passed</span></span>
+    <span class="text-neutral-300 dark:text-neutral-700">|</span>
+    <span class="text-subtext-color font-normal">RFID = physical card &bull; App = mobile app &bull; P&amp;C = Plug &amp; Charge</span>
+</div>
 <!-- Summary cards -->
 <div class="grid grid-cols-5 gap-4 mb-6">
-  {% set stat_classes = "bg-gray-900 border border-gray-800 rounded-xl p-4 text-center" %}
+  {% set stat_classes = "card p-4 text-center" %}
   <div class="{{ stat_classes }}">
-    <div class="text-2xl font-bold text-white">{{ stats.total }}</div>
-    <div class="text-xs text-gray-500 mt-1">Total</div>
+    <div class="text-2xl font-bold text-brand-600 dark:text-brand-400">{{ stats.total }}</div>
+    <div class="text-xs text-subtext-color mt-1">Total</div>
   </div>
   <div class="{{ stat_classes }}">
-    <div class="text-2xl font-bold text-green-400">{{ stats.active }}</div>
-    <div class="text-xs text-gray-500 mt-1">Active</div>
+    <div class="text-2xl font-bold text-success-600 dark:text-success-400">{{ stats.active }}</div>
+    <div class="text-xs text-subtext-color mt-1">Active</div>
   </div>
   <div class="{{ stat_classes }}">
-    <div class="text-2xl font-bold text-red-400">{{ stats.blocked }}</div>
-    <div class="text-xs text-gray-500 mt-1">Blocked</div>
+    <div class="text-2xl font-bold text-error-600 dark:text-error-400">{{ stats.blocked }}</div>
+    <div class="text-xs text-subtext-color mt-1">Blocked</div>
   </div>
   <div class="{{ stat_classes }}">
-    <div class="text-2xl font-bold text-yellow-400">{{ stats.expired }}</div>
-    <div class="text-xs text-gray-500 mt-1">Expired</div>
+    <div class="text-2xl font-bold text-warning-600 dark:text-warning-400">{{ stats.expired }}</div>
+    <div class="text-xs text-subtext-color mt-1">Expired</div>
   </div>
   <div class="{{ stat_classes }}">
-    <div class="text-2xl font-bold text-blue-400">{{ stats.groups }}</div>
-    <div class="text-xs text-gray-500 mt-1">Groups</div>
+    <div class="text-2xl font-bold text-brand-600 dark:text-brand-400">{{ stats.groups }}</div>
+    <div class="text-xs text-subtext-color mt-1">Groups</div>
   </div>
 </div>
 
@@ -38,14 +46,13 @@
   <div class="flex gap-1">
     {% for f, label in [('', 'All'), ('active', 'Active'), ('blocked', 'Blocked'), ('expired', 'Expired')] %}
     <a href="/tokens?status={{ f }}&group={{ request.query_params.get('group','') }}&search={{ request.query_params.get('search','') }}"
-       class="px-3 py-1.5 rounded text-xs font-semibold border transition-colors
-              {% if current_status == f %}bg-brand-blue text-white border-brand-blue{% else %}bg-gray-900 border-gray-700 text-gray-400 hover:bg-gray-800{% endif %}">
+       class="btn {% if current_status == f %}btn-primary{% else %}btn-outline{% endif %} text-xs py-1.5 px-3">
       {{ label }}
     </a>
     {% endfor %}
   </div>
   <select id="group-filter" onchange="applyGroupFilter()"
-    class="bg-gray-900 border border-gray-700 rounded px-3 pr-8 py-1.5 text-xs text-gray-300 min-w-[140px] focus:outline-none">
+    class="select min-w-[140px] text-xs py-1.5">
     <option value="">All groups</option>
     {% for g in groups %}
     <option value="{{ g.id }}" {% if current_group == g.id|string %}selected{% endif %}>{{ g.name }}</option>
@@ -53,23 +60,23 @@
   </select>
   <input type="text" id="search-box" value="{{ current_search }}"
     placeholder="Search UID, driver, label…"
-    class="flex-1 min-w-48 bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-xs text-gray-200 placeholder-gray-500 focus:border-brand-blue focus:outline-none"
+    class="input flex-1 min-w-48 text-xs py-1.5"
     onkeydown="if(event.key==='Enter') applySearch()">
   <div class="flex-1"></div>
-  <button onclick="openModal('modal-create')" class="px-3 py-1.5 bg-green-700 hover:bg-green-600 text-white rounded text-xs font-semibold">+ Add Token</button>
-  <a href="/tokens/export.csv" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 rounded text-xs font-semibold inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> <span>Export CSV</span></a>
+  <button onclick="openModal('modal-create')" class="btn btn-primary text-xs py-1.5">+ Add Token</button>
+  <a href="/tokens/export.csv" class="btn btn-outline text-xs py-1.5 inline-flex items-center gap-1.5"><i data-lucide="download" class="w-3.5 h-3.5"></i> <span>Export CSV</span></a>
   <button hx-post="/action/token/purge-test" hx-target="#feedback" hx-swap="innerHTML"
     hx-confirm="Remove all test tokens (STRESS-, SIM-, VAL-, CHAOS-)?"
-    class="px-3 py-1.5 bg-red-900/40 hover:bg-red-900/70 border border-red-800 text-red-400 rounded text-xs font-semibold inline-flex items-center gap-1.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span>Purge Test</span></button>
+    class="btn btn-outline text-error-600 border-error-200 dark:border-error-800 hover:bg-error-50 dark:hover:bg-error-900/30 text-xs py-1.5 inline-flex items-center gap-1.5"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i> <span>Delete Test</span></button>
 </div>
 
 <div id="feedback" class="mb-2"></div>
 
 <!-- Table -->
-<div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+<div class="card overflow-hidden">
   <table class="w-full text-sm">
     <thead>
-      <tr class="border-b border-gray-800 text-[10px] tracking-widest text-gray-500 uppercase">
+      <tr>
         <th class="p-3 text-left">UID</th>
         <th class="p-3 text-left">Type</th>
         <th class="p-3 text-left">Status</th>
@@ -82,135 +89,132 @@
     </thead>
     <tbody>
       {% for t in tokens %}
-      <tr class="border-b border-gray-800/50 hover:bg-gray-800/40 transition-colors">
+      <tr class="hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
         <td class="p-3">
-          <a href="/tokens/{{ t.id }}" class="font-mono text-brand-blue hover:underline text-xs">{{ t.uid }}</a>
+          <a href="/tokens/{{ t.id }}" class="font-mono text-brand-600 dark:text-brand-400 hover:underline text-xs font-semibold">{{ t.uid }}</a>
         </td>
         <td class="p-3">
-          {% if t.type == 'rfid' %}<span class="px-2 py-0.5 bg-blue-900 text-blue-300 rounded text-xs">RFID</span>
-          {% elif t.type == 'app' %}<span class="px-2 py-0.5 bg-purple-900 text-purple-300 rounded text-xs">App</span>
-          {% elif t.type == 'pnc' %}<span class="px-2 py-0.5 bg-teal-900 text-teal-300 rounded text-xs">P&amp;C</span>
-          {% else %}<span class="px-2 py-0.5 bg-gray-800 text-gray-400 rounded text-xs">{{ t.type }}</span>{% endif %}
+          {% if t.type == 'rfid' %}<span class="badge badge-brand">RFID</span>
+          {% elif t.type == 'app' %}<span class="badge badge-brand">App</span>
+          {% elif t.type == 'pnc' %}<span class="badge badge-neutral">P&amp;C</span>
+          {% else %}<span class="badge badge-neutral">{{ t.type }}</span>{% endif %}
         </td>
         <td class="p-3">
-          {% if t.status == 'active' %}<span class="px-2 py-0.5 bg-green-900 text-green-300 rounded-full text-xs">Active</span>
-          {% elif t.status == 'blocked' %}<span class="px-2 py-0.5 bg-red-900 text-red-300 rounded-full text-xs">Blocked</span>
-          {% elif t.status == 'expired' %}<span class="px-2 py-0.5 bg-gray-700 text-gray-400 rounded-full text-xs">Expired</span>
-          {% elif t.status == 'revoked' %}<span class="px-2 py-0.5 bg-orange-900 text-orange-300 rounded-full text-xs">Revoked</span>
-          {% else %}<span class="px-2 py-0.5 bg-gray-800 text-gray-500 rounded-full text-xs">{{ t.status }}</span>{% endif %}
+          {% if t.status == 'active' %}<span class="badge badge-success"><span class="status-dot status-dot-green animate-pulse"></span>Active</span>
+          {% elif t.status == 'blocked' %}<span class="badge badge-error">Blocked</span>
+          {% elif t.status == 'expired' %}<span class="badge badge-neutral">Expired</span>
+          {% elif t.status == 'revoked' %}<span class="badge badge-warning">Revoked</span>
+          {% else %}<span class="badge badge-neutral">{{ t.status }}</span>{% endif %}
         </td>
-        <td class="p-3 text-gray-300 text-xs">{{ t.driver_name or '—' }}</td>
+        <td class="p-3 text-default-font text-xs">{{ t.driver_name or '—' }}</td>
         <td class="p-3 text-xs">
-          {% if t.group_name %}<a href="/groups/{{ t.group_id }}" class="text-blue-400 hover:underline">{{ t.group_name }}</a>
-          {% else %}<span class="text-gray-600">—</span>{% endif %}
+          {% if t.group_name %}<a href="/groups/{{ t.group_id }}" class="text-brand-600 dark:text-brand-400 hover:underline">{{ t.group_name }}</a>
+          {% else %}<span class="text-subtext-color">—</span>{% endif %}
         </td>
-        <td class="p-3 text-xs text-gray-400">{{ (t.valid_until or '')[:10] or '—' }}</td>
-        <td class="p-3 text-xs text-gray-400">{{ (t.last_used or '')[:10] or '—' }}</td>
+        <td class="p-3 text-xs text-subtext-color font-mono">{{ t.valid_until|format_date }}</td>
+        <td class="p-3 text-xs text-subtext-color font-mono">{{ t.last_used|format_datetime }}</td>
         <td class="p-3 text-right">
           <div class="flex gap-1 justify-end">
-            <a href="/tokens/{{ t.id }}" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300">View</a>
+            <a href="/tokens/{{ t.id }}" class="btn btn-outline text-xs py-1 px-2">View</a>
+            <button onclick="openEditModal('{{ t.id }}')"
+              class="btn btn-outline text-xs py-1 px-2">Edit</button>
             {% if t.status == 'blocked' %}
             <button hx-post="/action/token/unblock/{{ t.id }}" hx-target="#feedback" hx-swap="innerHTML"
-              class="px-2 py-1 bg-green-900/50 hover:bg-green-800 rounded text-xs text-green-300">Unblock</button>
+              class="btn btn-outline text-xs py-1 px-2 text-success-600 border-success-200">Unblock</button>
             {% elif t.status == 'active' %}
             <button onclick="openBlockModal('{{ t.id }}')"
-              class="px-2 py-1 bg-red-900/50 hover:bg-red-800 rounded text-xs text-red-300">Block</button>
+              class="btn btn-outline text-xs py-1 px-2 text-error-600 border-error-200">Block</button>
             {% endif %}
             <button onclick="openReplaceModal('{{ t.id }}', '{{ t.uid }}')"
-              class="px-2 py-1 bg-yellow-900/50 hover:bg-yellow-800 rounded text-xs text-yellow-300">Replace</button>
-            <button onclick="openEditModal('{{ t.id }}')"
-              class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300">Edit</button>
+              class="btn btn-outline text-xs py-1 px-2 text-warning-600 border-warning-200">Replace</button>
             <button hx-delete="/action/token/delete/{{ t.id }}" hx-target="#feedback" hx-swap="innerHTML"
               hx-confirm="Revoke token {{ t.uid }}?"
-              class="px-2 py-1 bg-red-900/30 hover:bg-red-900/60 rounded text-xs text-red-400 inline-flex items-center justify-center"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+              class="btn btn-outline text-xs py-1 px-2 text-error-600 border-error-200 hover:bg-error-50 dark:hover:bg-error-900/30 inline-flex items-center justify-center"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
           </div>
         </td>
       </tr>
       {% else %}
-      <tr><td colspan="8" class="p-8 text-center text-gray-500 text-sm">No tokens found</td></tr>
+      <tr><td colspan="8" class="p-8 text-center text-subtext-color text-sm">No tokens found</td></tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
-<div class="mt-3 text-xs text-gray-600">{{ total }} tokens</div>
+<div class="mt-3 text-xs text-subtext-color">{{ total }} tokens</div>
 
 <!-- Create Modal -->
-<div id="modal-create" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-  <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+<div id="modal-create" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+  <div class="card p-6 w-full max-w-md shadow-lg text-default-font">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="font-semibold text-gray-100">Add Token</h3>
-      <button onclick="closeModal('modal-create')" class="text-gray-500 hover:text-gray-300 inline-flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <h3 class="font-semibold text-default-font">Add Token</h3>
+      <button onclick="closeModal('modal-create')" class="text-subtext-color hover:text-default-font inline-flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <form hx-post="/action/token/create" hx-target="#feedback" hx-swap="innerHTML" class="space-y-3">
-      <div><label class="block text-xs text-gray-400 mb-1">UID *</label>
-        <input name="uid" required placeholder="e.g. 04A1B2C3D4E5" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm font-mono"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">UID *</label>
+        <input name="uid" required placeholder="e.g. 04A1B2C3D4E5" class="input w-full font-mono"></div>
       <div class="grid grid-cols-2 gap-3">
-        <div><label class="block text-xs text-gray-400 mb-1">Type</label>
-          <select name="type" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm">
+        <div><label class="block text-xs text-subtext-color mb-1">Type</label>
+          <select name="type" class="select w-full">
             <option value="rfid">RFID</option><option value="app">App</option><option value="pnc">P&amp;C</option>
           </select></div>
-        <div><label class="block text-xs text-gray-400 mb-1">Status</label>
-          <select name="status" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm">
+        <div><label class="block text-xs text-subtext-color mb-1">Status</label>
+          <select name="status" class="select w-full">
             <option value="active">Active</option><option value="ordered">Ordered</option><option value="blocked">Blocked</option>
           </select></div>
       </div>
-      <div><label class="block text-xs text-gray-400 mb-1">Driver Name</label>
-        <input name="driver_name" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"></div>
-      <div><label class="block text-xs text-gray-400 mb-1">Driver Email</label>
-        <input name="driver_email" type="email" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"></div>
-      <div><label class="block text-xs text-gray-400 mb-1">Group</label>
-        <select name="group_id" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm">
+      <div><label class="block text-xs text-subtext-color mb-1">Driver Name</label>
+        <input name="driver_name" class="input w-full"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">Driver Email</label>
+        <input name="driver_email" type="email" class="input w-full"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">Group</label>
+        <select name="group_id" class="select w-full">
           <option value="">No group</option>
           {% for g in groups %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
         </select></div>
-      <div><label class="block text-xs text-gray-400 mb-1">Label</label>
-        <input name="label" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">Label</label>
+        <input name="label" class="input w-full"></div>
       <div id="create-result"></div>
       <div class="flex gap-3 pt-2">
-        <button type="button" onclick="closeModal('modal-create')" class="px-4 py-2 bg-gray-800 rounded text-sm text-gray-300">Cancel</button>
-        <button type="submit" class="flex-1 px-4 py-2 bg-brand-blue text-white font-bold rounded text-sm hover:opacity-90">Create Token</button>
+        <button type="button" onclick="closeModal('modal-create')" class="btn btn-outline flex-1 py-2">Cancel</button>
+        <button type="submit" class="btn btn-primary flex-1 py-2">Create Token</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Block Modal -->
-<div id="modal-block" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-  <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm shadow-2xl">
-    <h3 class="font-semibold text-gray-100 mb-4">Block Token</h3>
+<div id="modal-block" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+  <div class="card p-6 w-full max-w-sm shadow-lg text-default-font">
+    <h3 class="font-semibold text-default-font mb-4">Block Token</h3>
     <form id="block-form" hx-target="#feedback" hx-swap="innerHTML" class="space-y-3">
-      <div><label class="block text-xs text-gray-400 mb-1">Reason</label>
-        <input name="reason" placeholder="Lost card, policy violation…" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">Reason</label>
+        <input name="reason" placeholder="Lost card, policy violation…" class="input w-full"></div>
       <div class="flex gap-3">
-        <button type="button" onclick="closeModal('modal-block')" class="px-4 py-2 bg-gray-800 rounded text-sm text-gray-300">Cancel</button>
-        <button type="submit" class="flex-1 px-4 py-2 bg-red-700 text-white font-bold rounded text-sm hover:bg-red-600">Block</button>
+        <button type="button" onclick="closeModal('modal-block')" class="btn btn-outline flex-1 py-2">Cancel</button>
+        <button type="submit" class="btn btn-primary flex-1 py-2 bg-error-600 hover:bg-error-700 border-error-600">Block</button>
       </div>
     </form>
   </div>
 </div>
 
 <!-- Replace Modal -->
-<div id="modal-replace" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-  <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm shadow-2xl">
-    <h3 class="font-semibold text-gray-100 mb-1">Replace Token</h3>
-    <p class="text-xs text-gray-500 mb-4">Creates new token, blocks old one.</p>
+<div id="modal-replace" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+  <div class="card p-6 w-full max-w-sm shadow-lg text-default-font">
+    <h3 class="font-semibold text-default-font mb-1">Replace Token</h3>
+    <p class="text-xs text-subtext-color mb-4">Creates new token, blocks old one.</p>
     <form id="replace-form" hx-target="#feedback" hx-swap="innerHTML" class="space-y-3">
-      <div><label class="block text-xs text-gray-400 mb-1">New UID *</label>
-        <input name="new_uid" required class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm font-mono"></div>
-      <div><label class="block text-xs text-gray-400 mb-1">New Label (optional)</label>
-        <input name="label" class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">New UID *</label>
+        <input name="new_uid" required class="input w-full font-mono"></div>
+      <div><label class="block text-xs text-subtext-color mb-1">New Label (optional)</label>
+        <input name="label" class="input w-full"></div>
       <div class="flex gap-3">
-        <button type="button" onclick="closeModal('modal-replace')" class="px-4 py-2 bg-gray-800 rounded text-sm text-gray-300">Cancel</button>
-        <button type="submit" class="flex-1 px-4 py-2 bg-yellow-700 text-white font-bold rounded text-sm hover:bg-yellow-600">Replace</button>
+        <button type="button" onclick="closeModal('modal-replace')" class="btn btn-outline flex-1 py-2">Cancel</button>
+        <button type="submit" class="btn btn-primary flex-1 py-2 bg-warning-600 hover:bg-warning-700 border-warning-600">Replace</button>
       </div>
     </form>
   </div>
 </div>
 
 <script>
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
 function applyGroupFilter() {
   const g = document.getElementById('group-filter').value;
   const url = new URL(window.location);

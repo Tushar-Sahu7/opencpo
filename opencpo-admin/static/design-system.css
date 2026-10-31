@@ -1,0 +1,1146 @@
+/**
+ * OpenCPO Enterprise Design System & Semantic Tokens
+ * 
+ * Powered by Tailwind CSS theme tokens, CSS custom properties, and unified component primitives.
+ * Fully supports Light (default) and Dark (selector .dark) modes with deep tactile elevation,
+ * crisp typographic hierarchy, and responsive contrast ratios.
+ */
+
+:root {
+  /* Default Colors */
+  --color-brand-primary: rgb(48 0 138);
+  --color-brand-secondary: rgb(78 236 34);
+  --color-default-font: var(--color-neutral-900);
+  --color-subtext-color: var(--color-neutral-500);
+  --color-neutral-border: var(--color-neutral-200);
+  --color-white: var(--color-neutral-0);
+  --color-default-background: var(--color-neutral-50);
+
+  /* Brand */
+  --color-brand-50: rgb(239 246 255);
+  --color-brand-100: rgb(219 234 254);
+  --color-brand-200: rgb(191 219 254);
+  --color-brand-300: rgb(147 197 253);
+  --color-brand-400: rgb(96 165 250);
+  --color-brand-500: rgb(59 130 246);
+  --color-brand-600: rgb(37 99 235);
+  --color-brand-700: rgb(29 78 216);
+  --color-brand-800: rgb(30 64 175);
+  --color-brand-900: rgb(30 58 138);
+
+  /* Neutral */
+  --color-neutral-0: rgb(255 255 255);
+  --color-neutral-50: rgb(250 250 250);
+  --color-neutral-100: rgb(245 245 245);
+  --color-neutral-200: rgb(229 229 229);
+  --color-neutral-300: rgb(212 212 212);
+  --color-neutral-400: rgb(163 163 163);
+  --color-neutral-500: rgb(115 115 115);
+  --color-neutral-600: rgb(82 82 82);
+  --color-neutral-700: rgb(64 64 64);
+  --color-neutral-800: rgb(38 38 38);
+  --color-neutral-900: rgb(23 23 23);
+  --color-neutral-950: rgb(10 10 10);
+
+  /* Error */
+  --color-error-50: rgb(254 242 242);
+  --color-error-100: rgb(254 226 226);
+  --color-error-200: rgb(254 202 202);
+  --color-error-300: rgb(252 165 165);
+  --color-error-400: rgb(248 113 113);
+  --color-error-500: rgb(239 68 68);
+  --color-error-600: rgb(220 38 38);
+  --color-error-700: rgb(185 28 28);
+  --color-error-800: rgb(153 27 27);
+  --color-error-900: rgb(127 29 29);
+
+  /* Warning */
+  --color-warning-50: rgb(254 252 232);
+  --color-warning-100: rgb(254 249 195);
+  --color-warning-200: rgb(254 240 138);
+  --color-warning-300: rgb(253 224 71);
+  --color-warning-400: rgb(250 204 21);
+  --color-warning-500: rgb(234 179 8);
+  --color-warning-600: rgb(202 138 4);
+  --color-warning-700: rgb(161 98 7);
+  --color-warning-800: rgb(133 77 14);
+  --color-warning-900: rgb(113 63 18);
+
+  /* Success */
+  --color-success-50: rgb(240 253 244);
+  --color-success-100: rgb(220 252 231);
+  --color-success-200: rgb(187 247 208);
+  --color-success-300: rgb(134 239 172);
+  --color-success-400: rgb(74 222 128);
+  --color-success-500: rgb(34 197 94);
+  --color-success-600: rgb(22 163 74);
+  --color-success-700: rgb(21 128 61);
+  --color-success-800: rgb(22 101 52);
+  --color-success-900: rgb(20 83 45);
+
+  /* Typography metrics */
+  --text-caption: 12px;
+  --text-caption--font-weight: 400;
+  --text-caption--letter-spacing: 0em;
+  --text-caption--line-height: 16px;
+  --text-caption-bold: 12px;
+  --text-caption-bold--font-weight: 500;
+  --text-caption-bold--letter-spacing: 0em;
+  --text-caption-bold--line-height: 16px;
+  --text-body: 14px;
+  --text-body--font-weight: 400;
+  --text-body--letter-spacing: 0em;
+  --text-body--line-height: 20px;
+  --text-body-bold: 14px;
+  --text-body-bold--font-weight: 500;
+  --text-body-bold--letter-spacing: 0em;
+  --text-body-bold--line-height: 20px;
+  --text-heading-3: 16px;
+  --text-heading-3--font-weight: 600;
+  --text-heading-3--letter-spacing: 0em;
+  --text-heading-3--line-height: 20px;
+  --text-heading-2: 20px;
+  --text-heading-2--font-weight: 600;
+  --text-heading-2--letter-spacing: 0em;
+  --text-heading-2--line-height: 24px;
+  --text-heading-1: 30px;
+  --text-heading-1--font-weight: 500;
+  --text-heading-1--letter-spacing: 0em;
+  --text-heading-1--line-height: 36px;
+  --text-monospace-body: 14px;
+  --text-monospace-body--font-weight: 400;
+  --text-monospace-body--letter-spacing: 0em;
+  --text-monospace-body--line-height: 20px;
+
+  /* Font families */
+  --font-caption: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-caption-bold: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body-bold: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading-3: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading-2: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-heading-1: 'Plus Jakarta Sans', Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-monospace-body: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Border radiuses */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* Box shadows (Light Mode) */
+  --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-default: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0px 4px 16px -2px rgba(0, 0, 0, 0.08), 0px 2px 4px -1px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0px 12px 32px -4px rgba(0, 0, 0, 0.08), 0px 4px 8px -2px rgba(0, 0, 0, 0.08);
+  --shadow-overlay: 0px 12px 32px -4px rgba(0, 0, 0, 0.08), 0px 4px 8px -2px rgba(0, 0, 0, 0.08);
+}
+
+/* ── HIGH-CRAFT DARK THEME TOKENS (Selector: .dark) ───────────────────────── */
+.dark {
+  /* Rich obsidian surface canvas (not flat grey) */
+  --color-brand-primary: rgb(59 130 246);
+  --color-brand-secondary: rgb(34 197 94);
+  --color-default-background: #090d16;
+  --color-default-font: #f8fafc;
+  --color-subtext-color: #94a3b8;
+  --color-neutral-border: rgba(255, 255, 255, 0.08);
+  --color-white: #0f172a;
+  /* Card and panel elevated surface */
+
+  /* Dark theme brand tokens */
+  --color-brand-50: rgba(59, 130, 246, 0.12);
+  --color-brand-100: rgba(59, 130, 246, 0.2);
+  --color-brand-200: rgba(59, 130, 246, 0.3);
+  --color-brand-300: rgb(147 197 253);
+  --color-brand-400: rgb(96 165 250);
+  --color-brand-500: rgb(59 130 246);
+  --color-brand-600: rgb(96 165 250);
+  --color-brand-700: rgb(147 197 253);
+  --color-brand-800: rgb(191 219 254);
+  --color-brand-900: rgb(219 234 254);
+
+  /* Dark theme neutral tokens */
+  --color-neutral-0: #0f172a;
+  --color-neutral-50: rgba(255, 255, 255, 0.03);
+  --color-neutral-100: rgba(255, 255, 255, 0.06);
+  --color-neutral-200: rgba(255, 255, 255, 0.08);
+  --color-neutral-300: rgba(255, 255, 255, 0.12);
+  --color-neutral-400: #64748b;
+  --color-neutral-500: #94a3b8;
+  --color-neutral-600: #cbd5e1;
+  --color-neutral-700: #e2e8f0;
+  --color-neutral-800: #f1f5f9;
+  --color-neutral-900: #f8fafc;
+  --color-neutral-950: #ffffff;
+
+  /* Dark theme error tokens */
+  --color-error-50: rgba(239, 68, 68, 0.12);
+  --color-error-100: rgba(239, 68, 68, 0.2);
+  --color-error-200: rgba(239, 68, 68, 0.3);
+  --color-error-300: rgb(252 165 165);
+  --color-error-400: rgb(248 113 113);
+  --color-error-500: rgb(239 68 68);
+  --color-error-600: rgb(248 113 113);
+  --color-error-700: rgb(252 165 165);
+  --color-error-800: rgb(254 202 202);
+  --color-error-900: rgb(254 226 226);
+
+  /* Dark theme warning tokens */
+  --color-warning-50: rgba(245, 158, 11, 0.12);
+  --color-warning-100: rgba(245, 158, 11, 0.2);
+  --color-warning-200: rgba(245, 158, 11, 0.3);
+  --color-warning-300: rgb(253 224 71);
+  --color-warning-400: rgb(250 204 21);
+  --color-warning-500: rgb(234 179 8);
+  --color-warning-600: rgb(250 204 21);
+  --color-warning-700: rgb(253 224 71);
+  --color-warning-800: rgb(254 240 138);
+  --color-warning-900: rgb(254 249 195);
+
+  /* Dark theme success tokens */
+  --color-success-50: rgba(16, 185, 129, 0.12);
+  --color-success-100: rgba(16, 185, 129, 0.2);
+  --color-success-200: rgba(16, 185, 129, 0.3);
+  --color-success-300: rgb(134 239 172);
+  --color-success-400: rgb(74 222 128);
+  --color-success-500: rgb(34 197 94);
+  --color-success-600: rgb(52 211 153);
+  --color-success-700: rgb(110 231 183);
+  --color-success-800: rgb(167 243 208);
+  --color-success-900: rgb(209 250 229);
+
+  /* Dark theme shadow elevations */
+  --shadow-sm: 0px 1px 2px 0px rgba(0, 0, 0, 0.5);
+  --shadow-default: 0px 1px 3px 0px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0px 4px 16px -2px rgba(0, 0, 0, 0.6), 0px 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0px 12px 32px -4px rgba(0, 0, 0, 0.7), 0px 4px 8px -2px rgba(0, 0, 0, 0.5);
+  --shadow-overlay: 0px 24px 64px -12px rgba(0, 0, 0, 0.85);
+
+  color-scheme: dark;
+}
+
+/* ── BASE & TYPOGRAPHY ─────────────────────────────────────────────────── */
+body {
+  background-color: var(--color-default-background);
+  color: var(--color-default-font);
+  font-family: var(--font-body);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+/* ── DARK MODE COMPREHENSIVE TEXT HIERARCHY ────────────────────────────── */
+/* Ensure all primary headings, titles, values and bold text shine bright */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark .metric-value-huge,
+.dark .panel-header-title,
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark strong,
+.dark b {
+  color: #f8fafc !important;
+}
+
+/* Secondary body text & table content */
+.dark p,
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-gray-700,
+.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+/* Tertiary captions, subtitles, timestamps & muted text */
+.dark .text-slate-500,
+.dark .text-gray-500,
+.dark .text-slate-400,
+.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+/* Brand & accent text in dark mode */
+.dark .text-blue-600,
+.dark .text-blue-700 {
+  color: #60a5fa !important;
+}
+
+.dark .text-emerald-600,
+.dark .text-green-600,
+.dark .text-green-700 {
+  color: #34d399 !important;
+}
+
+.dark .text-amber-600,
+.dark .text-yellow-600 {
+  color: #fbbf24 !important;
+}
+
+.dark .text-red-600,
+.dark .text-red-700 {
+  color: #f87171 !important;
+}
+
+/* ── DARK MODE CARDS, PANELS & SURFACES ────────────────────────────────── */
+.dark .card,
+.dark .panel,
+.dark .dashboard-panel,
+.dark .login-card {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+  /* Top inner highlight + ambient soft depth */
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.04), 0 4px 20px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Hoverable card effect in dark mode */
+.dark .dashboard-panel-clickable:hover {
+  border-color: rgba(96, 165, 250, 0.3) !important;
+  background-color: #131c33 !important;
+}
+
+/* Background overrides in dark mode */
+.dark .bg-white {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-gray-200,
+.dark .border-gray-300,
+.dark .border-slate-100,
+.dark .border-gray-800 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Header & Sidebar in Dark Mode */
+.dark .top-navbar {
+  background-color: #0b0f19 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .sidebar-nav {
+  background-color: #0b0f19 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .sidebar-section-title {
+  color: #64748b !important;
+}
+
+.dark .nav-item-link {
+  color: #94a3b8 !important;
+}
+
+.dark .nav-item-link:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #f8fafc !important;
+}
+
+.dark .nav-item-link.active {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px -2px rgba(37, 99, 235, 0.5) !important;
+}
+
+/* ── 1. UNIFIED BADGE COMPONENT SYSTEM ──────────────────────────────────── */
+.badge,
+.badge-pill,
+.ds-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+  font-weight: var(--text-caption-bold--font-weight);
+  letter-spacing: var(--text-caption-bold--letter-spacing);
+  border-radius: var(--radius-full);
+  border-width: 1px;
+  border-style: solid;
+  border-color: var(--color-neutral-border);
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-700);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+.dark .badge,
+.dark .badge-pill,
+.dark .ds-badge {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Badge Variants */
+.badge-success,
+.badge-green,
+.ds-badge-green,
+.badge-pill.badge-green {
+  background-color: var(--color-success-50) !important;
+  color: var(--color-success-700) !important;
+  border-color: var(--color-success-200) !important;
+}
+
+.dark .badge-success,
+.dark .badge-green,
+.dark .ds-badge-green,
+.dark .badge-pill.badge-green {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+.badge-warning,
+.badge-yellow,
+.badge-amber,
+.ds-badge-amber,
+.badge-pill.badge-amber,
+.badge-pill.badge-yellow {
+  background-color: var(--color-warning-50) !important;
+  color: var(--color-warning-700) !important;
+  border-color: var(--color-warning-200) !important;
+}
+
+.dark .badge-warning,
+.dark .badge-yellow,
+.dark .badge-amber,
+.dark .ds-badge-amber,
+.dark .badge-pill.badge-amber,
+.dark .badge-pill.badge-yellow {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  color: #fbbf24 !important;
+  border-color: rgba(245, 158, 11, 0.25) !important;
+}
+
+.badge-error,
+.badge-danger,
+.badge-red,
+.ds-badge-red,
+.badge-pill.badge-red {
+  background-color: var(--color-error-50) !important;
+  color: var(--color-error-700) !important;
+  border-color: var(--color-error-200) !important;
+}
+
+.dark .badge-error,
+.dark .badge-danger,
+.dark .badge-red,
+.dark .ds-badge-red,
+.dark .badge-pill.badge-red {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #f87171 !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+.badge-brand,
+.badge-blue,
+.badge-cyan,
+.ds-badge-blue,
+.badge-pill.badge-cyan,
+.badge-pill.badge-blue {
+  background-color: var(--color-brand-50) !important;
+  color: var(--color-brand-700) !important;
+  border-color: var(--color-brand-200) !important;
+}
+
+.dark .badge-brand,
+.dark .badge-blue,
+.dark .badge-cyan,
+.dark .ds-badge-blue,
+.dark .badge-pill.badge-cyan,
+.dark .badge-pill.badge-blue {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+.badge-neutral,
+.badge-gray,
+.ds-badge-gray,
+.badge-pill.badge-gray {
+  background-color: var(--color-neutral-100) !important;
+  color: var(--color-neutral-700) !important;
+  border-color: var(--color-neutral-300) !important;
+}
+
+.dark .badge-neutral,
+.dark .badge-gray,
+.dark .ds-badge-gray,
+.dark .badge-pill.badge-gray {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ── 2. CARDS & PANELS ──────────────────────────────────────────────────── */
+.card,
+.panel,
+.dashboard-panel,
+.login-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  color: var(--color-default-font);
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* ── 3. BUTTONS ─────────────────────────────────────────────────────────── */
+.btn,
+.ds-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: var(--text-body);
+  font-weight: var(--text-body-bold--font-weight);
+  line-height: var(--text-body--line-height);
+  border-radius: var(--radius-md);
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  cursor: pointer;
+  transition: all 150ms var(--ease-out);
+  user-select: none;
+}
+
+.btn:active:not(:disabled),
+.ds-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-primary,
+.ds-btn-primary,
+.btn-login {
+  background-color: var(--color-brand-600);
+  color: #ffffff;
+  border-color: var(--color-brand-600);
+}
+
+.btn-primary:hover,
+.ds-btn-primary:hover,
+.btn-login:hover {
+  background-color: var(--color-brand-700);
+  border-color: var(--color-brand-700);
+}
+
+.btn-primary:active,
+.ds-btn-primary:active,
+.btn-login:active {
+  background-color: var(--color-brand-800);
+  border-color: var(--color-brand-800);
+}
+
+.btn-secondary,
+.ds-btn-secondary {
+  background-color: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+  border-color: var(--color-neutral-200);
+}
+
+.btn-secondary:hover,
+.ds-btn-secondary:hover {
+  background-color: var(--color-neutral-200);
+}
+
+.dark .btn-secondary,
+.dark .ds-btn-secondary {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .btn-secondary:hover,
+.dark .ds-btn-secondary:hover {
+  background-color: #27354f;
+}
+
+.btn-outline,
+.ds-btn-outline {
+  background-color: var(--color-white);
+  color: var(--color-default-font);
+  border-color: var(--color-neutral-border);
+}
+
+.btn-outline:hover,
+.ds-btn-outline:hover {
+  background-color: var(--color-neutral-100);
+  border-color: var(--color-neutral-300);
+}
+
+.dark .btn-outline,
+.dark .ds-btn-outline {
+  background-color: #0f172a;
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .btn-outline:hover,
+.dark .ds-btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ── 4. FORM INPUTS & SELECTS ───────────────────────────────────────────── */
+.input,
+.select,
+.ds-input,
+.ds-select,
+.input-field {
+  background-color: var(--color-white);
+  color: var(--color-default-font);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  padding: 0.375rem 0.625rem;
+  outline: none;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.input::placeholder,
+.ds-input::placeholder,
+.input-field::placeholder {
+  color: var(--color-subtext-color);
+}
+
+.input:focus,
+.select:focus,
+.ds-input:focus,
+.ds-select:focus,
+.input-field:focus {
+  border-color: var(--color-brand-500);
+  box-shadow: 0 0 0 2px var(--color-brand-100);
+}
+
+.dark .input,
+.dark .select,
+.dark .ds-input,
+.dark .ds-select,
+.dark .input-field {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .input::placeholder,
+.dark .select::placeholder,
+.dark .ds-input::placeholder,
+.dark .input-field::placeholder {
+  color: #64748b;
+}
+
+.dark .input:focus,
+.dark .select:focus,
+.dark .ds-input:focus,
+.dark .ds-select:focus,
+.dark .input-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+}
+
+/* ── 5. TABLES ──────────────────────────────────────────────────────────── */
+table,
+.exception-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table thead th,
+.exception-table thead th {
+  background-color: var(--color-neutral-50);
+  color: var(--color-subtext-color);
+  border-bottom: 1px solid var(--color-neutral-border);
+  font-size: var(--text-caption);
+  line-height: var(--text-caption--line-height);
+  font-weight: var(--text-caption-bold--font-weight);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.dark table thead th,
+.dark .exception-table thead th {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark table tbody tr:hover{
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+table tbody td,
+.exception-table tbody td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--color-neutral-border);
+  color: var(--color-default-font);
+  font-size: var(--text-body);
+}
+
+.dark table tbody td,
+.dark .exception-table tbody td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #e2e8f0 !important;
+}
+
+table tbody tr:hover td,
+.exception-table tbody tr:hover td {
+  background-color: var(--color-neutral-100);
+}
+
+.dark table tbody tr:hover td,
+.dark .exception-table tbody tr:hover td {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* ── 6. CALLOUTS & BANNERS ──────────────────────────────────────────────── */
+.callout,
+.ds-callout {
+  background-color: var(--color-neutral-100);
+  border: 1px solid var(--color-neutral-border);
+  border-radius: var(--radius-md);
+  color: var(--color-default-font);
+  padding: 0.5rem 0.75rem;
+  font-size: var(--text-caption);
+}
+
+.dark .callout,
+.dark .ds-callout {
+  background-color: #0f172a;
+  border-color: rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+}
+
+/* ── 7. STATUS DOTS ─────────────────────────────────────────────────────── */
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.status-dot-green {
+  background-color: var(--color-success-500);
+  box-shadow: 0 0 8px var(--color-success-500);
+}
+
+.status-dot-amber,
+.status-dot-yellow {
+  background-color: var(--color-warning-500);
+  box-shadow: 0 0 8px var(--color-warning-500);
+}
+
+.status-dot-red {
+  background-color: var(--color-error-500);
+  box-shadow: 0 0 8px var(--color-error-500);
+}
+
+.status-dot-blue {
+  background-color: var(--color-brand-500);
+  box-shadow: 0 0 8px var(--color-brand-500);
+}
+
+/* ── 8. NUMERICS & MONOSPACE UTILITIES ──────────────────────────────────── */
+.tabular-nums,
+.font-mono,
+[data-tabular-nums] {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+  font-family: var(--font-monospace-body);
+}
+
+/* ── 9. MODALS & POPUP OVERLAYS IN DARK MODE ────────────────────────────── */
+.dark .modal-dialog,
+.dark div[id^="modal-"]>div {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── 10. ACTION BUTTONS & SLIDING TABS IN DARK MODE ─────────────────────── */
+.dark .action-btn {
+  background-color: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .action-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #f8fafc !important;
+}
+
+.dark .action-btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #f87171 !important;
+}
+
+.dark .action-btn-accent:hover {
+  background-color: rgba(59, 130, 246, 0.2) !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+  color: #60a5fa !important;
+}
+
+.dark .tabs-sliding-container {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .sliding-indicator {
+  background-color: #1e293b !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .tab-indicator-btn {
+  color: #94a3b8 !important;
+}
+
+.dark .tab-indicator-btn.active {
+  color: #60a5fa !important;
+}
+
+.dark .tab-indicator-btn:hover:not(.active) {
+  color: #f8fafc !important;
+}
+
+/* ── 11. KPI ACCENTS & PILLS IN DARK MODE ───────────────────────────────── */
+.dark .bg-blue-50 {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  color: #34d399 !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: rgba(245, 158, 11, 0.12) !important;
+  color: #fbbf24 !important;
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(239, 68, 68, 0.12) !important;
+  color: #f87171 !important;
+}
+
+.dark .status-pill,
+.dark .simulated-toggle,
+.dark .user-profile-pill {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+}
+
+.dark .search-container input {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+.dark .search-container input::placeholder {
+  color: #64748b !important;
+}
+
+.dark #global-search-dropdown {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark #global-search-dropdown>div.border-t {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  color: #94a3b8 !important;
+}
+
+.dark #global-search-dropdown kbd {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .search-result-item {
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark .search-result-item:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ── 12. USER PROFILE DROPDOWN IN DARK MODE ──────────────────────────────── */
+.dark #user-profile-dropdown {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark #user-profile-dropdown .bg-slate-50\/90 {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+.dark #user-profile-dropdown a {
+  color: #cbd5e1 !important;
+}
+
+.dark #user-profile-dropdown a:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #60a5fa !important;
+}
+
+.dark #user-profile-dropdown a:hover i {
+  color: #60a5fa !important;
+}
+
+.dark #user-profile-dropdown a.text-red-600 {
+  color: #f87171 !important;
+}
+
+.dark #user-profile-dropdown a.text-red-600:hover {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #fca5a5 !important;
+}
+
+.dark #user-profile-dropdown a.text-red-600:hover i {
+  color: #fca5a5 !important;
+}
+
+.dark #user-profile-dropdown .border-slate-100 {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── 13. DOCUMENTATION EXPANDABLES & CODE BLOCKS IN DARK MODE ────────────── */
+.dark details {
+  background-color: #0f172a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+.dark .docs-summary {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+.dark .docs-summary:hover {
+  background-color: #162033 !important;
+}
+
+.dark details[open]>.docs-summary {
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .docs-section-body {
+  background-color: #0f172a !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .docs-section-body p,
+.dark .docs-section-body li {
+  color: #cbd5e1 !important;
+}
+
+.dark .docs-section-body strong {
+  color: #f8fafc !important;
+}
+
+.dark .docs-h3 {
+  color: #f8fafc !important;
+}
+
+.dark .docs-code-block {
+  background-color: #0b101b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .docs-code-block pre {
+  color: #e2e8f0 !important;
+}
+
+.dark .docs-table th {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .docs-table td {
+  border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .docs-table code {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #34d399 !important;
+}
+
+.dark .docs-callout {
+  background-color: rgba(37, 99, 235, 0.1) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+  border-left-color: #3b82f6 !important;
+  color: #93c5fd !important;
+}
+
+.dark .docs-country-block,
+.dark .docs-subsidy-card {
+  background-color: #131c2e !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .docs-country-header,
+.dark .docs-subsidy-title {
+  color: #f8fafc !important;
+}
+
+.dark .docs-badge {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .docs-badge-green {
+  background-color: rgba(16, 185, 129, 0.12) !important;
+  color: #34d399 !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.dark .docs-badge-blue {
+  background-color: rgba(59, 130, 246, 0.12) !important;
+  color: #60a5fa !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+/* ── 15. TOP NAVBAR & SIDEBAR TOGGLE BUTTON IN DARK MODE ─────────────────── */
+.dark .sidebar-toggle-btn {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .sidebar-toggle-btn:hover {
+  background-color: #27354f !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+.dark .sidebar-close-btn {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .sidebar-close-btn:hover {
+  background-color: #27354f !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+/* ── 16. DASHBOARD FILTERS & SEARCH INPUTS IN DARK MODE ─────────────────── */
+.dark .filter-select {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .filter-select:hover {
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+.dark .filter-select:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3) !important;
+}
+
+.dark .filter-select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+.dark #dashboard-sync-btn,
+.dark #btn-export-exceptions {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #e2e8f0 !important;
+}
+
+.dark #dashboard-sync-btn:hover,
+.dark #btn-export-exceptions:hover {
+  background-color: #27354f !important;
+  border-color: #3b82f6 !important;
+  color: #60a5fa !important;
+}
+
+.dark #btn-ack-all-exceptions {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+  color: #60a5fa !important;
+}
+
+.dark #btn-ack-all-exceptions:hover {
+  background-color: rgba(59, 130, 246, 0.28) !important;
+  color: #93c5fd !important;
+}
+
+.dark #fleet-search,
+.dark #exception-search {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  color: #f8fafc !important;
+}
+
+.dark #fleet-search::placeholder,
+.dark #exception-search::placeholder {
+  color: #64748b !important;
+}
+
+.dark #fleet-search:focus,
+.dark #exception-search:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* ── 17. EXCEPTION TABLE & TRIAGE TABS IN DARK MODE ──────────────────────── */
+.dark #exception-triage-tabs {
+  background-color: #1e293b !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .exception-table th {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark .exception-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark .exception-table tr:hover td {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}

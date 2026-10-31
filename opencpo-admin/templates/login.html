@@ -5,72 +5,253 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <title>Sign In — OpenCPO Admin</title>
+    <!-- Instant Theme Resolver -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('opencpo_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (savedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="/static/design-system.css">
     <script src="/static/tailwind.js"></script>
     <script>
         tailwind.config = {
+            darkMode: "selector",
             theme: {
                 extend: {
                     colors: {
-                        brand: { dark: '#0f172a', green: '#22c55e', blue: '#2563eb' }
+                        "brand-primary": "var(--color-brand-primary)",
+                        "brand-secondary": "var(--color-brand-secondary)",
+                        "default-font": "var(--color-default-font)",
+                        "subtext-color": "var(--color-subtext-color)",
+                        "neutral-border": "var(--color-neutral-border)",
+                        white: "var(--color-white)",
+                        "default-background": "var(--color-default-background)",
+                        "brand-50": "var(--color-brand-50)",
+                        "brand-100": "var(--color-brand-100)",
+                        "brand-200": "var(--color-brand-200)",
+                        "brand-300": "var(--color-brand-300)",
+                        "brand-400": "var(--color-brand-400)",
+                        "brand-500": "var(--color-brand-500)",
+                        "brand-600": "var(--color-brand-600)",
+                        "brand-700": "var(--color-brand-700)",
+                        "brand-800": "var(--color-brand-800)",
+                        "brand-900": "var(--color-brand-900)",
+                        "neutral-0": "var(--color-neutral-0)",
+                        "neutral-50": "var(--color-neutral-50)",
+                        "neutral-100": "var(--color-neutral-100)",
+                        "neutral-200": "var(--color-neutral-200)",
+                        "neutral-300": "var(--color-neutral-300)",
+                        "neutral-400": "var(--color-neutral-400)",
+                        "neutral-500": "var(--color-neutral-500)",
+                        "neutral-600": "var(--color-neutral-600)",
+                        "neutral-700": "var(--color-neutral-700)",
+                        "neutral-800": "var(--color-neutral-800)",
+                        "neutral-900": "var(--color-neutral-900)",
+                        "neutral-950": "var(--color-neutral-950)",
+                        "error-50": "var(--color-error-50)",
+                        "error-100": "var(--color-error-100)",
+                        "error-200": "var(--color-error-200)",
+                        "error-300": "var(--color-error-300)",
+                        "error-400": "var(--color-error-400)",
+                        "error-500": "var(--color-error-500)",
+                        "error-600": "var(--color-error-600)",
+                        "error-700": "var(--color-error-700)",
+                        "error-800": "var(--color-error-800)",
+                        "error-900": "var(--color-error-900)",
+                        "warning-50": "var(--color-warning-50)",
+                        "warning-100": "var(--color-warning-100)",
+                        "warning-200": "var(--color-warning-200)",
+                        "warning-300": "var(--color-warning-300)",
+                        "warning-400": "var(--color-warning-400)",
+                        "warning-500": "var(--color-warning-500)",
+                        "warning-600": "var(--color-warning-600)",
+                        "warning-700": "var(--color-warning-700)",
+                        "warning-800": "var(--color-warning-800)",
+                        "warning-900": "var(--color-warning-900)",
+                        "success-50": "var(--color-success-50)",
+                        "success-100": "var(--color-success-100)",
+                        "success-200": "var(--color-success-200)",
+                        "success-300": "var(--color-success-300)",
+                        "success-400": "var(--color-success-400)",
+                        "success-500": "var(--color-success-500)",
+                        "success-600": "var(--color-success-600)",
+                        "success-700": "var(--color-success-700)",
+                        "success-800": "var(--color-success-800)",
+                        "success-900": "var(--color-success-900)",
                     },
                     fontSize: {
-                        'xs': ['13px', '18px'],
-                        'sm': ['15px', '22px'],
-                        'base': ['16px', '24px'],
-                        'lg': ['18px', '26px'],
-                    }
+                        caption: [
+                            "var(--text-caption)",
+                            {
+                                lineHeight: "var(--text-caption--line-height)",
+                                fontWeight: "var(--text-caption--font-weight)",
+                                letterSpacing: "var(--text-caption--letter-spacing)",
+                            },
+                        ],
+                        "caption-bold": [
+                            "var(--text-caption-bold)",
+                            {
+                                lineHeight: "var(--text-caption--line-height)",
+                                fontWeight: "var(--text-caption--font-weight)",
+                                letterSpacing: "var(--text-caption--letter-spacing)",
+                            },
+                        ],
+                        body: [
+                            "var(--text-body)",
+                            {
+                                lineHeight: "var(--text-body--line-height)",
+                                fontWeight: "var(--text-body--font-weight)",
+                                letterSpacing: "var(--text-body--letter-spacing)",
+                            },
+                        ],
+                        "body-bold": [
+                            "var(--text-body-bold)",
+                            {
+                                lineHeight: "var(--text-body-bold--line-height)",
+                                fontWeight: "var(--text-body-bold--font-weight)",
+                                letterSpacing: "var(--text-body-bold--letter-spacing)",
+                            },
+                        ],
+                        "heading-3": [
+                            "var(--text-heading-3)",
+                            {
+                                lineHeight: "var(--text-heading-3--line-height)",
+                                fontWeight: "var(--text-heading-3--font-weight)",
+                                letterSpacing: "var(--text-heading-3--letter-spacing)",
+                            },
+                        ],
+                        "heading-2": [
+                            "var(--text-heading-2)",
+                            {
+                                lineHeight: "var(--text-heading-2--line-height)",
+                                fontWeight: "var(--text-heading-2--font-weight)",
+                                letterSpacing: "var(--text-heading-2--letter-spacing)",
+                            },
+                        ],
+                        "heading-1": [
+                            "var(--text-heading-1)",
+                            {
+                                lineHeight: "var(--text-heading-1--line-height)",
+                                fontWeight: "var(--text-heading-1--font-weight)",
+                                letterSpacing: "var(--text-heading-1--letter-spacing)",
+                            },
+                        ],
+                        "monospace-body": [
+                            "var(--text-monospace-body)",
+                            {
+                                lineHeight: "var(--text-monospace-body--line-height)",
+                                fontWeight: "var(--text-monospace-body--font-weight)",
+                                letterSpacing: "var(--text-monospace-body--letter-spacing)",
+                            },
+                        ],
+                    },
+                    fontFamily: {
+                        caption: "var(--font-caption)",
+                        "caption-bold": "var(--font-caption-bold)",
+                        body: "var(--font-body)",
+                        "body-bold": "var(--font-body-bold)",
+                        "heading-3": "var(--font-heading-3)",
+                        "heading-2": "var(--font-heading-2)",
+                        "heading-1": "var(--font-heading-1)",
+                        "monospace-body": "var(--font-monospace-body)",
+                    },
+                    boxShadow: {
+                        sm: "var(--shadow-sm)",
+                        default: "var(--shadow-default)",
+                        md: "var(--shadow-md)",
+                        lg: "var(--shadow-lg)",
+                        overlay: "var(--shadow-overlay)",
+                    },
+                    borderRadius: {
+                        sm: "var(--radius-sm)",
+                        md: "var(--radius-md)",
+                        lg: "var(--radius-lg)",
+                        full: "var(--radius-full)",
+                    },
+                    container: {
+                        padding: {
+                            DEFAULT: "16px",
+                            sm: "calc((100vw + 16px - 640px) / 2)",
+                            md: "calc((100vw + 16px - 768px) / 2)",
+                            lg: "calc((100vw + 16px - 1024px) / 2)",
+                            xl: "calc((100vw + 16px - 1280px) / 2)",
+                            "2xl": "calc((100vw + 16px - 1536px) / 2)",
+                        },
+                    },
+                    spacing: {
+                        112: "28rem",
+                        144: "36rem",
+                        192: "48rem",
+                        256: "64rem",
+                        320: "80rem",
+                    },
+                    screens: {
+                        mobile: {
+                            max: "767px",
+                        },
+                    },
                 }
             }
-        }
+        };
     </script>
     <style>
-        body { background: #f8fafc; color: #0f172a; }
+        body { background: var(--color-bg-app); color: var(--color-text-primary); font-family: var(--font-sans); }
 
         .login-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-modal);
+            box-shadow: var(--shadow-modal);
         }
 
         .input-field {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            color: #0f172a;
-            font-size: 15px;
-            padding: 11px 14px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border-input);
+            border-radius: var(--radius-control);
+            color: var(--color-text-primary);
+            font-size: var(--text-sm);
+            padding: 9px 12px;
             width: 100%;
             outline: none;
-            transition: border-color 0.15s, box-shadow 0.15s;
+            transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
         }
-        .input-field::placeholder { color: #94a3b8; }
+        .input-field::placeholder { color: var(--color-text-subtle); }
         .input-field:focus {
-            border-color: #2563eb;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+            border-color: var(--color-border-focus);
+            background: var(--color-surface);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.18);
         }
 
         .btn-login {
-            background: #2563eb;
+            background: var(--color-action-primary);
             color: #fff;
             border: none;
-            border-radius: 7px;
-            font-size: 15px;
+            border-radius: var(--radius-control);
+            font-size: var(--text-sm);
             font-weight: 600;
-            padding: 12px 0;
+            padding: 10px 0;
             width: 100%;
             cursor: pointer;
             letter-spacing: 0.2px;
-            transition: background 0.15s, box-shadow 0.15s;
+            transition: background var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out), transform var(--duration-press) var(--ease-out);
         }
         .btn-login:hover {
-            background: #1d4ed8;
-            box-shadow: 0 4px 16px rgba(37,99,235,0.3);
+            background: var(--color-action-primary-hover);
+            box-shadow: 0 4px 14px rgba(37,99,235,0.28);
         }
-        .btn-login:active { background: #1e40af; }
+        .btn-login:active {
+            background: var(--color-action-primary-active);
+            transform: scale(0.98);
+        }
 
-        label { font-size: 13px; color: #475569; letter-spacing: 0.3px; }
+        label { font-size: var(--text-xs); color: var(--color-text-secondary); letter-spacing: 0.3px; }
     </style>
 </head>
 <body class="h-full flex flex-col items-center justify-center" style="min-height:100vh;">
@@ -78,7 +259,7 @@
     <!-- Logo bar at top -->
     <div style="margin-bottom:36px;text-align:center;">
         <div style="font-size:32px;font-weight:700;letter-spacing:-0.5px;line-height:1;">
-            <span style="color:#0f172a;">Open</span><span style="color:#2563eb;">CPO</span>
+            <img src="/static/logo.png" alt="ChargeQ" width="200">
         </div>
         <div style="font-size:10px;color:#64748b;letter-spacing:2.5px;text-transform:uppercase;margin-top:8px;">
             Admin Panel
@@ -88,7 +269,7 @@
     <!-- Login card -->
     <div class="login-card" style="width:100%;max-width:380px;padding:36px 32px;">
 
-        <h1 style="font-size:17px;font-weight:600;color:#0f172a;margin-bottom:24px;">Sign in</h1>
+        <h1 style="font-size:17px;font-weight:600;color:var(--color-default-font);margin-bottom:24px;">Sign in</h1>
 
         <!-- Error message -->
         {% if error %}
@@ -130,9 +311,10 @@
     </div>
 
     <!-- Footer -->
-    <div style="margin-top:32px;font-size:12px;color:#2d4a63;text-align:center;">
-        Powered by <span style="color:#3d5870;">OpenCPO</span>
+    <div style="margin-top:32px;font-size:12px;color:var(--color-text-muted);text-align:center;">
+        Powered by <span style="color:var(--color-text-secondary);font-weight:600;">ChargeQ</span>
     </div>
+    <!-- <div style="margin-top:32px;font-size:12px;color:var(--color-text-muted);text-align:center;">Made with ❤️ by Gaurav Singh</div> -->
 
 </body>
 </html>

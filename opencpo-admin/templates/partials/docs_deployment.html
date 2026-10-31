@@ -4,7 +4,7 @@
 <summary class="docs-summary">
   <span class="docs-section-num">08</span>
   Deployment Architecture — Production-Grade Setup
-  <span class="docs-badge" style="background:rgba(132,189,0,0.1);color:#84BD00;border-color:#84BD00;">HA</span>
+  <span class="docs-badge docs-badge-green">HA</span>
 </summary>
 <div class="docs-section-body">
 
@@ -50,14 +50,14 @@
     <text x="630" y="174" text-anchor="middle" font-size="7" fill="#3d5870">zero-trust</text>
 
     <!-- Node 1 Primary -->
-    <rect x="10"  y="188" width="210" height="130" rx="10" fill="#071828" stroke="#84BD00" stroke-opacity="0.6"/>
-    <text x="115" y="206" text-anchor="middle" font-size="9" fill="#84BD00" font-family="monospace" font-weight="700">NODE 1 — PRIMARY</text>
+    <rect x="10"  y="188" width="210" height="130" rx="10" fill="#071828" stroke="#22c55e" stroke-opacity="0.6"/>
+    <text x="115" y="206" text-anchor="middle" font-size="9" fill="#22c55e" font-family="monospace" font-weight="700">NODE 1 — PRIMARY</text>
     <rect x="22"  y="214" width="186" height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="115" y="229" text-anchor="middle" font-size="7" fill="#c0cdd8">OCPP Core  :9100 :9201</text>
     <rect x="22"  y="240" width="186" height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="115" y="255" text-anchor="middle" font-size="7" fill="#c0cdd8">CPO API + Admin  :8000 :8080</text>
-    <rect x="22"  y="266" width="90"  height="22" rx="4" fill="#0d2137" stroke="#00B0E4" stroke-opacity="0.5"/>
-    <text x="67"  y="281" text-anchor="middle" font-size="7" fill="#00B0E4">Postgres Primary</text>
+    <rect x="22"  y="266" width="90"  height="22" rx="4" fill="#0d2137" stroke="#3b82f6" stroke-opacity="0.5"/>
+    <text x="67"  y="281" text-anchor="middle" font-size="7" fill="#3b82f6">Postgres Primary</text>
     <rect x="118" y="266" width="90"  height="22" rx="4" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="163" y="281" text-anchor="middle" font-size="7" fill="#c0cdd8">Redis Primary</text>
     <text x="115" y="308" text-anchor="middle" font-size="7" fill="#3d5870">R/W  ·  leader election</text>
@@ -95,10 +95,10 @@
     <text x="556" y="264" text-anchor="middle" font-size="7" fill="#2d4a63">stream</text>
 
     <!-- Chargers -->
-    <rect x="60" y="358" width="100" height="30" rx="6" fill="#0a1e30" stroke="#84BD00" stroke-opacity="0.4"/>
-    <text x="110" y="376" text-anchor="middle" font-size="8" fill="#84BD00">Charger Fleet</text>
+    <rect x="60" y="358" width="100" height="30" rx="6" fill="#0a1e30" stroke="#22c55e" stroke-opacity="0.4"/>
+    <text x="110" y="376" text-anchor="middle" font-size="8" fill="#22c55e">Charger Fleet</text>
 
-    <line x1="110" y1="318" x2="110" y2="357" stroke="#84BD00" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#dep-arr)"/>
+    <line x1="110" y1="318" x2="110" y2="357" stroke="#22c55e" stroke-opacity="0.3" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#dep-arr)"/>
     <text x="110" y="344" text-anchor="middle" font-size="7" fill="#2d4a63">OCPP WS</text>
 
     <!-- TimescaleDB -->
@@ -159,8 +159,8 @@
     <text x="248" y="83" text-anchor="middle" font-size="7" fill="#3d5870">session end</text>
 
     <!-- Postgres -->
-    <rect x="276" y="20" width="210" height="140" rx="10" fill="#071828" stroke="#00B0E4" stroke-opacity="0.4"/>
-    <text x="381" y="42" text-anchor="middle" font-size="9" fill="#00B0E4" font-family="monospace" font-weight="700">POSTGRES — Warm</text>
+    <rect x="276" y="20" width="210" height="140" rx="10" fill="#071828" stroke="#3b82f6" stroke-opacity="0.4"/>
+    <text x="381" y="42" text-anchor="middle" font-size="9" fill="#3b82f6" font-family="monospace" font-weight="700">POSTGRES — Warm</text>
     <text x="381" y="56" text-anchor="middle" font-size="7" fill="#3d5870">&lt; 10ms access  ·  persistent</text>
     <rect x="288" y="64"  width="186" height="18" rx="3" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="381" y="76"  text-anchor="middle" font-size="7" fill="#c0cdd8">Completed sessions + CDRs</text>
@@ -175,8 +175,8 @@
     <text x="514" y="83" text-anchor="middle" font-size="7" fill="#3d5870">batch write</text>
 
     <!-- TimescaleDB -->
-    <rect x="542" y="20" width="210" height="140" rx="10" fill="#071828" stroke="#84BD00" stroke-opacity="0.3"/>
-    <text x="647" y="42" text-anchor="middle" font-size="9" fill="#84BD00" font-family="monospace" font-weight="700">TIMESCALEDB — Cold</text>
+    <rect x="542" y="20" width="210" height="140" rx="10" fill="#071828" stroke="#22c55e" stroke-opacity="0.3"/>
+    <text x="647" y="42" text-anchor="middle" font-size="9" fill="#22c55e" font-family="monospace" font-weight="700">TIMESCALEDB — Cold</text>
     <text x="647" y="56" text-anchor="middle" font-size="7" fill="#3d5870">time-series  ·  compressed</text>
     <rect x="554" y="64"  width="186" height="18" rx="3" fill="#0d2137" stroke="#1a3a5c"/>
     <text x="647" y="76"  text-anchor="middle" font-size="7" fill="#c0cdd8">MeterValues (kWh, kW, V, A, per interval)</text>

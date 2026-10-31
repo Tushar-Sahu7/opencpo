@@ -5,55 +5,225 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" type="image/svg+xml" href="/static/favicon.png">
     <title>{% block title %}Dashboard{% endblock %} — OpenCPO / ChargeQ</title>
+    <!-- Instant Theme Resolver to Eliminate Theme FOUC -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('opencpo_theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (savedTheme === 'light') {
+                    document.documentElement.classList.remove('dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <!-- Preconnect & asynchronous font loading to eliminate FOUC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
     <script src="/static/tailwind.js"></script>
     <script src="/static/htmx.min.js"></script>
     <script src="/static/chart.min.js"></script>
     <script src="/static/lucide.min.js"></script>
     <script>
         tailwind.config = {
+            darkMode: "selector",
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            dark: '#0f172a',
-                            green: '#22c55e', // parrot green
-                            blue: '#2563eb',  // royal blue
-                            cyan: '#3b82f6',  // bright accent
-                            royal: '#2563eb',
-                            parrot: '#22c55e',
-                            bg: '#f8fafc',
-                            surface: '#ffffff'
-                        }
+                        "brand-primary": "var(--color-brand-primary)",
+                        "brand-secondary": "var(--color-brand-secondary)",
+                        "default-font": "var(--color-default-font)",
+                        "subtext-color": "var(--color-subtext-color)",
+                        "neutral-border": "var(--color-neutral-border)",
+                        white: "var(--color-white)",
+                        "default-background": "var(--color-default-background)",
+                        "brand-50": "var(--color-brand-50)",
+                        "brand-100": "var(--color-brand-100)",
+                        "brand-200": "var(--color-brand-200)",
+                        "brand-300": "var(--color-brand-300)",
+                        "brand-400": "var(--color-brand-400)",
+                        "brand-500": "var(--color-brand-500)",
+                        "brand-600": "var(--color-brand-600)",
+                        "brand-700": "var(--color-brand-700)",
+                        "brand-800": "var(--color-brand-800)",
+                        "brand-900": "var(--color-brand-900)",
+                        "neutral-0": "var(--color-neutral-0)",
+                        "neutral-50": "var(--color-neutral-50)",
+                        "neutral-100": "var(--color-neutral-100)",
+                        "neutral-200": "var(--color-neutral-200)",
+                        "neutral-300": "var(--color-neutral-300)",
+                        "neutral-400": "var(--color-neutral-400)",
+                        "neutral-500": "var(--color-neutral-500)",
+                        "neutral-600": "var(--color-neutral-600)",
+                        "neutral-700": "var(--color-neutral-700)",
+                        "neutral-800": "var(--color-neutral-800)",
+                        "neutral-900": "var(--color-neutral-900)",
+                        "neutral-950": "var(--color-neutral-950)",
+                        "error-50": "var(--color-error-50)",
+                        "error-100": "var(--color-error-100)",
+                        "error-200": "var(--color-error-200)",
+                        "error-300": "var(--color-error-300)",
+                        "error-400": "var(--color-error-400)",
+                        "error-500": "var(--color-error-500)",
+                        "error-600": "var(--color-error-600)",
+                        "error-700": "var(--color-error-700)",
+                        "error-800": "var(--color-error-800)",
+                        "error-900": "var(--color-error-900)",
+                        "warning-50": "var(--color-warning-50)",
+                        "warning-100": "var(--color-warning-100)",
+                        "warning-200": "var(--color-warning-200)",
+                        "warning-300": "var(--color-warning-300)",
+                        "warning-400": "var(--color-warning-400)",
+                        "warning-500": "var(--color-warning-500)",
+                        "warning-600": "var(--color-warning-600)",
+                        "warning-700": "var(--color-warning-700)",
+                        "warning-800": "var(--color-warning-800)",
+                        "warning-900": "var(--color-warning-900)",
+                        "success-50": "var(--color-success-50)",
+                        "success-100": "var(--color-success-100)",
+                        "success-200": "var(--color-success-200)",
+                        "success-300": "var(--color-success-300)",
+                        "success-400": "var(--color-success-400)",
+                        "success-500": "var(--color-success-500)",
+                        "success-600": "var(--color-success-600)",
+                        "success-700": "var(--color-success-700)",
+                        "success-800": "var(--color-success-800)",
+                        "success-900": "var(--color-success-900)"
                     },
                     fontSize: {
-                        'xs': ['12px', '16px'],
-                        'sm': ['13px', '18px'],
-                        'base': ['14px', '20px'],
-                        'lg': ['16px', '22px'],
+                        caption: [
+                            "var(--text-caption)",
+                            {
+                                lineHeight: "var(--text-caption--line-height)",
+                                fontWeight: "var(--text-caption--font-weight)",
+                                letterSpacing: "var(--text-caption--letter-spacing)",
+                            },
+                        ],
+                        "caption-bold": [
+                            "var(--text-caption-bold)",
+                            {
+                                lineHeight: "var(--text-caption--line-height)",
+                                fontWeight: "var(--text-caption-bold--font-weight)",
+                                letterSpacing: "var(--text-caption-bold--letter-spacing)",
+                            },
+                        ],
+                        body: [
+                            "var(--text-body)",
+                            {
+                                lineHeight: "var(--text-body--line-height)",
+                                fontWeight: "var(--text-body--font-weight)",
+                                letterSpacing: "var(--text-body--letter-spacing)",
+                            },
+                        ],
+                        "body-bold": [
+                            "var(--text-body-bold)",
+                            {
+                                lineHeight: "var(--text-body-bold--line-height)",
+                                fontWeight: "var(--text-body-bold--font-weight)",
+                                letterSpacing: "var(--text-body-bold--letter-spacing)",
+                            },
+                        ],
+                        "heading-3": [
+                            "var(--text-heading-3)",
+                            {
+                                lineHeight: "var(--text-heading-3--line-height)",
+                                fontWeight: "var(--text-heading-3--font-weight)",
+                                letterSpacing: "var(--text-heading-3--letter-spacing)",
+                            },
+                        ],
+                        "heading-2": [
+                            "var(--text-heading-2)",
+                            {
+                                lineHeight: "var(--text-heading-2--line-height)",
+                                fontWeight: "var(--text-heading-2--font-weight)",
+                                letterSpacing: "var(--text-heading-2--letter-spacing)",
+                            },
+                        ],
+                        "heading-1": [
+                            "var(--text-heading-1)",
+                            {
+                                lineHeight: "var(--text-heading-1--line-height)",
+                                fontWeight: "var(--text-heading-1--font-weight)",
+                                letterSpacing: "var(--text-heading-1--letter-spacing)",
+                            },
+                        ],
+                        "monospace-body": [
+                            "var(--text-monospace-body)",
+                            {
+                                lineHeight: "var(--text-monospace-body--line-height)",
+                                fontWeight: "var(--text-monospace-body--font-weight)",
+                                letterSpacing: "var(--text-monospace-body--letter-spacing)",
+                            },
+                        ],
+                        xs: ['12px', '16px'],
+                        sm: ['13px', '18px'],
+                        base: ['14px', '20px'],
+                        lg: ['16px', '22px'],
                     },
-                    transitionTimingFunction: {
-                        'DEFAULT': 'cubic-bezier(0.23, 1, 0.32, 1)',      /* Strong UI ease-out */
-                        'out': 'cubic-bezier(0.23, 1, 0.32, 1)',          /* Strong UI ease-out */
-                        'in-out': 'cubic-bezier(0.77, 0, 0.175, 1)',      /* On-screen movement */
-                        'drawer': 'cubic-bezier(0.32, 0.72, 0, 1)',       /* iOS drawer curve */
-                        'spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)' /* Subtle physical spring */
+                    fontFamily: {
+                        caption: "var(--font-caption)",
+                        "caption-bold": "var(--font-caption-bold)",
+                        body: "var(--font-body)",
+                        "body-bold": "var(--font-body-bold)",
+                        "heading-3": "var(--font-heading-3)",
+                        "heading-2": "var(--font-heading-2)",
+                        "heading-1": "var(--font-heading-1)",
+                        "monospace-body": "var(--font-monospace-body)",
                     },
-                    transitionDuration: {
-                        'DEFAULT': '180ms',
-                        'press': '120ms',
-                        'fast': '150ms',
-                        'normal': '180ms',
-                        'slow': '250ms'
-                    }
+                    boxShadow: {
+                        sm: "var(--shadow-sm)",
+                        default: "var(--shadow-default)",
+                        md: "var(--shadow-md)",
+                        lg: "var(--shadow-lg)",
+                        overlay: "var(--shadow-overlay)",
+                    },
+                    borderRadius: {
+                        sm: "var(--radius-sm)",
+                        md: "var(--radius-md)",
+                        lg: "var(--radius-lg)",
+                        full: "var(--radius-full)",
+                    },
+                    container: {
+                        padding: {
+                            DEFAULT: "16px",
+                            sm: "calc((100vw + 16px - 640px) / 2)",
+                            md: "calc((100vw + 16px - 768px) / 2)",
+                            lg: "calc((100vw + 16px - 1024px) / 2)",
+                            xl: "calc((100vw + 16px - 1280px) / 2)",
+                            "2xl": "calc((100vw + 16px - 1536px) / 2)",
+                        },
+                    },
+                    spacing: {
+                        112: "28rem",
+                        144: "36rem",
+                        192: "48rem",
+                        256: "64rem",
+                        320: "80rem",
+                    },
+                    screens: {
+                        mobile: {
+                            max: "767px",
+                        },
+                    },
                 }
             }
-        }
+        };
     </script>
+    <!-- Load custom design tokens AFTER tailwind config so custom classes maintain strict precedence -->
+    <link rel="stylesheet" href="/static/design-system.css?v=1.2">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        
         * {
             box-sizing: border-box;
+        }
+
+        i[data-lucide] {
+            display: inline-flex;
+            width: 1em;
+            height: 1em;
+            vertical-align: middle;
+            flex-shrink: 0;
         }
 
         :root {
@@ -122,7 +292,7 @@
             padding: 0 16px;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
             gap: 10px;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
         }
@@ -162,6 +332,18 @@
             transform: scale(0.94);
         }
 
+        .dark .sidebar-toggle-btn {
+            background: #1e293b;
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+        }
+
+        .dark .sidebar-toggle-btn:hover {
+            background: #27354f;
+            border-color: #3b82f6;
+            color: #60a5fa;
+        }
+
         .sidebar-close-btn {
             display: inline-flex;
             align-items: center;
@@ -181,6 +363,18 @@
             background: #e2e8f0;
             border-color: #2563eb;
             color: #2563eb;
+        }
+
+        .dark .sidebar-close-btn {
+            background: #1e293b;
+            border-color: rgba(255, 255, 255, 0.12);
+            color: #cbd5e1;
+        }
+
+        .dark .sidebar-close-btn:hover {
+            background: #27354f;
+            border-color: #3b82f6;
+            color: #60a5fa;
         }
 
         /* ── Mobile Sidebar Backdrop Overlay ──────────────────────── */
@@ -257,9 +451,6 @@
             right: 8px;
             top: 50%;
             transform: translateY(-50%);
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
             padding: 1px 5px;
             font-size: 10px;
             color: #64748b;
@@ -278,6 +469,36 @@
             font-size: 11px;
             font-weight: 500;
             color: #475569;
+        }
+
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            color: var(--color-subtext-color);
+            cursor: pointer;
+            user-select: none;
+            transition: all 180ms cubic-bezier(0.23, 1, 0.32, 1);
+            flex-shrink: 0;
+        }
+
+        .theme-toggle-btn:hover {
+            color: var(--color-brand-600);
+            transform: scale(1.05);
+        }
+
+        .dark .theme-toggle-btn {
+            color: var(--color-neutral-300);
+        }
+
+        .dark .theme-toggle-btn:hover {
+            color: var(--color-brand-400);
+        }
+
+        .theme-toggle-btn:active {
+            transform: scale(0.95);
         }
 
         .simulated-toggle {
@@ -342,7 +563,7 @@
             transition: all 0.25s ease;
         }
 
-        /* ── Active / ON State (Royal Blue track + Parrot Green glow) ── */
+        /* ── Active / ON State (Brand Primary track + Success glow) ── */
         .simulated-toggle.active .toggle-track {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             border-color: #2563eb;
@@ -372,6 +593,20 @@
             border: 1px solid #e2e8f0;
             border-radius: 20px;
             padding: 3px 10px 3px 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .user-profile-pill:hover,
+        .user-profile-pill.active {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
+        .user-profile-pill:focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: 1px;
         }
 
         .user-avatar-circle {
@@ -434,7 +669,7 @@
             font-weight: 600;
         }
 
-        .nav-item-link.active .badge-pill {
+        .nav-item-link.active .badge-pill, .badge {
             background: rgba(255, 255, 255, 0.25);
             color: #ffffff;
         }
@@ -456,24 +691,9 @@
             opacity: 0.85;
         }
 
-        .badge-pill {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 1px 7px;
-            border-radius: 9999px;
-            letter-spacing: 0.2px;
-            background: #f1f5f9;
-            color: #64748b;
-            min-width: 22px;
-            text-align: center;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .badge-pill, .badge {
+            /* Inherits directly from design-system.css .badge */
         }
-
-        .badge-pill.badge-green { background: rgba(34, 197, 94, 0.15); color: #16a34a; }
-        .badge-pill.badge-cyan { background: rgba(37, 99, 235, 0.12); color: #2563eb; }
-        .badge-pill.badge-gray { background: #f1f5f9; color: #64748b; }
 
         /* ── Main Area ────────────────────────────────────────────── */
         .dashboard-main-content {
@@ -586,103 +806,114 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* ── Global Theme Overrides for Light/Offwhite Mode ───────── */
-        /* Surface and Panel Backgrounds */
+        /* ── Design System Layout Surfaces & Semantic Tokens ───────────────────── */
+        body {
+            background-color: var(--color-default-background);
+            color: var(--color-default-font);
+        }
+
+        .top-navbar {
+            background-color: var(--color-white);
+            border-bottom: 1px solid var(--color-neutral-border);
+        }
+
+        .sidebar-nav {
+            background-color: var(--color-white);
+            border-right: 1px solid var(--color-neutral-border);
+        }
+
+        .sidebar-section-title {
+            color: var(--color-subtext-color);
+        }
+
+        .nav-item-link {
+            color: var(--color-subtext-color);
+        }
+
+        .nav-item-link:hover {
+            background-color: var(--color-neutral-100);
+            color: var(--color-default-font);
+        }
+
+        .dark .nav-item-link:hover {
+            background-color: var(--color-neutral-800);
+            color: var(--color-neutral-100);
+        }
+
+        .nav-item-link.active {
+            background-color: var(--color-brand-600);
+            color: #ffffff;
+        }
+
+        .dashboard-main-content {
+            background-color: var(--color-default-background);
+        }
+
         .dashboard-panel,
-        .bg-gray-900,
-        .bg-gray-950,
-        div[class*="bg-[#0b1422]"],
-        div[class*="bg-[#0a1221]"],
-        div[class*="bg-[#080f1a]"],
-        div[class*="bg-[#060b13]"] {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
-            color: #1e293b;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
-        }
-
-        /* Light Sub-panels, Table Headers, Filter Bars */
-        .bg-gray-800,
-        th {
-            background-color: #f8fafc !important;
-            border-color: #e2e8f0 !important;
-            color: #475569 !important;
-        }
-
-        /* Borders across tables and cards */
-        .border-gray-800,
-        .border-gray-700,
-        tr[class*="border-gray-800"],
-        th[class*="border-gray-800"],
-        td[class*="border-gray-800"],
-        div[class*="border-[#14243b]"],
-        div[class*="border-[#192d48]"],
-        div[class*="border-[#1e3556]"],
-        div[class*="border-[#132238]"] {
-            border-color: #e2e8f0 !important;
-        }
-
-        /* High-contrast text on offwhite background */
-        .text-gray-100,
-        .text-gray-200,
-        .text-gray-300,
-        h1, h2, h3, h4,
-        .metric-value-huge {
-            color: #0f172a !important;
-        }
-
-        .text-gray-400,
-        .text-gray-500 {
-            color: #64748b !important;
-        }
-
-        /* Primary: Royal Blue Utilities */
-        .bg-brand-blue,
-        .bg-blue-600 {
-            background-color: #2563eb !important;
-            color: #ffffff !important;
-        }
-        .text-brand-blue,
-        .text-cyan-400,
-        .text-blue-600 {
-            color: #2563eb !important;
-        }
-        .border-brand-blue,
-        .focus\:border-brand-blue:focus {
-            border-color: #2563eb !important;
-        }
-
-        /* Secondary: Parrot Green Utilities */
-        .bg-brand-green,
-        .bg-green-600,
-        .bg-green-700,
-        .bg-emerald-600 {
-            background-color: #22c55e !important;
-            color: #ffffff !important;
-        }
-        .text-brand-green,
-        .text-emerald-400,
-        .text-green-400,
-        .text-green-500 {
-            color: #16a34a !important;
-        }
-
-        /* Hover states for rows */
-        tbody tr:hover {
-            background-color: #f8fafc !important;
+        .card,
+        .panel {
+            background-color: var(--color-white);
+            border-color: var(--color-neutral-border);
+            color: var(--color-default-font);
         }
 
         /* Form Inputs */
         input:not([type="checkbox"]):not([type="radio"]),
         select,
         textarea {
-            background-color: #ffffff !important;
-            border-color: #cbd5e1 !important;
-            color: #0f172a !important;
+            background-color: var(--color-white);
+            border-color: var(--color-neutral-border);
+            color: var(--color-default-font);
         }
+
         input:focus, select:focus, textarea:focus {
-            border-color: #2563eb !important;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+            border-color: var(--color-brand-500);
+            box-shadow: 0 0 0 2px var(--color-brand-100);
+        }
+
+        .dark input:focus, .dark select:focus, .dark textarea:focus {
+            box-shadow: 0 0 0 2px var(--color-brand-900);
+        }
+
+        .search-container input {
+            background-color: var(--color-neutral-100);
+            border-color: var(--color-neutral-border);
+            color: var(--color-default-font);
+        }
+
+        .dark .search-container input {
+            background-color: var(--color-neutral-800);
+            border-color: var(--color-neutral-700);
+            color: var(--color-neutral-100);
+        }
+
+        #global-search-dropdown {
+            background-color: var(--color-white);
+            border-color: var(--color-neutral-border);
+        }
+
+        .search-result-item:hover {
+            background-color: var(--color-neutral-100);
+        }
+
+        .dark .search-result-item:hover {
+            background-color: var(--color-neutral-800);
+        }
+
+        .status-pill,
+        .simulated-toggle,
+        .user-profile-pill {
+            background-color: var(--color-neutral-100);
+            border-color: var(--color-neutral-border);
+            color: var(--color-default-font);
+        }
+
+        .dark .status-pill,
+        .dark .simulated-toggle,
+        .dark .user-profile-pill {
+            background-color: var(--color-neutral-800);
+            border-color: var(--color-neutral-700);
+            color: var(--color-neutral-200);
         }
 
         /* Scrollbar styles */
@@ -1015,10 +1246,27 @@
         </a>
     </div>
 
-    <div class="search-container">
-        <span class="search-icon"><i data-lucide="search" class="w-3.5 h-3.5 text-slate-400"></i></span>
-        <input type="text" placeholder="Search assets, sites, transactions..." id="global-search">
-        <span class="kbd-shortcut">⌘K</span>
+    <div class="search-container" id="global-search-container">
+        <span class="search-icon"><i data-lucide="search" class="w-3.5 h-3.5 text-subtext-color"></i></span>
+        <input type="text" placeholder="Search assets, sites, transactions..." id="global-search" autocomplete="off" spellcheck="false" style="padding-left: 38px !important; padding-right: 36px !important;">
+        <span class="kbd-shortcut">⌘ K</span>
+
+        <!-- Global Search Results Dropdown -->
+        <div id="global-search-dropdown" class="hidden absolute left-0 right-0 top-full mt-1.5 card shadow-overlay overflow-hidden z-[9999] text-xs">
+            <div id="global-search-loading" class="hidden p-3 text-center text-subtext-color flex items-center justify-center gap-2">
+                <span class="w-3.5 h-3.5 border-2 border-brand-600 border-t-transparent rounded-full animate-spin"></span>
+                <span>Searching assets &amp; sessions...</span>
+            </div>
+            <div id="global-search-empty" class="hidden p-4 text-center text-subtext-color">
+                No matching assets, sessions, or pages found
+            </div>
+            <div id="global-search-list" class="max-h-80 overflow-y-auto divide-y divide-neutral-border"></div>
+            <div class="p-2 bg-neutral-50/80 dark:bg-neutral-800/40 border-t border-neutral-border flex items-center justify-between text-[10px] text-subtext-color">
+                <span>Navigate: <kbd class="px-1 py-0.5 bg-white dark:bg-neutral-800 border border-neutral-border rounded font-mono">↑</kbd> <kbd class="px-1 py-0.5 bg-white dark:bg-neutral-800 border border-neutral-border rounded font-mono">↓</kbd></span>
+                <span>Select: <kbd class="px-1 py-0.5 bg-white dark:bg-neutral-800 border border-neutral-border rounded font-mono">Enter</kbd></span>
+                <span>Close: <kbd class="px-1 py-0.5 bg-white dark:bg-neutral-800 border border-neutral-border rounded font-mono">Esc</kbd></span>
+            </div>
+        </div>
     </div>
 
     <div class="header-actions">
@@ -1026,6 +1274,17 @@
             <span class="status-dot status-dot-green"></span>
             <span class="status-pill-text">Live Grid &amp; Charger Status</span>
         </div>
+
+        <!-- Dark/Light Theme Toggle with Lucide Icon -->
+        <button type="button"
+                id="theme-toggle-btn"
+                class="theme-toggle-btn"
+                title="Switch Theme"
+                aria-label="Switch Theme">
+            <span id="theme-toggle-icon-wrap" class="inline-flex items-center justify-center">
+                <i data-lucide="moon" id="theme-toggle-icon" class="w-4 h-4 text-default-font"></i>
+            </span>
+        </button>
 
         <div class="simulated-toggle" id="simulated-toggle-btn" role="switch" aria-checked="false" title="Toggle simulation mode" tabindex="0">
             <span class="simulated-toggle-text">Real</span>
@@ -1035,14 +1294,96 @@
             </div>
         </div>
 
-        <div class="user-profile-pill">
-            <div class="user-avatar-circle"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>
-            <div class="user-profile-details flex flex-col text-left leading-tight">
-                <div class="flex items-center gap-1.5">
-                    <span class="text-xs font-semibold text-gray-200">Operations Admin</span>
-                    <span class="text-[9px] font-bold px-1 py-0.5 rounded bg-blue-100 text-blue-700 uppercase tracking-wider">SuperAdmin</span>
+        <!-- User Profile Dropdown -->
+        {% set current_user = request.state.user if (request is defined and request and request.state is defined and request.state.user is defined) else None %}
+        <div class="relative inline-block text-left" id="user-profile-dropdown-wrapper">
+            <button type="button" 
+                    id="user-profile-btn" 
+                    class="user-profile-pill group focus:outline-none"
+                    aria-expanded="false" 
+                    aria-haspopup="true"
+                    title="User account and profile menu">
+                <div class="user-avatar-circle">
+                    <i data-lucide="user" class="w-3.5 h-3.5"></i>
                 </div>
-                <span class="text-[10px] text-gray-400">admin@chargeq.io</span>
+                <div class="user-profile-details flex flex-col text-left leading-tight sm:flex">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-semibold text-default-font truncate max-w-[120px]">
+                            {{ current_user.name if current_user and current_user.name else 'Operations Admin' }}
+                        </span>
+                        <span class="text-[9px] font-bold px-1 py-0.5 rounded bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300 uppercase tracking-wider">
+                            {{ current_user.role if current_user and current_user.role else 'SuperAdmin' }}
+                        </span>
+                    </div>
+                    <span class="text-[10px] text-subtext-color truncate max-w-[140px]">
+                        {{ current_user.email if current_user and current_user.email else 'admin@chargeq.io' }}
+                    </span>
+                </div>
+                <i data-lucide="chevron-down" id="user-profile-chevron" class="w-3.5 h-3.5 text-subtext-color group-hover:text-default-font transition-transform duration-200"></i>
+            </button>
+
+            <!-- Dropdown Menu Panel -->
+            <div id="user-profile-dropdown" 
+                 class="hidden absolute right-0 mt-2 w-64 rounded-xl card shadow-overlay ring-1 ring-black/10 border border-neutral-border focus:outline-none z-[1050] overflow-hidden transform origin-top-right transition-all duration-150"
+                 role="menu" 
+                 aria-orientation="vertical" 
+                 tabindex="-1">
+                
+                <!-- User Header Info -->
+                <div class="px-4 py-3 bg-neutral-50 dark:bg-neutral-800/60 border-b border-neutral-border">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-brand-100 border border-brand-200 text-brand-700 dark:bg-brand-900/40 dark:border-brand-800 dark:text-brand-300 flex items-center justify-center font-bold text-xs shrink-0">
+                            {{ (current_user.name[:1] if current_user and current_user.name else 'O')|upper }}
+                        </div>
+                        <div class="flex flex-col min-w-0">
+                            <span class="text-xs font-bold text-default-font truncate">
+                                {{ current_user.name if current_user and current_user.name else 'Operations Admin' }}
+                            </span>
+                            <span class="text-[11px] text-subtext-color truncate">
+                                {{ current_user.email if current_user and current_user.email else 'admin@chargeq.io' }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-2 flex items-center gap-1.5">
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-success-50 text-success-700 border border-success-200 dark:bg-success-950/40 dark:text-success-400 dark:border-success-800/50">
+                            <span class="w-1.5 h-1.5 rounded-full bg-success-500"></span> Active Session
+                        </span>
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-brand-50 text-brand-700 border border-brand-200 dark:bg-brand-950/40 dark:text-brand-300 dark:border-brand-800 uppercase tracking-wider">
+                            {{ current_user.role if current_user and current_user.role else 'SuperAdmin' }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Navigation Items -->
+                <div class="py-1" role="none">
+                    <a href="/settings" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-default-font hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 transition-colors group" role="menuitem">
+                        <i data-lucide="user-cog" class="w-4 h-4 text-subtext-color group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>
+                        <span>My Profile / Account Settings</span>
+                    </a>
+                    <a href="/security" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-default-font hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 transition-colors group" role="menuitem">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-subtext-color group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>
+                        <span>Security &amp; Password</span>
+                    </a>
+                    <a href="/ocpi/log" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-default-font hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 transition-colors group" role="menuitem">
+                        <i data-lucide="file-text" class="w-4 h-4 text-subtext-color group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>
+                        <span>System Logs / Audit</span>
+                    </a>
+                    <a href="/docs" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-default-font hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-brand-600 dark:hover:text-brand-400 transition-colors group" role="menuitem">
+                        <i data-lucide="key" class="w-4 h-4 text-subtext-color group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>
+                        <span>API Keys &amp; Documentation</span>
+                    </a>
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-neutral-border my-1"></div>
+
+                <!-- Logout -->
+                <div class="py-1" role="none">
+                    <a href="/logout" class="flex items-center gap-2.5 px-4 py-2 text-xs font-medium text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-950/30 hover:text-error-700 transition-colors group" role="menuitem">
+                        <i data-lucide="log-out" class="w-4 h-4 text-error-500 group-hover:text-error-600 transition-colors"></i>
+                        <span>Sign Out / Logout</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
@@ -1054,10 +1395,10 @@
     <!-- ── Sidebar Navigation ────────────────────────────────────────── -->
     <aside class="sidebar-nav" id="app-sidebar">
         <!-- Mobile Header with Close Button -->
-        <div class="sidebar-mobile-header flex items-center justify-between px-3.5 py-3 border-b border-slate-200 lg:hidden">
+        <div class="sidebar-mobile-header flex items-center justify-between px-3.5 py-3 border-b border-neutral-border lg:hidden">
             <div class="flex items-center gap-2">
-                <i data-lucide="zap" class="w-4 h-4 text-cyan-500"></i>
-                <span class="font-bold text-sm text-gray-200">ChargeQ Menu</span>
+                <i data-lucide="zap" class="w-4 h-4 text-brand-500"></i>
+                <span class="font-bold text-sm text-default-font">ChargeQ Menu</span>
             </div>
             <button id="sidebar-close-btn" class="sidebar-close-btn" aria-label="Close navigation menu" title="Close menu">
                 <i data-lucide="x" class="w-4 h-4"></i>
@@ -1079,21 +1420,21 @@
                     <i data-lucide="map-pin" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>Areas &amp; Sites</span>
                 </div>
-                <span class="badge-pill badge-gray">{{ region_count if region_count is defined and region_count else (regions_list|length if regions_list is defined and regions_list else (areas_count if areas_count is defined else 4)) }}</span>
+                <span class="badge badge-neutral">{{ region_count if region_count is defined and region_count else (regions_list|length if regions_list is defined and regions_list else (areas_count if areas_count is defined else 4)) }}</span>
             </a>
             <a href="/chargers" class="nav-item-link {% if active == 'chargers' %}active{% endif %}">
                 <div class="nav-item-left">
                     <i data-lucide="zap" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>Charger Network</span>
                 </div>
-                <span class="badge-pill badge-cyan">{{ charger_count if charger_count is defined and charger_count else (chargers|length if chargers is defined and chargers else 42) }}</span>
+                <span class="badge badge-brand">{{ charger_count if charger_count is defined and charger_count else (chargers|length if chargers is defined and chargers else 42) }}</span>
             </a>
             <a href="/sessions" class="nav-item-link {% if active == 'sessions' %}active{% endif %}">
                 <div class="nav-item-left">
                     <i data-lucide="clock" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>Charging Sessions</span>
                 </div>
-                <span class="badge-pill badge-green">{{ active_sessions if active_sessions is defined and active_sessions is not none else (active_count if active_count is defined else 18) }}</span>
+                <span class="badge badge-success">{{ active_sessions if active_sessions is defined and active_sessions is not none else (active_count if active_count is defined else 18) }}</span>
             </a>
 
             <div class="sidebar-section-title">Commercial &amp; Access</div>
@@ -1108,7 +1449,7 @@
                     <i data-lucide="credit-card" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>RFID Tokens</span>
                 </div>
-                <span class="badge-pill badge-gray">Whitelist</span>
+                <span class="badge badge-neutral">Whitelist</span>
             </a>
             <a href="/groups" class="nav-item-link {% if active == 'groups' %}active{% endif %}">
                 <div class="nav-item-left">
@@ -1123,7 +1464,7 @@
                     <i data-lucide="shield-check" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>PKI &amp; Certificates</span>
                 </div>
-                <span class="badge-pill badge-cyan">Sub-CAs</span>
+                <span class="badge badge-brand">Sub-CAs</span>
             </a>
             <a href="/security" class="nav-item-link {% if active == 'security' %}active{% endif %}">
                 <div class="nav-item-left">
@@ -1138,14 +1479,14 @@
                     <i data-lucide="radio" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>OCPP Live Stream</span>
                 </div>
-                <span class="badge-pill badge-gray font-mono">WS2:9100</span>
+                <span class="badge badge-neutral font-mono">WS2:9100</span>
             </a>
             <a href="/ocpi" class="nav-item-link {% if active == 'ocpi' %}active{% endif %}">
                 <div class="nav-item-left">
                     <i data-lucide="globe" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>OCPI Roaming</span>
                 </div>
-                <span class="badge-pill badge-gray font-mono">v2.2.1</span>
+                <span class="badge badge-neutral font-mono">v2.2.1</span>
             </a>
 
             <div class="sidebar-section-title">System Administration</div>
@@ -1178,16 +1519,16 @@
                     <i data-lucide="book-open" class="nav-icon w-4 h-4 inline-block"></i>
                     <span>Documentation</span>
                 </div>
-                <span class="badge-pill badge-gray">Help</span>
+                <span class="badge badge-neutral">Help</span>
             </a>
         </div>
 
-        <div class="p-3 border-t border-slate-200 text-[10px] text-gray-500 flex items-center justify-between">
+        <div class="p-3 border-t border-neutral-border text-[10px] text-subtext-color flex items-center justify-between">
             <div class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                 <span>v2.4 LTS</span>
             </div>
-            <span class="text-gray-400 font-medium">CSMS Ready</span>
+            <span class="text-subtext-color font-medium">CSMS Ready</span>
         </div>
     </aside>
 
@@ -1201,13 +1542,214 @@
 </div>
 
 <script>
-    // Global ⌘K / Ctrl+K focus
-    document.addEventListener('keydown', function(e) {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            document.getElementById('global-search')?.focus();
+    // Global ⌘K / Ctrl+K focus & Live Search
+    (function initGlobalSearch() {
+        const input = document.getElementById('global-search');
+        const dropdown = document.getElementById('global-search-dropdown');
+        const list = document.getElementById('global-search-list');
+        const loading = document.getElementById('global-search-loading');
+        const empty = document.getElementById('global-search-empty');
+        const container = document.getElementById('global-search-container');
+        if (!input || !dropdown || !list) return;
+
+        let debounceTimer = null;
+        let selectedIndex = -1;
+        let currentResults = [];
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                input.focus();
+                input.select();
+                if (input.value.trim().length > 0) {
+                    performSearch(input.value.trim());
+                }
+            }
+        });
+
+        function hideDropdown() {
+            dropdown.classList.add('hidden');
+            selectedIndex = -1;
         }
-    });
+
+        function showDropdown() {
+            dropdown.classList.remove('hidden');
+        }
+
+        async function performSearch(query) {
+            if (!query) {
+                hideDropdown();
+                return;
+            }
+            showDropdown();
+            loading.classList.remove('hidden');
+            empty.classList.add('hidden');
+            list.innerHTML = '';
+
+            try {
+                const res = await fetch('/api/search?q=' + encodeURIComponent(query));
+                if (!res.ok) throw new Error('Search failed');
+                const data = await res.json();
+                currentResults = data.results || [];
+
+                loading.classList.add('hidden');
+                selectedIndex = -1;
+
+                if (currentResults.length === 0) {
+                    empty.classList.remove('hidden');
+                } else {
+                    renderResults(currentResults);
+                }
+            } catch (err) {
+                loading.classList.add('hidden');
+                empty.textContent = 'Search unavailable';
+                empty.classList.remove('hidden');
+            }
+        }
+
+        function renderResults(results) {
+            list.innerHTML = results.map((item, idx) => {
+                const badgeColorClass = item.badge_color === 'green' || item.badge_color === 'emerald' ? 'badge-success' :
+                                       item.badge_color === 'blue' || item.badge_color === 'purple' ? 'badge-brand' :
+                                       item.badge_color === 'amber' || item.badge_color === 'yellow' ? 'badge-warning' :
+                                       item.badge_color === 'red' ? 'badge-error' :
+                                       'badge-neutral';
+
+                return `
+                <a href="${item.url}" data-index="${idx}" class="search-result-item flex items-center justify-between p-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-left group cursor-pointer block text-inherit">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-7 h-7 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-subtext-color group-hover:bg-brand-50 dark:group-hover:bg-brand-950/40 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors flex-shrink-0">
+                            <i data-lucide="${item.icon || 'arrow-right'}" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-semibold text-default-font font-semibold text-xs truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">${escapeHtml(item.title)}</div>
+                            <div class="text-[11px] text-subtext-color truncate">${escapeHtml(item.subtitle)}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                        <span class="badge ${badgeColorClass}">${escapeHtml(item.badge || item.category)}</span>
+                        <i data-lucide="chevron-right" class="w-3 h-3 text-subtext-color group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors"></i>
+                    </div>
+                </a>
+                `;
+            }).join('');
+
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons({ root: list });
+            }
+        }
+
+        function updateSelection() {
+            const items = list.querySelectorAll('.search-result-item');
+            items.forEach((el, idx) => {
+                if (idx === selectedIndex) {
+                    el.classList.add('bg-brand-50/80 dark:bg-brand-950/60');
+                    el.scrollIntoView({ block: 'nearest' });
+                } else {
+                    el.classList.remove('bg-brand-50/80 dark:bg-brand-950/60');
+                }
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        input.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            const val = input.value.trim();
+            if (!val) {
+                hideDropdown();
+                return;
+            }
+            debounceTimer = setTimeout(() => {
+                performSearch(val);
+            }, 180);
+        });
+
+        input.addEventListener('focus', function() {
+            if (input.value.trim().length > 0 && currentResults.length > 0) {
+                showDropdown();
+            }
+        });
+
+        input.addEventListener('keydown', function(e) {
+            if (dropdown.classList.contains('hidden')) {
+                if (e.key === 'ArrowDown' && input.value.trim().length > 0) {
+                    performSearch(input.value.trim());
+                    e.preventDefault();
+                }
+                return;
+            }
+
+            const items = list.querySelectorAll('.search-result-item');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex + 1) % items.length;
+                updateSelection();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+                updateSelection();
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedIndex >= 0 && selectedIndex < currentResults.length) {
+                    window.location.href = currentResults[selectedIndex].url;
+                } else if (currentResults.length > 0) {
+                    window.location.href = currentResults[0].url;
+                }
+            } else if (e.key === 'Escape') {
+                e.preventDefault();
+                hideDropdown();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!container.contains(e.target)) {
+                hideDropdown();
+            }
+        });
+    })();
+
+    // ── Dark / Light Theme Controller ────────────────────────────────
+    (function initThemeToggle() {
+        const btn = document.getElementById('theme-toggle-btn');
+        const iconWrap = document.getElementById('theme-toggle-icon-wrap');
+        if (!btn || !iconWrap) return;
+
+        function updateThemeUI(isDark) {
+            btn.setAttribute('title', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+            btn.setAttribute('aria-label', isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+            
+            // Render Lucide icon
+            iconWrap.innerHTML = isDark 
+                ? '<i data-lucide="sun" id="theme-toggle-icon" class="w-4 h-4 text-warning-400"></i>'
+                : '<i data-lucide="moon" id="theme-toggle-icon" class="w-4 h-4 text-default-font"></i>';
+
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons({ root: iconWrap });
+            }
+        }
+
+        // Initialize state from document class
+        const initialDark = document.documentElement.classList.contains('dark');
+        updateThemeUI(initialDark);
+
+        btn.addEventListener('click', function() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            try {
+                localStorage.setItem('opencpo_theme', isDark ? 'dark' : 'light');
+            } catch (e) {}
+            updateThemeUI(isDark);
+            window.dispatchEvent(new CustomEvent('opencpo_theme_changed', { detail: { isDark } }));
+        });
+    })();
 
     // ── Sidebar Responsive & Drawer Controller ───────────────────────
     (function initSidebar() {
@@ -1381,6 +1923,184 @@
         });
     })();
 
+    // ── User Profile Dropdown Controller ─────────────────────────────
+    (function initUserProfileDropdown() {
+        const wrapper = document.getElementById('user-profile-dropdown-wrapper');
+        const btn = document.getElementById('user-profile-btn');
+        const dropdown = document.getElementById('user-profile-dropdown');
+        const chevron = document.getElementById('user-profile-chevron');
+        if (!wrapper || !btn || !dropdown) return;
+
+        let isOpen = false;
+
+        function openDropdown() {
+            isOpen = true;
+            dropdown.classList.remove('hidden');
+            // Small RAF delay for smooth entry transition
+            requestAnimationFrame(() => {
+                dropdown.classList.remove('opacity-0', 'scale-95');
+                dropdown.classList.add('opacity-100', 'scale-100');
+            });
+            btn.setAttribute('aria-expanded', 'true');
+            btn.classList.add('active');
+            if (chevron) chevron.classList.add('rotate-180');
+            if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                lucide.createIcons();
+            }
+        }
+
+        function closeDropdown() {
+            isOpen = false;
+            dropdown.classList.add('opacity-0', 'scale-95');
+            dropdown.classList.remove('opacity-100', 'scale-100');
+            btn.setAttribute('aria-expanded', 'false');
+            btn.classList.remove('active');
+            if (chevron) chevron.classList.remove('rotate-180');
+            // Hide after transition completes
+            setTimeout(() => {
+                if (!isOpen) dropdown.classList.add('hidden');
+            }, 150);
+        }
+
+        function toggleDropdown(e) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (isOpen) {
+                closeDropdown();
+            } else {
+                openDropdown();
+            }
+        }
+
+        btn.addEventListener('click', toggleDropdown);
+
+        btn.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!isOpen) {
+                    openDropdown();
+                    const firstItem = dropdown.querySelector('a[role="menuitem"]');
+                    if (firstItem) firstItem.focus();
+                } else if (e.key === 'Enter' || e.key === ' ') {
+                    closeDropdown();
+                }
+            }
+        });
+
+        // Click outside closes dropdown
+        document.addEventListener('click', function(e) {
+            if (isOpen && !wrapper.contains(e.target)) {
+                closeDropdown();
+            }
+        });
+
+        // Keyboard navigation inside dropdown
+        dropdown.addEventListener('keydown', function(e) {
+            const items = Array.from(dropdown.querySelectorAll('a[role="menuitem"]'));
+            const currentIndex = items.indexOf(document.activeElement);
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeDropdown();
+                btn.focus();
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const nextIndex = (currentIndex + 1) % items.length;
+                items[nextIndex].focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const prevIndex = (currentIndex - 1 + items.length) % items.length;
+                items[prevIndex].focus();
+            } else if (e.key === 'Tab') {
+                closeDropdown();
+            }
+        });
+    })();
+
+    // ── Global Modal System (Centralized, Accessible, Scroll-Locked) ──
+    (function initGlobalModalSystem() {
+        let _activeModals = [];
+        let _lastActiveElement = null;
+
+        function focusModalFirstInput(modal) {
+            if (!modal) return;
+            const input = modal.querySelector('input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])');
+            if (input) {
+                input.focus();
+                if (typeof input.select === 'function') {
+                    try { input.select(); } catch (_) {}
+                }
+            } else {
+                const btn = modal.querySelector('button:not([disabled])');
+                if (btn) btn.focus();
+            }
+        }
+
+        window.openModal = function(id, triggerEl) {
+            const el = typeof id === 'string' ? document.getElementById(id) : id;
+            if (!el) return;
+
+            _lastActiveElement = triggerEl || document.activeElement;
+            if (!_activeModals.includes(el)) {
+                _activeModals.push(el);
+            }
+
+            el.classList.remove('hidden');
+            el.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons({ root: el });
+            }
+
+            requestAnimationFrame(() => {
+                focusModalFirstInput(el);
+            });
+        };
+
+        window.closeModal = function(id) {
+            const el = typeof id === 'string' ? document.getElementById(id) : (id || _activeModals[_activeModals.length - 1]);
+            if (!el) return;
+
+            el.classList.add('hidden');
+            el.style.display = 'none';
+
+            _activeModals = _activeModals.filter(m => m !== el);
+
+            if (_activeModals.length === 0) {
+                document.body.style.overflow = '';
+                if (_lastActiveElement && typeof _lastActiveElement.focus === 'function') {
+                    try { _lastActiveElement.focus(); } catch (_) {}
+                    _lastActiveElement = null;
+                }
+            } else {
+                const topModal = _activeModals[_activeModals.length - 1];
+                focusModalFirstInput(topModal);
+            }
+        };
+
+        // Close topmost modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && _activeModals.length > 0) {
+                e.preventDefault();
+                const topModal = _activeModals[_activeModals.length - 1];
+                window.closeModal(topModal);
+            }
+        });
+
+        // Close modal when clicking directly on overlay backdrop
+        document.addEventListener('click', function(e) {
+            if (_activeModals.length > 0) {
+                const topModal = _activeModals[_activeModals.length - 1];
+                if (e.target === topModal) {
+                    window.closeModal(topModal);
+                }
+            }
+        });
+    })();
+
     // ── Lucide Icons Initializer ─────────────────────────────────────
     function initLucideIcons() {
         if (typeof lucide !== 'undefined' && lucide.createIcons) {
@@ -1411,9 +2131,22 @@
         // Ensure tabular numbers styling
         el.classList.add('tabular-nums');
 
+        const useGrouping = options.useGrouping !== undefined
+            ? options.useGrouping
+            : (el.textContent && el.textContent.includes(','));
+
+        function formatVal(v) {
+            if (useGrouping) {
+                return decimals > 0
+                    ? v.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+                    : Math.round(v).toLocaleString('en-US');
+            }
+            return v.toFixed(decimals);
+        }
+
         // Reduced motion check (instant snap for accessibility)
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            el.textContent = prefix + to.toFixed(decimals) + suffix;
+            el.textContent = prefix + formatVal(to) + suffix;
             el.dataset.currentVal = to;
             return;
         }
@@ -1445,12 +2178,12 @@
             const eased = easeOutCurve(progress);
             const current = startVal + (diff * eased);
 
-            el.textContent = prefix + current.toFixed(decimals) + suffix;
+            el.textContent = prefix + formatVal(current) + suffix;
 
             if (progress < 1) {
                 el._animFrameId = requestAnimationFrame(step);
             } else {
-                el.textContent = prefix + to.toFixed(decimals) + suffix;
+                el.textContent = prefix + formatVal(to) + suffix;
                 el.dataset.currentVal = to;
                 el._animFrameId = null;
             }
@@ -1681,6 +2414,7 @@
                 try {
                     const parsed = JSON.parse(e.data);
                     handleFault(parsed.data || parsed);
+                    window.dispatchEvent(new CustomEvent('opencpo:charger-status', { detail: parsed.data || parsed }));
                 } catch {}
             });
 
@@ -1688,6 +2422,7 @@
                 try {
                     const parsed = JSON.parse(e.data);
                     handleFault(parsed.data || parsed);
+                    window.dispatchEvent(new CustomEvent('opencpo:charger-status', { detail: parsed.data || parsed }));
                 } catch {}
             });
 
@@ -1710,6 +2445,14 @@
                 clearTimeout(reconnectTimer);
                 reconnectTimer = setTimeout(connect, 6000);
             };
+
+            window.addEventListener('beforeunload', () => {
+                if (reconnectTimer) clearTimeout(reconnectTimer);
+                if (sse) {
+                    try { sse.close(); } catch {}
+                    sse = null;
+                }
+            });
         }
 
         if (document.readyState === 'complete') {
@@ -1718,6 +2461,38 @@
             window.addEventListener('load', connect);
         }
     })();
+
+    // ── Global Time String Formatter ─────────────────────────────────
+    window.formatReadableTime = function(val, defaultVal = '—') {
+        if (!val || val === 'null' || val === 'undefined') return defaultVal;
+        const s = String(val).trim();
+        if (!s || s === 'None' || s === 'null' || s === '-' || s === '—') return defaultVal;
+        if (s === 'Never' || s === 'Just now' || s === 'stale') return s;
+        if (s.length === 10 && (s.match(/-/g) || []).length === 2) return s;
+        try {
+            const clean = s.includes('T') ? s.replace(/Z$/, '+00:00') : s.replace(' ', 'T');
+            const d = new Date(clean);
+            if (!isNaN(d.getTime())) {
+                const pad = (n) => String(n).padStart(2, '0');
+                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            }
+        } catch (_) {}
+        const cleaned = s.replace('T', ' ');
+        if (cleaned.length >= 19 && cleaned[4] === '-' && cleaned[7] === '-') {
+            return cleaned.slice(0, 19);
+        }
+        return s;
+    };
+
+    function updateReadableTimestamps(root = document) {
+        if (!root || !root.querySelectorAll) return;
+        root.querySelectorAll('.readable-time').forEach(el => {
+            const raw = el.getAttribute('data-time') || el.textContent;
+            if (raw) el.textContent = window.formatReadableTime(raw);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => updateReadableTimestamps());
+    document.addEventListener('htmx:afterSwap', (e) => updateReadableTimestamps(e.detail ? e.detail.target : document));
 </script>
 </body>
 </html>

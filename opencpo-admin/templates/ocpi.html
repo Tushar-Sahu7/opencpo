@@ -4,23 +4,19 @@
 
 {% block content %}
 
-<div class="flex flex-wrap justify-between items-start gap-3 mb-4">
+<div class="flex flex-wrap justify-between items-start gap-4 mb-4">
   <div>
     <h1 class="text-2xl font-bold">OCPI Roaming
-      <span class="text-gray-500 text-lg">({{ partners|length }})</span>
+      <span class="text-subtext-color text-lg">({{ partners|length }})</span>
     </h1>
-    <p style="color:#4a6580;font-size:13px;margin-top:4px;max-width:760px;">
-      OCPI (Open Charge Point Interface) is the protocol that connects your
-      charging network to other operators. When an eMSP (electric vehicle
-      subscription provider) sends their drivers to your chargers, they
-      authenticate via OCPI. This page manages those roaming partnerships —
-      who you trust, what tokens they have, and whether the connection is live.
+    <p class="text-xs text-subtext-color mt-1 mb-0 max-w-2xl leading-normal">
+      OCPI (Open Charge Point Interface) is the protocol that connects your charging network to other operators. When an eMSP (electric vehicle subscription provider) sends their drivers to your chargers, they authenticate via OCPI.
     </p>
   </div>
   <div class="flex gap-2 flex-shrink-0">
     <button onclick="openModal('modal-add-partner')"
-      style="padding:6px 14px;background:#16a34a;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;">
-      Add Partner
+      class="btn btn-primary text-xs py-1.5 px-3">
+      + Add Partner
     </button>
   </div>
 </div>
@@ -28,148 +24,148 @@
 {% set identity = status.get("identity", {}) %}
 {% set partners_count = status.get("partners", {}) %}
 {% set ep_health = status.get("endpoints_health", "unknown") %}
-<div style="background:#0a1221;border:1px solid #15283f;border-radius:10px;padding:16px 20px;margin-bottom:16px;">
-  <div style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;font-weight:600;">Our OCPI Identity</div>
-  <div style="display:flex;flex-wrap:wrap;gap:24px;align-items:center;">
+<div class="card p-5 mb-4">
+  <div class="text-[10px] text-subtext-color uppercase tracking-wider mb-3 font-semibold">Our OCPI Identity</div>
+  <div class="flex flex-wrap gap-6 items-center">
     <div>
-      <div style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Operator</div>
-      <div style="font-size:14px;color:#e8edf2;font-weight:600;">{{ identity.get("operator_name", "—") }}</div>
+      <div class="text-[10px] text-subtext-color uppercase tracking-wider mb-0.5">Operator</div>
+      <div class="text-sm font-semibold text-default-font">{{ identity.get("operator_name", "—") }}</div>
     </div>
     <div>
-      <div style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Party ID</div>
-      <div style="font-family:monospace;font-size:14px;color:#e8edf2;">
+      <div class="text-[10px] text-subtext-color uppercase tracking-wider mb-0.5">Party ID</div>
+      <div class="font-mono text-sm text-default-font">
         {{ identity.get("country_code", "—") }} / {{ identity.get("party_id", "—") }}
       </div>
     </div>
     <div>
-      <div style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Role</div>
-      <div style="font-size:14px;color:#e8edf2;">{{ identity.get("role", "CPO") }}</div>
+      <div class="text-[10px] text-subtext-color uppercase tracking-wider mb-0.5">Role</div>
+      <div class="text-sm text-default-font">{{ identity.get("role", "CPO") }}</div>
     </div>
     <div>
-      <div style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Base URL</div>
-      <div style="font-family:monospace;font-size:12px;color:#6b8299;">{{ identity.get("base_url", "—") }}</div>
+      <div class="text-[10px] text-subtext-color uppercase tracking-wider mb-0.5">Base URL</div>
+      <div class="font-mono text-xs text-subtext-color">{{ identity.get("base_url", "—") }}</div>
     </div>
-    <div style="margin-left:auto;text-align:right;">
-      <div style="font-size:10px;color:#3d5870;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">Endpoints</div>
+    <div class="ml-auto text-right">
+      <div class="text-[10px] text-subtext-color uppercase tracking-wider mb-0.5">Endpoints</div>
       {% if ep_health == "ok" %}
-        <span style="color:#84BD00;font-size:13px;">● Responding</span>
+        <span class="badge badge-success"><span class="status-dot status-dot-green"></span>Responding</span>
       {% elif ep_health == "unknown" %}
-        <span style="color:#6b8299;font-size:13px;">● Unknown</span>
+        <span class="badge badge-neutral">Unknown</span>
       {% else %}
-        <span style="color:#ef4444;font-size:13px;">● {{ ep_health }}</span>
+        <span class="badge badge-error">{{ ep_health }}</span>
       {% endif %}
     </div>
   </div>
 
-  <div style="display:flex;gap:20px;margin-top:14px;padding-top:14px;border-top:1px solid #15283f;">
-    <span style="font-size:12px;color:#4a6580;">
-      <span style="color:#84BD00;font-weight:600;">{{ partners_count.get("active", 0) }}</span> active
+  <div class="flex flex-wrap gap-4 mt-4 pt-3 border-t border-neutral-border text-xs text-subtext-color">
+    <span>
+      <span class="text-success-600 font-bold font-mono">{{ partners_count.get("active", 0) }}</span> active
     </span>
-    <span style="font-size:12px;color:#4a6580;">
-      <span style="color:#fbbf24;font-weight:600;">{{ partners_count.get("pending", 0) }}</span> pending
+    <span>
+      <span class="text-warning-600 font-bold font-mono">{{ partners_count.get("pending", 0) }}</span> pending
     </span>
-    <span style="font-size:12px;color:#4a6580;">
-      <span style="color:#6b8299;font-weight:600;">{{ partners_count.get("suspended", 0) + partners_count.get("disabled", 0) }}</span> inactive
+    <span>
+      <span class="text-subtext-color font-bold font-mono">{{ partners_count.get("suspended", 0) + partners_count.get("disabled", 0) }}</span> inactive
     </span>
     {% if status.get("last_sync") %}
-    <span style="font-size:12px;color:#4a6580;margin-left:auto;">
-      Last sync: <span style="color:#6b8299;">{{ status.get("last_sync", "")[:19].replace("T"," ") }}</span>
+    <span class="ml-auto">
+      Last sync: <span class="text-default-font font-mono">{{ status.get("last_sync")|format_datetime }}</span>
     </span>
     {% endif %}
   </div>
 </div>
 
-<p style="color:#4a6580;font-size:12px;margin-bottom:8px;">
-  <span style="color:#84BD00;">● Active</span> = handshake complete, this partner can use your chargers
-  &nbsp;&middot;&nbsp;
-  <span style="color:#fbbf24;">● Pending</span> = registered but OCPI handshake not yet completed
-  &nbsp;&middot;&nbsp;
-  <span style="color:#6b8299;">● Suspended / Disabled</span> = access paused
-  &nbsp;&middot;&nbsp;
-  <strong style="color:#c0cdd8;">CPO</strong> = they run chargers too (peer network)
-  &nbsp;&middot;&nbsp;
-  <strong style="color:#c0cdd8;">eMSP</strong> = they provide subscriptions to drivers
-</p>
-
-<div style="margin-bottom:12px;">
-  <input type="text" id="partner-search" placeholder="Search by name, party ID, country, role..."
-    oninput="applyFilters()"
-    style="width:100%;padding:8px 14px;background:#0d1a2e;border:1px solid #1e3450;border-radius:8px;color:#c0cdd8;font-size:13px;">
+<div class="card bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border py-2 px-3 mb-3 text-xs flex flex-wrap items-center gap-3">
+  <span class="text-success-600 font-medium">● Active <span class="text-subtext-color font-normal">= handshake complete</span></span>
+  <span class="text-neutral-300 dark:text-neutral-700">|</span>
+  <span class="text-warning-600 font-medium">● Pending <span class="text-subtext-color font-normal">= awaiting handshake</span></span>
+  <span class="text-neutral-300 dark:text-neutral-700">|</span>
+  <span class="text-subtext-color font-normal">CPO = peer operator &bull; eMSP = driver subscriptions</span>
 </div>
 
-<div style="background:#0a1221;border:1px solid #15283f;border-radius:10px;overflow:hidden;">
-  <table style="width:100%;font-size:13px;border-collapse:collapse;">
+<div class="mb-4">
+  <input type="text" id="partner-search" placeholder="Search by name, party ID, country, role..."
+    oninput="applyFilters()"
+    class="input w-full text-sm">
+</div>
+
+<div class="card overflow-hidden">
+  <table class="w-full text-sm">
     <thead>
-      <tr style="border-bottom:1px solid #15283f;color:#3d5870;font-size:11px;text-transform:uppercase;letter-spacing:1px;">
-        <th style="text-align:left;padding:10px 14px;">Partner</th>
-        <th style="text-align:left;padding:10px 14px;">Party ID</th>
-        <th style="text-align:left;padding:10px 14px;">Role</th>
-        <th style="text-align:left;padding:10px 14px;">Status</th>
-        <th style="text-align:left;padding:10px 14px;">Token (theirs)</th>
-        <th style="text-align:left;padding:10px 14px;">Tariff</th>
-        <th style="text-align:left;padding:10px 14px;">Last Sync</th>
-        <th style="text-align:right;padding:10px 14px;">Actions</th>
+      <tr class="border-b border-neutral-border text-subtext-color text-[10px] uppercase tracking-wider">
+        <th class="text-left p-3">Partner</th>
+        <th class="text-left p-3">Party ID</th>
+        <th class="text-left p-3">Role</th>
+        <th class="text-left p-3">Status</th>
+        <th class="text-left p-3">Token (theirs)</th>
+        <th class="text-left p-3">Tariff</th>
+        <th class="text-left p-3">Last Sync</th>
+        <th class="text-right p-3">Actions</th>
       </tr>
     </thead>
     <tbody id="partner-body">
       {% if partners %}
         {% for p in partners %}
-        <tr class="partner-row" style="border-bottom:1px solid #0d1b2e;"
+        <tr class="partner-row border-b border-neutral-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
           data-name="{{ p.name|lower }}"
           data-party="{{ p.party_id|lower }}"
           data-country="{{ p.country_code|lower }}"
           data-role="{{ p.role|lower }}"
           data-status="{{ p.status|lower }}">
-          <td style="padding:10px 14px;">
-            <div style="color:#e8edf2;font-weight:500;">{{ p.name }}</div>
-            <div style="font-size:11px;color:#3d5870;margin-top:1px;">{{ p.country_code }}</div>
+          <td class="p-3">
+            <div class="text-default-font font-medium">{{ p.name }}</div>
+            <div class="text-xs text-subtext-color mt-0.5">{{ p.country_code }}</div>
           </td>
-          <td style="padding:10px 14px;font-family:monospace;color:#c0cdd8;">
+          <td class="p-3 font-mono text-default-font text-xs">
             {{ p.country_code }}*{{ p.party_id }}
           </td>
-          <td style="padding:10px 14px;">
-            <span style="font-size:11px;font-weight:600;color:{% if p.role == 'CPO' %}#00B0E4{% elif p.role == 'EMSP' %}#a78bfa{% else %}#6b8299{% endif %};">
-              {{ p.role }}
-            </span>
-          </td>
-          <td style="padding:10px 14px;">
-            {% if p.status == 'active' %}
-              <span style="color:#84BD00;font-size:12px;">● Active</span>
-            {% elif p.status == 'pending' %}
-              <span style="color:#fbbf24;font-size:12px;">● Pending</span>
-            {% elif p.status == 'suspended' %}
-              <span style="color:#f97316;font-size:12px;">● Suspended</span>
+          <td class="p-3">
+            {% if p.role == 'CPO' %}
+              <span class="badge badge-brand text-[10px]">{{ p.role }}</span>
+            {% elif p.role == 'EMSP' %}
+              <span class="badge badge-brand text-[10px]">{{ p.role }}</span>
             {% else %}
-              <span style="color:#6b8299;font-size:12px;">● {{ p.status|capitalize }}</span>
+              <span class="badge badge-neutral text-[10px]">{{ p.role }}</span>
             {% endif %}
           </td>
-          <td style="padding:10px 14px;font-family:monospace;font-size:11px;color:#4a6580;">
+          <td class="p-3">
+            {% if p.status == 'active' %}
+              <span class="badge badge-success"><span class="status-dot status-dot-green"></span>Active</span>
+            {% elif p.status == 'pending' %}
+              <span class="badge badge-warning">Pending</span>
+            {% elif p.status == 'suspended' %}
+              <span class="badge badge-error">Suspended</span>
+            {% else %}
+              <span class="badge badge-neutral">{{ p.status|capitalize }}</span>
+            {% endif %}
+          </td>
+          <td class="p-3 font-mono text-xs text-subtext-color">
             {{ p.token_b_masked or "—" }}
           </td>
-          <td style="padding:10px 14px;font-size:11px;">
+          <td class="p-3 text-xs">
             {% if p.base_tariff_id %}
-              <span style="color:#c0cdd8;font-family:monospace;">{{ p.base_tariff_id }}</span>
+              <span class="text-default-font font-mono">{{ p.base_tariff_id }}</span>
               {% if p.roaming_fee_kwh %}
-                <span style="color:#4a6580;margin-left:4px;">+{{ "%.4f"|format(p.roaming_fee_kwh) }}/kWh</span>
+                <span class="text-subtext-color ml-1">+{{ "%.4f"|format(p.roaming_fee_kwh) }}/kWh</span>
               {% endif %}
             {% else %}
-              <span style="color:#3d5870;">All</span>
+              <span class="text-subtext-color">All</span>
             {% endif %}
           </td>
-          <td style="padding:10px 14px;font-size:11px;color:#4a6580;">
-            {{ (p.last_sync or "")[:19].replace("T"," ") or "Never" }}
+          <td class="p-3 text-xs text-subtext-color font-mono">
+            {{ p.last_sync|format_datetime(default="Never") }}
           </td>
-          <td style="padding:10px 14px;text-align:right;">
-            <div style="display:flex;gap:6px;justify-content:flex-end;align-items:center;">
-              <span id="test-result-{{ p.id }}" style="font-size:11px;color:#4a6580;min-width:60px;text-align:right;"></span>
+          <td class="p-3 text-right">
+            <div class="flex gap-1.5 justify-end items-center flex-wrap">
+              <span id="test-result-{{ p.id }}" class="text-xs text-subtext-color min-w-[50px] text-right font-mono"></span>
               <button
                 hx-post="/partials/ocpi/test/{{ p.id }}"
                 hx-target="#test-result-{{ p.id }}"
                 hx-swap="innerHTML"
                 hx-indicator="#test-spinner-{{ p.id }}"
-                style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#00B0E4;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;"
+                class="btn btn-outline text-xs py-1 px-2.5 text-brand-600 dark:text-brand-400 border-brand-200"
                 title="Test connection to this partner's OCPI endpoint">
-                <span class="htmx-indicator" id="test-spinner-{{ p.id }}" style="font-size:10px;color:#4a6580;">testing…</span>
+                <span class="htmx-indicator text-[10px] text-subtext-color" id="test-spinner-{{ p.id }}">testing…</span>
                 <span>Test</span>
               </button>
               {% if p.status == 'active' %}
@@ -177,14 +173,23 @@
                 hx-post="/partials/ocpi/sync/{{ p.id }}"
                 hx-target="#test-result-{{ p.id }}"
                 hx-swap="innerHTML"
-                style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#84BD00;border-radius:5px;font-size:11px;cursor:pointer;white-space:nowrap;"
+                class="btn btn-outline text-xs py-1 px-2.5 text-success-600 border-success-200"
                 title="Pull latest data from this partner">
                 Sync
               </button>
               {% endif %}
               <button
-                onclick="openEditModal({{ p.id }}, '{{ p.name|replace("'","\\'")|e }}', '{{ p.url|e }}', '{{ p.status }}', '{{ p.base_tariff_id or "" }}', {{ p.roaming_fee_kwh or 0 }}, {{ p.roaming_fee_flat or 0 }}, {{ p.roaming_fee_time or 0 }})"
-                style="padding:4px 10px;background:#111c2e;border:1px solid #1e3450;color:#6b8299;border-radius:5px;font-size:11px;cursor:pointer;"
+                type="button"
+                onclick="openEditModal(this)"
+                data-id="{{ p.id }}"
+                data-name="{{ p.name|e }}"
+                data-url="{{ p.url|e }}"
+                data-status="{{ p.status }}"
+                data-tariff="{{ p.base_tariff_id or '' }}"
+                data-fee-kwh="{{ p.roaming_fee_kwh or 0 }}"
+                data-fee-flat="{{ p.roaming_fee_flat or 0 }}"
+                data-fee-time="{{ p.roaming_fee_time or 0 }}"
+                class="btn btn-outline text-xs py-1 px-2.5"
                 title="Edit partner details">
                 Edit
               </button>
@@ -194,12 +199,11 @@
         {% endfor %}
       {% else %}
       <tr>
-        <td colspan="8" style="padding:40px;text-align:center;color:#3d5870;font-size:13px;">
+        <td colspan="8" class="p-10 text-center text-subtext-color text-sm">
           No roaming partners yet.
           <br><br>
-          <span style="font-size:12px;line-height:1.7;">
-            Add a partner manually to pre-configure the record before the OCPI handshake,
-            or wait for an eMSP to initiate the handshake at your OCPI credentials endpoint.
+          <span class="text-xs text-subtext-color">
+            Add a partner manually to pre-configure the record before the OCPI handshake, or wait for an eMSP to initiate the handshake at your OCPI credentials endpoint.
           </span>
         </td>
       </tr>
@@ -212,30 +216,26 @@
 
 {% include 'partials/ocpi_modal_edit.html' %}
 
-<div style="margin-top:16px;padding-top:12px;border-top:1px solid #0d1b2e;font-size:12px;color:#3d5870;">
-  <a href="/ocpi/log" style="color:#3d5870;text-decoration:none;">View OCPI request log</a>
-  &nbsp;&middot;&nbsp;
-  <span style="color:#3d5870;">OCPI versions endpoint:
-    <code style="font-family:monospace;font-size:11px;">{{ identity.get("versions_url","—") }}</code>
+<div class="mt-4 pt-3 border-t border-neutral-border text-xs text-subtext-color flex flex-wrap gap-3 items-center">
+  <a href="/ocpi/log" class="text-brand-600 dark:text-brand-400 hover:underline">View OCPI request log &rarr;</a>
+  <span>&bull;</span>
+  <span>OCPI versions endpoint:
+    <code class="bg-neutral-100 dark:bg-neutral-800 px-1 py-0.5 rounded font-mono text-[11px] text-default-font">{{ identity.get("versions_url","—") }}</code>
   </span>
 </div>
 
 <script>
-function openModal(id) {
-  document.getElementById(id).classList.remove('hidden');
-}
-function closeModal(id) {
-  document.getElementById(id).classList.add('hidden');
-}
-
 function openEditModal(id, name, url, status, baseTariffId, feeKwh, feeFlat, feeTime) {
-  document.getElementById('edit-name').value = name;
-  document.getElementById('edit-url').value = url;
+  if (id && id.dataset) {
+    const d = id.dataset;
+    return openEditModal(d.id, d.name, d.url, d.status, d.tariff, d.feeKwh, d.feeFlat, d.feeTime);
+  }
+  document.getElementById('edit-name').value = name || '';
+  document.getElementById('edit-url').value = url || '';
   document.getElementById('edit-token-b').value = '';
   document.getElementById('edit-status').value = '';
   document.getElementById('edit-partner-result').innerHTML = '';
 
-  // Roaming markup
   const tariffSel = document.getElementById('edit-base-tariff');
   if (tariffSel) tariffSel.value = baseTariffId || '';
   const feeKwhEl  = document.getElementById('edit-fee-kwh');
@@ -277,8 +277,8 @@ function _calcPreview(tariffSel, feeKwhEl, feeFlatEl, feeTimeEl) {
   if (totalFlat   > 0) parts.push(`${totalFlat.toFixed(2)} € flat`);
   if (totalTime   > 0) parts.push(`${totalTime.toFixed(4)} €/min`);
   const baseName = opt.textContent.split('(')[0].trim();
-  return `Partner sees: <strong style="color:#e8edf2;">${parts.join(' + ') || '—'}</strong>`
-       + `<span style="color:#3d5870;margin-left:8px;">(base: ${baseName}`
+  return `Partner sees: <strong class="text-default-font">${parts.join(' + ') || '—'}</strong>`
+       + `<span class="text-subtext-color ml-2">(base: ${baseName}`
        + (addKwh || addFlat || addTime ? ` + your markup` : '') + `)</span>`;
 }
 
@@ -306,20 +306,20 @@ function updateEditPreview() {
 
 function applyFilters() {
   const q = (document.getElementById('partner-search').value || '').toLowerCase();
-  let visible = 0;
   document.querySelectorAll('.partner-row').forEach(row => {
     const text = [row.dataset.name, row.dataset.party, row.dataset.country, row.dataset.role, row.dataset.status].join(' ');
     const show = !q || text.includes(q);
     row.style.display = show ? '' : 'none';
-    if (show) visible++;
   });
 }
 
-// Close modals on backdrop click
 ['modal-add-partner', 'modal-partner-detail'].forEach(id => {
-  document.getElementById(id).addEventListener('click', function(e) {
-    if (e.target === this) closeModal(id);
-  });
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) closeModal(id);
+    });
+  }
 });
 </script>
 

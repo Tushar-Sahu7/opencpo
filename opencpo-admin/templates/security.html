@@ -3,52 +3,62 @@
 {% block title %}Security — CPO Admin{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-6">Security Dashboard</h1>
+<div class="mb-6">
+    <h1 class="text-heading-1 font-semibold text-default-font">Security Dashboard</h1>
+    <p class="text-caption text-subtext-color mt-1">Real-time surveillance of cryptographic credentials, PKI trust hierarchy, and operational security alerts.</p>
+</div>
 
-<div class="grid grid-cols-2 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Security Events -->
-    <div class="bg-gray-900 rounded-lg border border-gray-800">
-        <div class="p-4 border-b border-gray-800">
-            <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="shield-check" class="w-5 h-5 text-blue-500"></i> Recent Security Events</h2>
+    <div class="card overflow-hidden">
+        <div class="p-4 border-b border-neutral-border flex items-center justify-between">
+            <h2 class="text-heading-3 font-semibold text-default-font flex items-center gap-2">
+                <i data-lucide="shield-check" class="w-5 h-5 text-brand-600"></i> Recent Security Events
+            </h2>
+            <span class="badge badge-brand text-[10px]">Real-time bus</span>
         </div>
         <div id="security-events" class="p-4 space-y-2 max-h-[400px] overflow-y-auto">
-            <div class="text-gray-500 text-sm">Loading security events from event bus...</div>
+            <div class="text-subtext-color text-caption">Connecting to security event stream...</div>
         </div>
     </div>
 
     <!-- PKI Health -->
-    <div class="bg-gray-900 rounded-lg border border-gray-800">
-        <div class="p-4 border-b border-gray-800">
-            <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="lock" class="w-5 h-5 text-blue-500"></i> PKI Health</h2>
+    <div class="card overflow-hidden">
+        <div class="p-4 border-b border-neutral-border">
+            <h2 class="text-heading-3 font-semibold text-default-font flex items-center gap-2">
+                <i data-lucide="lock" class="w-5 h-5 text-brand-600"></i> PKI Health &amp; Sub-CAs
+            </h2>
         </div>
         <div class="p-4 space-y-3" hx-get="/partials/stats" hx-trigger="load" hx-swap="innerHTML">
-            <div class="flex justify-between text-sm">
-                <span class="text-gray-400">Root CA</span>
-                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
+            <div class="flex justify-between items-center text-caption py-1.5 border-b border-neutral-border">
+                <span class="text-default-font font-medium">Root CA</span>
+                <span class="badge badge-success flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
             </div>
-            <div class="flex justify-between text-sm">
-                <span class="text-gray-400">CPO Sub-CA</span>
-                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
+            <div class="flex justify-between items-center text-caption py-1.5 border-b border-neutral-border">
+                <span class="text-default-font font-medium">CPO Sub-CA</span>
+                <span class="badge badge-success flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
             </div>
-            <div class="flex justify-between text-sm">
-                <span class="text-gray-400">MO Sub-CA</span>
-                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
+            <div class="flex justify-between items-center text-caption py-1.5 border-b border-neutral-border">
+                <span class="text-default-font font-medium">MO Sub-CA</span>
+                <span class="badge badge-success flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Valid</span>
             </div>
-            <div class="flex justify-between text-sm">
-                <span class="text-gray-400">OCSP Responder</span>
-                <span class="text-green-400 flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Running</span>
+            <div class="flex justify-between items-center text-caption py-1.5">
+                <span class="text-default-font font-medium">OCSP Responder</span>
+                <span class="badge badge-success flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5 inline-block"></i> Running</span>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Access Log -->
-<div class="mt-6 bg-gray-900 rounded-lg border border-gray-800">
-    <div class="p-4 border-b border-gray-800">
-        <h2 class="text-lg font-semibold flex items-center gap-2"><i data-lucide="clipboard-list" class="w-5 h-5 text-blue-500"></i> OCPI Partner Status</h2>
+<div class="mt-6 card overflow-hidden">
+    <div class="p-4 border-b border-neutral-border">
+        <h2 class="text-heading-3 font-semibold text-default-font flex items-center gap-2">
+            <i data-lucide="clipboard-list" class="w-5 h-5 text-brand-600"></i> OCPI Partner Status
+        </h2>
     </div>
-    <div class="p-4 text-sm text-gray-400">
-        Partner status loaded from OCPI credentials module.
+    <div class="p-4 text-caption text-subtext-color">
+        Partner credentials, tokens, and active mutual TLS connections are validated by the OCPI credentials engine.
     </div>
 </div>
 
@@ -62,7 +72,7 @@
         const data = JSON.parse(e.data);
         const time = new Date(data.timestamp).toLocaleTimeString();
         const el = document.createElement('div');
-        el.className = 'text-sm p-2 rounded bg-red-900/30 border border-red-800';
+        el.className = 'text-caption p-2.5 rounded-md bg-error-50/20 border border-error-500/30 text-error-600 dark:text-error-400 font-mono';
         el.textContent = `[${time}] ${data.data.security_event || 'Alert'}: ${JSON.stringify(data.data)}`;
         secDiv.prepend(el);
     });
@@ -70,7 +80,7 @@
     source.addEventListener('pki.cert.revoked', (e) => {
         const data = JSON.parse(e.data);
         const el = document.createElement('div');
-        el.className = 'text-sm p-2 rounded bg-yellow-900/30 border border-yellow-800';
+        el.className = 'text-caption p-2.5 rounded-md bg-warning-50/20 border border-warning-500/30 text-warning-600 dark:text-warning-400 font-mono';
         el.textContent = `Certificate revoked: ${JSON.stringify(data.data)}`;
         secDiv.prepend(el);
     });

@@ -55,6 +55,8 @@ async def events_stream_proxy(request: Request):
                 "GET", f"{CORE_API}/api/v1/events/stream", headers=headers
             ) as resp:
                 async for chunk in resp.aiter_bytes():
+                    if await request.is_disconnected():
+                        break
                     yield chunk
 
     return StreamingResponse(stream(), media_type="text/event-stream")

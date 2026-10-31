@@ -2,13 +2,18 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
 
     <!-- Card 1: Charging Stations & Status -->
-    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+    <div class="dashboard-panel dashboard-panel-clickable p-3.5 flex flex-col justify-between group"
+         role="link"
+         tabindex="0"
+         aria-label="Charging Stations &amp; Status — View Chargers"
+         onclick="if(!event.defaultPrevented){ window.location.href='/chargers'; }"
+         onkeydown="if(event.key==='Enter'||event.key===' '){ event.preventDefault(); window.location.href='/chargers'; }">
         <div class="flex items-center justify-between mb-2">
-            <div class="panel-header-title">
-                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+            <div class="panel-header-title group-hover:text-brand-600 transition-colors flex items-center gap-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-brand-400"></span>
                 <span>Charging Stations &amp; Status</span>
             </div>
-            <div class="flex items-center gap-1 text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">
+            <div class="badge badge-brand text-[9px] font-bold">
                 <span class="text-[8px] animate-pulse">●</span>
                 <span>LIVE</span>
             </div>
@@ -16,171 +21,215 @@
 
         <div class="flex items-center justify-between pt-1">
             <div>
-                <div class="metric-value-huge text-blue-600 font-mono">{{ charger_count }} <span class="text-xs font-normal text-blue-500">Units</span></div>
-                <div class="text-[10px] {% if online_count == charger_count and charger_count > 0 %}text-emerald-600{% else %}text-slate-500{% endif %} mt-0.5">
-                    {{ online_count }} Online &bull; {{ charger_count - online_count }} Offline
+                <div class="metric-value-huge text-brand-600 font-mono"><span data-kpi-val>{{ charger_count }}</span> <span class="text-xs font-normal text-subtext-color">Units</span></div>
+                <div class="text-[10px] {% if online_count == charger_count and charger_count > 0 %}text-success-600{% else %}text-subtext-color{% endif %} mt-0.5 flex items-center gap-1">
+                    <span class="hover:underline cursor-pointer" onclick="event.stopPropagation(); window.location.href='/chargers?status=online';" title="Filter Online Chargers">{{ online_count }} Online</span>
+                    <span>&bull;</span>
+                    <span class="hover:underline cursor-pointer" onclick="event.stopPropagation(); window.location.href='/chargers?status=offline';" title="Filter Offline Chargers">{{ charger_count - online_count }} Offline</span>
                 </div>
             </div>
-            <div class="text-blue-500 p-1.5 bg-blue-50 rounded-lg"><i data-lucide="fuel" class="w-6 h-6"></i></div>
+            <div class="text-brand-500 p-1.5 bg-brand-50 group-hover:bg-brand-100 group-hover:scale-105 rounded-lg transition-all"><i data-lucide="fuel" class="w-6 h-6"></i></div>
         </div>
 
         <!-- Areas, Sites, Connectors Sub-metrics -->
-        <div class="grid grid-cols-3 gap-1 pt-2 border-t border-slate-200 text-center text-[10px]">
-            <div>
-                <div class="font-bold text-slate-800 font-mono">{{ region_count or 1 }}</div>
-                <div class="text-[9px] text-slate-500">Areas</div>
+        <div class="grid grid-cols-3 gap-1 pt-2 border-t border-neutral-border text-center text-[10px]">
+            <div class="hover:bg-brand-50 hover:text-brand-700 rounded py-0.5 transition-colors cursor-pointer"
+                 role="link"
+                 tabindex="0"
+                 title="View Areas in Network"
+                 onclick="event.stopPropagation(); window.location.href='/network';"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){ event.stopPropagation(); event.preventDefault(); window.location.href='/network'; }">
+                <div class="font-bold text-default-font font-mono group-hover:text-brand-700">{{ region_count or 1 }}</div>
+                <div class="text-[9px] text-subtext-color">Areas</div>
             </div>
-            <div>
-                <div class="font-bold text-slate-800 font-mono">{{ site_count or 1 }}</div>
-                <div class="text-[9px] text-slate-500">Sites</div>
+            <div class="hover:bg-brand-50 hover:text-brand-700 rounded py-0.5 transition-colors cursor-pointer"
+                 role="link"
+                 tabindex="0"
+                 title="View Sites in Network"
+                 onclick="event.stopPropagation(); window.location.href='/network';"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){ event.stopPropagation(); event.preventDefault(); window.location.href='/network'; }">
+                <div class="font-bold text-default-font font-mono group-hover:text-brand-700">{{ site_count or 1 }}</div>
+                <div class="text-[9px] text-subtext-color">Sites</div>
             </div>
-            <div>
-                <div class="font-bold text-blue-600 font-mono">{{ total_connectors }}</div>
-                <div class="text-[9px] text-slate-500">Connectors</div>
+            <div class="hover:bg-brand-50 hover:text-brand-700 rounded py-0.5 transition-colors cursor-pointer"
+                 role="link"
+                 tabindex="0"
+                 title="View Connectors in Chargers"
+                 onclick="event.stopPropagation(); window.location.href='/chargers';"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){ event.stopPropagation(); event.preventDefault(); window.location.href='/chargers'; }">
+                <div class="font-bold text-brand-600 font-mono">{{ total_connectors }}</div>
+                <div class="text-[9px] text-subtext-color">Connectors</div>
             </div>
         </div>
     </div>
 
     <!-- Card 2: Charging Points -->
-    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+    <div class="dashboard-panel dashboard-panel-clickable p-3.5 flex flex-col justify-between group"
+         role="link"
+         tabindex="0"
+         aria-label="Charging Points — View Chargers"
+         onclick="if(!event.defaultPrevented){ window.location.href='/chargers'; }"
+         onkeydown="if(event.key==='Enter'||event.key===' '){ event.preventDefault(); window.location.href='/chargers'; }">
         <div class="flex items-center justify-between mb-1">
-            <div class="panel-header-title">
+            <div class="panel-header-title group-hover:text-brand-600 transition-colors">
                 <span>Charging Points ({{ total_connectors }})</span>
             </div>
-            <span class="text-xs text-emerald-500 inline-flex items-center"><i data-lucide="plug-zap" class="w-4 h-4"></i></span>
+            <span class="text-xs text-success-500 group-hover:scale-105 inline-flex items-center transition-transform"><i data-lucide="plug-zap" class="w-4 h-4"></i></span>
         </div>
 
         <div class="flex items-baseline justify-between pt-1">
             <div>
-                <div class="metric-value-huge text-slate-800 font-mono">{{ available_ratio }}%</div>
-                <div class="text-[10px] text-slate-500">Available Ratio</div>
+                <div class="metric-value-huge text-default-font font-mono"><span data-kpi-val>{{ available_ratio }}</span>%</div>
+                <div class="text-[10px] text-subtext-color">Available Ratio</div>
             </div>
             <div class="text-right">
-                <div class="text-sm font-bold text-blue-600">{{ actively_charging }} Actively Charging</div>
-                <div class="text-[10px] text-slate-500">{{ ((actively_charging / total_connectors * 100)|round(1)) if total_connectors else 0 }}% utilization</div>
+                <div class="text-sm font-bold text-brand-600">{{ actively_charging }} Actively Charging</div>
+                <div class="text-[10px] text-subtext-color">{{ ((actively_charging / total_connectors * 100)|round(1)) if total_connectors else 0 }}% utilization</div>
             </div>
         </div>
 
         <!-- Status mini indicators with generous Suspended & Faulted spacing -->
-        <div class="pt-2 border-t border-slate-200 space-y-1.5">
+        <div class="pt-2 border-t border-neutral-border space-y-1.5">
             <!-- Row 1: Active Operational States -->
             <div class="grid grid-cols-3 gap-1.5 text-center text-[10px]">
-                <div class="bg-slate-50 rounded py-1 px-1 border border-slate-100">
-                    <div class="font-bold text-emerald-600 font-mono text-xs tabular-nums">{{ connector_statuses.Available }}</div>
-                    <div class="text-[8.5px] text-slate-500 font-medium">Available</div>
+                <div class="bg-neutral-50 hover:bg-success-50 hover:border-success-200 rounded py-1 px-1 border border-neutral-border transition-colors cursor-pointer"
+                     title="Filter Online / Available Chargers"
+                     onclick="event.stopPropagation(); window.location.href='/chargers?status=online';">
+                    <div class="font-bold text-success-600 font-mono text-xs tabular-nums">{{ connector_statuses.Available }}</div>
+                    <div class="text-[8.5px] text-subtext-color font-medium">Available</div>
                 </div>
-                <div class="bg-slate-50 rounded py-1 px-1 border border-slate-100">
-                    <div class="font-bold text-blue-600 font-mono text-xs tabular-nums">{{ connector_statuses.Charging }}</div>
-                    <div class="text-[8.5px] text-slate-500 font-medium">Charging</div>
+                <div class="bg-neutral-50 hover:bg-brand-50 hover:border-brand-200 rounded py-1 px-1 border border-neutral-border transition-colors cursor-pointer"
+                     title="View Actively Charging Sessions"
+                     onclick="event.stopPropagation(); window.location.href='/sessions?status=active';">
+                    <div class="font-bold text-brand-600 font-mono text-xs tabular-nums">{{ connector_statuses.Charging }}</div>
+                    <div class="text-[8.5px] text-brand-700 font-medium">Charging</div>
                 </div>
-                <div class="bg-slate-50 rounded py-1 px-1 border border-slate-100">
-                    <div class="font-bold text-amber-600 font-mono text-xs tabular-nums">{{ connector_statuses.Preparing }}</div>
-                    <div class="text-[8.5px] text-slate-500 font-medium">Preparing</div>
+                <div class="bg-neutral-50 hover:bg-warning-50 hover:border-warning-200 rounded py-1 px-1 border border-neutral-border transition-colors">
+                    <div class="font-bold text-warning-600 font-mono text-xs tabular-nums">{{ connector_statuses.Preparing }}</div>
+                    <div class="text-[8.5px] text-subtext-color font-medium">Preparing</div>
                 </div>
             </div>
 
             <!-- Row 2: Suspended & Faulted States with clear separation & badge padding -->
             <div class="grid grid-cols-2 gap-2 text-center text-[10px]">
-                <div class="bg-indigo-50/70 rounded py-1 px-2 border border-indigo-100 flex items-center justify-between">
-                    <span class="text-[9px] font-semibold text-slate-600 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                <div class="bg-neutral-50 hover:bg-brand-50 hover:border-brand-200 rounded py-1 px-1 border border-neutral-border transition-colors cursor-pointer">
+                    <span class="text-[9px] font-semibold text-subtext-color flex items-center justify-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
                         Suspended
                     </span>
-                    <span class="font-bold text-indigo-600 font-mono text-xs tabular-nums">{{ connector_statuses.SuspendedEV }}</span>
+                    <span class="font-bold text-brand-600 font-mono text-xs tabular-nums">{{ connector_statuses.SuspendedEV }}</span>
                 </div>
-                <div class="bg-red-50/70 rounded py-1 px-2 border border-red-100 flex items-center justify-between">
-                    <span class="text-[9px] font-semibold text-slate-600 flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                <div class="bg-neutral-50 hover:bg-error-50 hover:border-error-200 rounded py-1 px-1 border border-neutral-border transition-colors cursor-pointer"
+                     title="Filter Faulted / Offline Chargers"
+                     onclick="event.stopPropagation(); window.location.href='/chargers?status=offline';">
+                    <span class="text-[9px] font-semibold text-subtext-color flex items-center justify-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-error-500"></span>
                         Faulted
                     </span>
-                    <span class="font-bold text-red-600 font-mono text-xs tabular-nums">{{ connector_statuses.Faulted }}</span>
+                    <span class="font-bold text-error-600 font-mono text-xs tabular-nums">{{ connector_statuses.Faulted }}</span>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Card 3: Total Charging Power -->
-    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+    <div class="dashboard-panel dashboard-panel-clickable p-3.5 flex flex-col justify-between group"
+         role="link"
+         tabindex="0"
+         aria-label="Total Charging Power — View Active Sessions"
+         onclick="if(!event.defaultPrevented){ window.location.href='/sessions?status=active'; }"
+         onkeydown="if(event.key==='Enter'||event.key===' '){ event.preventDefault(); window.location.href='/sessions?status=active'; }">
         <div class="flex items-center justify-between mb-1">
-            <div class="panel-header-title">
+            <div class="panel-header-title group-hover:text-brand-600 transition-colors">
                 <span>Total Charging Power</span>
             </div>
-            <span class="text-xs text-blue-500 inline-flex items-center"><i data-lucide="zap" class="w-4 h-4"></i></span>
+            <span class="text-xs text-brand-500 group-hover:scale-105 inline-flex items-center transition-transform"><i data-lucide="zap" class="w-4 h-4"></i></span>
         </div>
 
         <div>
-            <div class="metric-value-huge text-blue-600 font-mono">{{ current_load_kw }} <span class="text-xs font-normal text-blue-500">kW</span></div>
-            <div class="text-[10px] text-slate-500 mt-0.5">Across {{ actively_charging }} ongoing session(s)</div>
+            <div class="metric-value-huge text-brand-600 font-mono"><span data-kpi-val>{{ current_load_kw }}</span> <span class="text-xs font-normal text-subtext-color">kW</span></div>
+            <div class="text-[10px] text-subtext-color mt-0.5">Across {{ actively_charging }} ongoing session(s)</div>
         </div>
 
-        <div class="pt-2 border-t border-slate-200">
-            <div class="flex justify-between text-[10px] text-slate-500 mb-1">
+        <div class="pt-2 border-t border-neutral-border">
+            <div class="flex justify-between text-[10px] text-subtext-color mb-1">
                 <span>Grid Contract Capacity</span>
-                <span class="font-semibold text-slate-800">{{ grid_contract_pct }}% <span class="text-slate-400 font-normal">({{ grid_contract_kw }} kW)</span></span>
+                <span class="font-semibold text-default-font">{{ grid_contract_pct }}% <span class="text-subtext-color font-normal">({{ grid_contract_kw }} kW)</span></span>
             </div>
-            <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                <div class="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full transition-all duration-500" style="width: {{ grid_contract_pct }}%;"></div>
+            <div class="w-full h-1.5 bg-neutral-200 rounded-full overflow-hidden">
+                <div class="h-full bg-brand-500 rounded-full transition-all duration-500" style="--w: {{ grid_contract_pct }}%; width: var(--w);"></div>
             </div>
         </div>
     </div>
 
     <!-- Card 4: Completed Charging Sessions -->
-    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+    <div class="dashboard-panel dashboard-panel-clickable p-3.5 flex flex-col justify-between group"
+         role="link"
+         tabindex="0"
+         aria-label="Completed Charging Sessions — View Completed Sessions"
+         onclick="if(!event.defaultPrevented){ window.location.href='/sessions?status=completed'; }"
+         onkeydown="if(event.key==='Enter'||event.key===' '){ event.preventDefault(); window.location.href='/sessions?status=completed'; }">
         <div class="flex items-center justify-between mb-1">
-            <div class="panel-header-title">
+            <div class="panel-header-title group-hover:text-brand-600 transition-colors">
                 <span>Completed Charging Sessions</span>
             </div>
-            <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
+            <span class="badge badge-success text-[9px] font-bold">
                 LIVE DB
             </span>
         </div>
 
         <div>
-            <div class="metric-value-huge text-slate-800 font-mono tabular-nums">{{ "{:,}".format(completed_sessions) }} <span class="text-xs font-normal text-slate-500">sessions</span></div>
+            <div class="metric-value-huge text-default-font font-mono tabular-nums"><span data-kpi-val>{{ "{:,}".format(completed_sessions) }}</span> <span class="text-xs font-normal text-subtext-color">sessions</span></div>
         </div>
 
-        <div class="pt-2 border-t border-slate-200 grid grid-cols-2 gap-2">
+        <div class="pt-2 border-t border-neutral-border grid grid-cols-2 gap-2">
             <div>
-                <div class="flex items-center gap-1 text-[10px] text-slate-500 mb-0.5">
-                    <i data-lucide="zap" class="w-3.5 h-3.5 text-blue-500 inline-block"></i> ENERGY
+                <div class="flex items-center gap-1 text-[10px] text-subtext-color mb-0.5">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 text-brand-500 inline-block"></i> ENERGY
                 </div>
-                <div class="text-xs font-bold text-slate-800 font-mono tabular-nums" data-animate-num="true">{{ "{:,.1f}".format(total_energy) }} <span class="text-[9px] font-normal text-slate-500">kWh</span></div>
+                <div class="text-xs font-bold text-default-font font-mono tabular-nums"><span data-kpi-val>{{ "{:,.1f}".format(total_energy) }}</span> <span class="text-[9px] font-normal text-subtext-color">kWh</span></div>
             </div>
             <div>
-                <div class="flex items-center gap-1 text-[10px] text-slate-500 mb-0.5">
-                    <i data-lucide="coins" class="w-3.5 h-3.5 text-emerald-500 inline-block"></i> EST. VALUE
+                <div class="flex items-center gap-1 text-[10px] text-subtext-color mb-0.5">
+                    <i data-lucide="coins" class="w-3.5 h-3.5 text-success-500 inline-block"></i> EST. VALUE
                 </div>
-                <div class="text-xs font-bold text-emerald-600 font-mono tabular-nums" data-animate-num="true">€{{ "{:,.2f}".format(total_energy * 0.45) }}</div>
+                <div class="text-xs font-bold text-success-600 font-mono tabular-nums">€<span data-kpi-val>{{ "{:,.2f}".format(total_energy * 0.45) }}</span></div>
             </div>
         </div>
     </div>
 
     <!-- Card 5: Charging Session Overview -->
-    <div class="dashboard-panel p-3.5 flex flex-col justify-between">
+    <div class="dashboard-panel dashboard-panel-clickable p-3.5 flex flex-col justify-between group"
+         role="link"
+         tabindex="0"
+         aria-label="Charging Session Overview — View All Sessions"
+         onclick="if(!event.defaultPrevented){ window.location.href='/sessions'; }"
+         onkeydown="if(event.key==='Enter'||event.key===' '){ event.preventDefault(); window.location.href='/sessions'; }">
         <div class="flex items-center justify-between mb-1">
-            <div class="panel-header-title">
+            <div class="panel-header-title group-hover:text-brand-600 transition-colors">
                 <span>Charging Session Overview</span>
             </div>
-            <span class="text-xs text-purple-500 inline-flex items-center"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
+            <span class="text-xs text-brand-500 group-hover:scale-105 inline-flex items-center transition-transform"><i data-lucide="trending-up" class="w-4 h-4"></i></span>
         </div>
 
         <div class="space-y-1.5 text-[11px] pt-1">
             <div class="flex items-center justify-between">
-                <span class="text-slate-500">Avg Energy</span>
-                <span class="font-bold text-slate-800 font-mono">{{ avg_energy }} <span class="text-[9px] text-slate-400 font-normal">kWh/sess</span></span>
+                <span class="text-subtext-color">Avg Energy</span>
+                <span class="font-bold text-default-font font-mono">{{ avg_energy }} <span class="text-[9px] text-subtext-color font-normal">kWh/sess</span></span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-slate-500">Avg Duration</span>
-                <span class="font-bold text-slate-800 font-mono">{{ avg_duration }} <span class="text-[9px] text-slate-400 font-normal">min</span></span>
+                <span class="text-subtext-color">Avg Duration</span>
+                <span class="font-bold text-default-font font-mono">{{ avg_duration }} <span class="text-[9px] text-subtext-color font-normal">min</span></span>
             </div>
             <div class="flex items-center justify-between">
-                <span class="text-slate-500">Peak Demand</span>
-                <span class="font-bold text-blue-600 font-mono">{{ max_power }} <span class="text-[9px] text-slate-400 font-normal">kW</span></span>
+                <span class="text-subtext-color">Peak Demand</span>
+                <span class="font-bold text-brand-600 font-mono">{{ max_power }} <span class="text-[9px] text-subtext-color font-normal">kW</span></span>
             </div>
         </div>
 
-        <div class="pt-1.5 border-t border-slate-200 text-[9px] text-slate-500">
-            Active sessions: <span class="text-blue-600 font-bold font-mono">{{ active_sessions }}</span>
+        <div class="pt-1.5 border-t border-neutral-border text-[9px] text-subtext-color flex items-center justify-between">
+            <span>Active sessions: <span class="text-brand-600 font-bold font-mono">{{ active_sessions }}</span></span>
+            <span class="text-[9px] text-brand-600 font-medium hover:underline cursor-pointer" onclick="event.stopPropagation(); window.location.href='/sessions?status=active';">View Active &rarr;</span>
         </div>
     </div>
 

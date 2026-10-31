@@ -7,12 +7,14 @@ EMSPs connect to us to discover locations, pull sessions/CDRs, push tokens.
 import logging
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, Request, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
 
 from config import config
 
 logger = logging.getLogger(__name__)
+
+router = APIRouter()
 
 ocpi_app = FastAPI(
     title="OCPI 2.2.1 — CPO Interface",
@@ -50,7 +52,7 @@ def ocpi_error(status_code: int, message: str):
 async def verify_ocpi_token(request: Request) -> str:
     """Verify the OCPI partner token from Authorization header."""
     auth = request.headers.get("Authorization", "")
-    if not auth.startswith("Token "):
+    if not auth.lower().startswith("token "):
         raise HTTPException(401, "Missing or invalid Authorization header")
 
     token = auth[6:].strip()
@@ -82,7 +84,8 @@ async def _get_base_url() -> str:
     return _base_url()
 
 
-@ocpi_app.get("/ocpi/versions")
+@router.get("/ocpi/versions", tags=["OCPI Discovery"])
+@router.get("/ocpi/versions/", include_in_schema=False)
 async def versions():
     """OCPI versions endpoint — entry point for partners."""
     base = await _get_base_url()
@@ -94,7 +97,9 @@ async def versions():
     ])
 
 
-@ocpi_app.get("/ocpi/2.2.1")
+@router.get("/ocpi/2.2.1", tags=["OCPI Discovery"])
+@router.get("/ocpi/2.2.1/", include_in_schema=False)
+@router.get("/ocpi/2.2.1/details", tags=["OCPI Discovery"])
 async def version_details():
     """OCPI 2.2.1 module endpoints."""
     base = f"{await _get_base_url()}/ocpi/2.2.1"
@@ -120,12 +125,15 @@ from ocpi.cdrs import router as cdrs_router
 from ocpi.tariffs import router as tariffs_router
 from ocpi.tokens import router as tokens_router
 
-ocpi_app.include_router(credentials_router, prefix="/ocpi/2.2.1/credentials", tags=["Credentials"])
-ocpi_app.include_router(locations_router, prefix="/ocpi/2.2.1/locations", tags=["Locations"])
-ocpi_app.include_router(sessions_router, prefix="/ocpi/2.2.1/sessions", tags=["Sessions"])
-ocpi_app.include_router(cdrs_router, prefix="/ocpi/2.2.1/cdrs", tags=["CDRs"])
-ocpi_app.include_router(tariffs_router, prefix="/ocpi/2.2.1/tariffs", tags=["Tariffs"])
-ocpi_app.include_router(tokens_router, prefix="/ocpi/2.2.1/tokens", tags=["Tokens"])
+router.include_router(credentials_router, prefix="/ocpi/2.2.1/credentials", tags=["OCPI Credentials"])
+router.include_router(locations_router, prefix="/ocpi/2.2.1/locations", tags=["OCPI Locations"])
+router.include_router(sessions_router, prefix="/ocpi/2.2.1/sessions", tags=["OCPI Sessions"])
+router.include_router(cdrs_router, prefix="/ocpi/2.2.1/cdrs", tags=["OCPI CDRs"])
+router.include_router(tariffs_router, prefix="/ocpi/2.2.1/tariffs", tags=["OCPI Tariffs"])
+router.include_router(tokens_router, prefix="/ocpi/2.2.1/tokens", tags=["OCPI Tokens"])
+
+# Also attach router to ocpi_app for standalone or backwards-compatible usage
+ocpi_app.include_router(router)
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────

@@ -7,6 +7,7 @@ Consumes OCPP Core via REST API only — no direct DB or Redis access.
 Route modules live in routes/. Shared helpers in shared.py.
 """
 import os
+import copy
 import logging
 
 import uvicorn
@@ -15,7 +16,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from shared import APP_TITLE, verify_session, get_setup_status
+from shared import APP_TITLE, verify_session, get_setup_status, current_user_ctx
 
 # Route modules
 from routes.dashboard import router as dashboard_router
@@ -39,6 +40,7 @@ from routes.auth import router as auth_router
 from routes.setup import router as setup_router
 from routes.updates import router as updates_router
 from routes.backup import router as backup_router
+from routes.search import router as search_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -62,8 +64,14 @@ class AuthMiddleware(BaseHTTPMiddleware):
             logger.warning("AuthMiddleware: redirecting to /login from %s", path)
             return RedirectResponse("/login", status_code=302)
 
-        request.state.user = user
-        return await call_next(request)
+        # Clone user identity strictly into per-request state and ContextVar (SEC-01)
+        cloned_user = copy.deepcopy(user) if isinstance(user, dict) else dict(user)
+        request.state.user = cloned_user
+        token = current_user_ctx.set(cloned_user)
+        try:
+            return await call_next(request)
+        finally:
+            current_user_ctx.reset(token)
 
 
 class SetupCheckMiddleware(BaseHTTPMiddleware):
@@ -93,7 +101,10 @@ class SetupCheckMiddleware(BaseHTTPMiddleware):
 app = FastAPI(title=APP_TITLE, docs_url=None, redoc_url=None)
 app.add_middleware(AuthMiddleware)
 app.add_middleware(SetupCheckMiddleware)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+_static_dir = os.path.join(os.path.dirname(__file__), "static")
+if not os.path.exists(_static_dir):
+    _static_dir = "static"
+app.mount("/static", StaticFiles(directory=_static_dir), name="static")
 
 # Register all route modules
 app.include_router(dashboard_router)
@@ -117,19 +128,25 @@ app.include_router(auth_router)
 app.include_router(setup_router)
 app.include_router(updates_router)
 app.include_router(backup_router)
+app.include_router(search_router)
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    from shared import close_http_client
+    await close_http_client()
 
 
 # ── Health Endpoint ──────────────────────────────────────────────────────────
 @app.get("/health")
 async def health():
     """Liveness check — verifies the service is running and core API is reachable."""
-    from shared import CORE_API
-    import httpx
+    from shared import CORE_API, get_http_client
     core_ok = False
     try:
-        async with httpx.AsyncClient(timeout=3) as client:
-            r = await client.get(f"{CORE_API}/health")
-            core_ok = r.status_code == 200
+        client = get_http_client()
+        r = await client.get(f"{CORE_API}/health")
+        core_ok = r.status_code == 200
     except Exception:
         pass
     return {

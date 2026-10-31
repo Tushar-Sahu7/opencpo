@@ -3,12 +3,15 @@
 {% block title %}Invoices — CPO Admin{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-6">
-  <h1 class="text-2xl font-bold text-gray-100">Invoices
-    <span class="text-gray-500 text-lg">({{ invoices|length }})</span>
-  </h1>
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl font-bold">Invoices
+      <span class="text-subtext-color text-lg">({{ invoices|length }})</span>
+    </h1>
+    <p class="text-xs text-subtext-color mt-1 mb-0 leading-normal">Billing statements and accounting records generated for fleet and customer accounts.</p>
+  </div>
   <button onclick="openModal('modal-generate')"
-    class="px-4 py-2 bg-brand-green hover:opacity-90 text-black font-bold rounded text-sm transition-opacity">
+    class="btn btn-primary text-xs py-1.5 px-3">
     + Generate Invoice
   </button>
 </div>
@@ -16,12 +19,12 @@
 <div id="feedback" class="mb-4"></div>
 
 <!-- Filter bar -->
-<div class="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-4 flex flex-wrap gap-3 items-end">
+<div class="card p-4 mb-4">
   <form method="get" action="/invoices" class="flex flex-wrap gap-3 items-end w-full">
     <div>
-      <label class="block text-xs text-gray-500 mb-1">Group</label>
+      <label class="block text-xs text-subtext-color mb-1">Group</label>
       <select name="group_id" onchange="this.form.submit()"
-        class="bg-gray-800 border border-gray-700 rounded px-3 pr-8 py-2 text-sm text-gray-200 min-w-[140px] focus:border-brand-blue focus:outline-none">
+        class="select min-w-[150px] text-sm">
         <option value="">All Groups</option>
         {% for g in groups %}
         <option value="{{ g.id }}" {% if request.query_params.get('group_id') == g.id %}selected{% endif %}>
@@ -31,9 +34,9 @@
       </select>
     </div>
     <div>
-      <label class="block text-xs text-gray-500 mb-1">Status</label>
+      <label class="block text-xs text-subtext-color mb-1">Status</label>
       <select name="status" onchange="this.form.submit()"
-        class="bg-gray-800 border border-gray-700 rounded px-3 pr-8 py-2 text-sm text-gray-200 min-w-[140px] focus:border-brand-blue focus:outline-none">
+        class="select min-w-[150px] text-sm">
         <option value="">All Statuses</option>
         {% for s in ['draft','sent','collecting','paid','failed','overdue'] %}
         <option value="{{ s }}" {% if request.query_params.get('status') == s %}selected{% endif %}>
@@ -43,7 +46,7 @@
       </select>
     </div>
     {% if request.query_params.get('group_id') or request.query_params.get('status') %}
-    <a href="/invoices" class="px-3 py-2 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-400 border border-gray-700 inline-flex items-center gap-1">
+    <a href="/invoices" class="btn btn-outline text-xs py-1.5 px-3 inline-flex items-center gap-1">
       <i data-lucide="x" class="w-3.5 h-3.5"></i> Clear filters
     </a>
     {% endif %}
@@ -51,10 +54,10 @@
 </div>
 
 <!-- Invoices table -->
-<div class="bg-gray-900 border border-gray-800 rounded-xl overflow-hidden">
+<div class="card overflow-hidden mb-6">
   <table class="w-full text-sm">
     <thead>
-      <tr class="border-b border-gray-800 text-[10px] tracking-widest text-gray-500 uppercase">
+      <tr class="border-b border-neutral-border text-[10px] tracking-widest text-subtext-color uppercase">
         <th class="p-4 text-left">Invoice #</th>
         <th class="p-4 text-left">Group</th>
         <th class="p-4 text-left">Period</th>
@@ -69,59 +72,59 @@
     <tbody>
     {% for inv in invoices %}
     {% set status = inv.status | default('draft') %}
-    <tr class="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+    <tr class="border-b border-neutral-border hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
       <td class="p-4">
-        <a href="#" class="font-mono text-brand-blue hover:underline text-xs">
+        <a href="#" class="font-mono text-brand-600 dark:text-brand-400 hover:underline text-xs font-semibold">
           {{ inv.invoice_number or inv.id[:8] }}
         </a>
       </td>
-      <td class="p-4 text-sm text-gray-300">{{ inv.group_name or inv.group_id or '—' }}</td>
-      <td class="p-4 text-xs text-gray-400">
-        {{ (inv.period_start or '')[:7] }} – {{ (inv.period_end or '')[:7] }}
+      <td class="p-4 text-sm text-default-font">{{ inv.group_name or inv.group_id or '—' }}</td>
+      <td class="p-4 text-xs text-subtext-color font-mono">
+        {{ (inv.period_start or '')[:7] }} — {{ (inv.period_end or '')[:7] }}
       </td>
-      <td class="p-4 text-right font-mono text-gray-300" style="font-family:'SF Mono',Monaco,monospace">
-        € {{ '%.2f'|format(inv.subtotal or 0) | replace('.', ',') | replace(',', '.', 1) | replace('.', ',') }}
+      <td class="p-4 text-right font-mono text-default-font">
+        € {{ '%.2f'|format(inv.subtotal or 0) }}
       </td>
-      <td class="p-4 text-right font-mono text-gray-400" style="font-family:'SF Mono',Monaco,monospace">
-        € {{ '%.2f'|format(inv.vat_amount or 0) | replace('.', ',') | replace(',', '.', 1) | replace('.', ',') }}
+      <td class="p-4 text-right font-mono text-subtext-color">
+        € {{ '%.2f'|format(inv.vat_amount or 0) }}
       </td>
-      <td class="p-4 text-right font-mono text-gray-100 font-semibold" style="font-family:'SF Mono',Monaco,monospace">
-        € {{ '%.2f'|format(inv.total or 0) | replace('.', ',') | replace(',', '.', 1) | replace('.', ',') }}
+      <td class="p-4 text-right font-mono text-default-font font-semibold">
+        € {{ '%.2f'|format(inv.total or 0) }}
       </td>
       <td class="p-4">
         {% if status == 'draft' %}
-          <span class="px-2 py-0.5 bg-gray-700 text-gray-300 rounded-full text-xs font-medium">Draft</span>
+          <span class="badge badge-neutral">Draft</span>
         {% elif status == 'sent' %}
-          <span class="px-2 py-0.5 bg-blue-900 text-blue-300 rounded-full text-xs font-medium">Sent</span>
+          <span class="badge badge-brand">Sent</span>
         {% elif status == 'collecting' %}
-          <span class="px-2 py-0.5 bg-yellow-900 text-yellow-300 rounded-full text-xs font-medium">Collecting</span>
+          <span class="badge badge-warning">Collecting</span>
         {% elif status == 'paid' %}
-          <span class="px-2 py-0.5 bg-green-900 text-green-300 rounded-full text-xs font-medium">Paid</span>
+          <span class="badge badge-success"><span class="status-dot status-dot-green"></span>Paid</span>
         {% elif status == 'failed' %}
-          <span class="px-2 py-0.5 bg-red-900 text-red-300 rounded-full text-xs font-medium">Failed</span>
+          <span class="badge badge-error">Failed</span>
         {% elif status == 'overdue' %}
-          <span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background:#7c2d12;color:#fed7aa;">Overdue</span>
+          <span class="badge badge-error">Overdue</span>
         {% elif status == 'cancelled' %}
-          <span class="px-2 py-0.5 bg-gray-800 text-gray-500 rounded-full text-xs font-medium">Cancelled</span>
+          <span class="badge badge-neutral">Cancelled</span>
         {% else %}
-          <span class="px-2 py-0.5 bg-gray-800 text-gray-500 rounded-full text-xs">{{ status }}</span>
+          <span class="badge badge-neutral">{{ status }}</span>
         {% endif %}
       </td>
-      <td class="p-4 text-xs text-gray-400">{{ (inv.due_date or '')[:10] or '—' }}</td>
+      <td class="p-4 text-xs text-subtext-color font-mono">{{ inv.due_date|format_date }}</td>
       <td class="p-4">
-        <div class="flex gap-1 justify-end flex-wrap">
+        <div class="flex gap-1.5 justify-end flex-wrap items-center">
           <!-- PDF download — always shown -->
           <a href="{{ CORE_API | default('http://127.0.0.1:8000') }}/api/v1/invoices/{{ inv.id }}/pdf"
              target="_blank"
              title="Download PDF"
-             class="px-2 py-1 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-300 transition-colors inline-flex items-center">
+             class="btn btn-outline text-xs py-1 px-2">
             <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
           </a>
           {% if status in ('draft', 'sent') %}
           <!-- Send -->
           <form method="post" action="/invoices/{{ inv.id }}/send" style="display:inline">
             <button type="submit" title="Send Invoice"
-              class="px-2 py-1 bg-blue-900/50 hover:bg-blue-800 rounded text-xs text-blue-300 transition-colors inline-flex items-center">
+              class="btn btn-outline text-xs py-1 px-2 text-brand-600 border-brand-200 hover:bg-brand-50">
               <i data-lucide="mail" class="w-3.5 h-3.5"></i>
             </button>
           </form>
@@ -131,7 +134,7 @@
           <form method="post" action="/invoices/{{ inv.id }}/collect" style="display:inline"
                 onsubmit="return confirm('Trigger SEPA collection for invoice {{ inv.invoice_number or inv.id[:8] }}?')">
             <button type="submit" title="Collect (SEPA)"
-              class="px-2 py-1 bg-yellow-900/50 hover:bg-yellow-800 rounded text-xs text-yellow-300 transition-colors inline-flex items-center">
+              class="btn btn-outline text-xs py-1 px-2 text-warning-600 border-warning-200 hover:bg-warning-50">
               <i data-lucide="credit-card" class="w-3.5 h-3.5"></i>
             </button>
           </form>
@@ -139,7 +142,7 @@
           <form method="post" action="/invoices/{{ inv.id }}/mark-paid" style="display:inline"
                 onsubmit="return confirm('Mark invoice {{ inv.invoice_number or inv.id[:8] }} as paid?')">
             <button type="submit" title="Mark as Paid"
-              class="px-2 py-1 bg-green-900/50 hover:bg-green-800 rounded text-xs text-green-300 transition-colors inline-flex items-center">
+              class="btn btn-outline text-xs py-1 px-2 text-success-600 border-success-200 hover:bg-success-50">
               <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
             </button>
           </form>
@@ -149,9 +152,9 @@
     </tr>
     {% else %}
     <tr>
-      <td colspan="9" class="p-10 text-center text-gray-500 text-sm">
+      <td colspan="9" class="p-10 text-center text-subtext-color text-sm">
         No invoices found.
-        <button onclick="openModal('modal-generate')" class="ml-2 text-brand-blue hover:underline">Generate one →</button>
+        <button onclick="openModal('modal-generate')" class="ml-2 text-brand-600 dark:text-brand-400 hover:underline">Generate one &rarr;</button>
       </td>
     </tr>
     {% endfor %}
@@ -160,46 +163,41 @@
 </div>
 
 <!-- Generate Invoice Modal -->
-<div id="modal-generate" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-  <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-md shadow-2xl">
+<div id="modal-generate" class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+  <div class="card p-6 w-full max-w-md shadow-2xl text-default-font">
     <div class="flex justify-between items-center mb-5">
-      <h3 class="font-semibold text-gray-100">Generate Invoice</h3>
-      <button onclick="closeModal('modal-generate')" class="text-gray-500 hover:text-gray-300 p-1 rounded"><i data-lucide="x" class="w-5 h-5"></i></button>
+      <h3 class="font-semibold text-default-font">Generate Invoice</h3>
+      <button onclick="closeModal('modal-generate')" class="text-subtext-color hover:text-default-font p-1 rounded inline-flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
     </div>
     <form action="/invoices/generate" method="post" class="space-y-4">
       <div>
-        <label class="block text-xs text-gray-400 mb-1">Group *</label>
-        <select name="group_id" required
-          class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:border-brand-blue focus:outline-none">
+        <label class="block text-xs text-subtext-color mb-1">Group *</label>
+        <select name="group_id" required class="select w-full text-sm">
           <option value="">— Select group —</option>
           {% for g in groups %}
           <option value="{{ g.id }}">{{ g.name }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs text-gray-400 mb-1">Period Start *</label>
-          <input name="period_start" type="date" required
-            class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:border-brand-blue focus:outline-none">
+          <label class="block text-xs text-subtext-color mb-1">Period Start *</label>
+          <input name="period_start" type="date" required class="input w-full text-sm">
         </div>
         <div>
-          <label class="block text-xs text-gray-400 mb-1">Period End *</label>
-          <input name="period_end" type="date" required
-            class="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-sm text-gray-200 focus:border-brand-blue focus:outline-none">
+          <label class="block text-xs text-subtext-color mb-1">Period End *</label>
+          <input name="period_end" type="date" required class="input w-full text-sm">
         </div>
       </div>
-      <div class="p-3 rounded-lg bg-gray-800/60 border border-gray-700 text-xs text-gray-400 flex items-start gap-2">
-        <i data-lucide="info" class="w-4 h-4 text-brand-blue flex-shrink-0 mt-0.5"></i>
+      <div class="card bg-neutral-50 dark:bg-neutral-800/40 border border-neutral-border p-3 text-xs flex items-start gap-2">
+        <i data-lucide="info" class="w-4 h-4 text-brand-500 flex-shrink-0 mt-0.5"></i>
         <span>Invoice will be generated from all unbilled CDRs in the selected period for this group. Includes BTW 21%. Invoice is created as Draft — review before sending.</span>
       </div>
-      <div class="flex gap-3 pt-1">
-        <button type="button" onclick="closeModal('modal-generate')"
-          class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded text-sm text-gray-300 transition-colors">
+      <div class="flex gap-3 pt-2">
+        <button type="button" onclick="closeModal('modal-generate')" class="btn btn-outline flex-1 py-2">
           Cancel
         </button>
-        <button type="submit"
-          class="flex-1 px-4 py-2.5 bg-brand-blue hover:opacity-90 text-white font-bold rounded text-sm transition-opacity">
+        <button type="submit" class="btn btn-primary flex-1 py-2">
           Generate Invoice
         </button>
       </div>
@@ -208,9 +206,6 @@
 </div>
 
 <script>
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-
 // Pre-fill period for current month
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
